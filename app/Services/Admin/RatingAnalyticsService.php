@@ -11,14 +11,13 @@ use App\Models\Vehicle;
 use App\Support\Admin\RatingReportFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class RatingAnalyticsService
 {
     public function dashboard(RatingReportFilters $filters): array
     {
         $ratings = $this->ratings($filters)->with(['branch', 'driver', 'vehicle'])->latest('submitted_at')->get();
-        $ratingAnswers = $this->ratingAnswers($filters)->with(['rating.driver', 'rating.vehicle', 'rating.branch', 'question'])->get();
+        $ratingAnswers = $this->ratingAnswers($filters)->with(['rating.driver.branch', 'rating.vehicle.branch', 'rating.branch', 'question'])->get();
         $driverRatingAnswers = $ratingAnswers->where('question.target_type', Question::TARGET_DRIVER);
         $vehicleRatingAnswers = $ratingAnswers->where('question.target_type', Question::TARGET_VEHICLE);
 
@@ -112,12 +111,14 @@ class RatingAnalyticsService
     private function value(RatingAnswer $answer): ?int
     {
         $value = $answer->answer_value[0] ?? null;
+
         return in_array((int) $value, [1, 2, 3, 4, 5], true) ? (int) $value : null;
     }
 
     private function average(Collection $answers): ?float
     {
         $values = $answers->map(fn ($answer) => $this->value($answer))->filter(fn ($value) => $value !== null);
+
         return $values->isEmpty() ? null : round($values->avg(), 2);
     }
 
@@ -126,8 +127,11 @@ class RatingAnalyticsService
         $base = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
         foreach ($answers as $answer) {
             $value = $this->value($answer);
-            if ($value !== null) $base[$value]++;
+            if ($value !== null) {
+                $base[$value]++;
+            }
         }
+
         return $base;
     }
 
@@ -145,6 +149,7 @@ class RatingAnalyticsService
     {
         return $ratings->groupBy('branch_id')->map(function ($items, $branchId) use ($answers) {
             $branchAnswers = $answers->filter(fn ($answer) => $answer->rating?->branch_id === (int) $branchId);
+
             return ['branch' => $items->first()->branch?->name ?? '-', 'total' => $items->count(), 'average' => $this->average($branchAnswers)];
         })->sortByDesc('total')->values();
     }
@@ -153,6 +158,7 @@ class RatingAnalyticsService
     {
         return $answers->filter(fn ($answer) => $answer->rating?->driver)->groupBy(fn ($answer) => $answer->rating->driver_id)->map(function ($items) {
             $driver = $items->first()->rating->driver;
+
             return ['name' => $driver->full_name, 'branch' => $driver->branch?->name, 'total' => $items->pluck('rating_id')->unique()->count(), 'average' => $this->average($items), 'distribution' => $this->distribution($items)];
         })->sortByDesc(fn ($row) => [$row['average'] ?? 0, $row['total']])->values();
     }
@@ -161,6 +167,7 @@ class RatingAnalyticsService
     {
         return $answers->filter(fn ($answer) => $answer->rating?->vehicle)->groupBy(fn ($answer) => $answer->rating->vehicle_id)->map(function ($items) {
             $vehicle = $items->first()->rating->vehicle;
+
             return ['name' => $vehicle->police_number, 'branch' => $vehicle->branch?->name, 'label' => trim($vehicle->brand.' '.$vehicle->model), 'total' => $items->pluck('rating_id')->unique()->count(), 'average' => $this->average($items), 'distribution' => $this->distribution($items)];
         })->sortByDesc(fn ($row) => [$row['average'] ?? 0, $row['total']])->values();
     }

@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BranchRequest;
 use App\Models\Branch;
+use App\Models\Driver;
+use App\Models\Vehicle;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class BranchController extends Controller
@@ -36,7 +39,7 @@ class BranchController extends Controller
 
     public function create(): View
     {
-        return view('admin.branches.create', ['branch' => new Branch()]);
+        return view('admin.branches.create', ['branch' => new Branch]);
     }
 
     public function store(BranchRequest $request): RedirectResponse
@@ -74,21 +77,36 @@ class BranchController extends Controller
 
     public function toggleStatus(Branch $branch): RedirectResponse
     {
-        $branch->update(['status' => $branch->status === Branch::STATUS_ACTIVE ? Branch::STATUS_INACTIVE : Branch::STATUS_ACTIVE]);
+        if ($branch->status === Branch::STATUS_ACTIVE) {
+            $this->deactivateWithDependents($branch);
 
-        return back()->with('status', 'Status cabang berhasil diperbarui.');
+            return back()->with('status', 'Unit kerja, driver, dan kendaraan terkait berhasil dinonaktifkan.');
+        }
+
+        $branch->update(['status' => Branch::STATUS_ACTIVE]);
+
+        return back()->with('status', 'Status unit kerja berhasil diaktifkan. Driver dan kendaraan tetap perlu diaktifkan secara terpisah.');
     }
 
     public function destroy(Branch $branch): RedirectResponse
     {
         if ($branch->drivers()->exists() || $branch->vehicles()->exists() || $branch->ratings()->exists()) {
-            $branch->update(['status' => Branch::STATUS_INACTIVE]);
+            $this->deactivateWithDependents($branch);
 
-            return back()->with('status', 'Cabang sudah punya data terkait, jadi dinonaktifkan.');
+            return back()->with('status', 'Unit kerja sudah punya data terkait, jadi unit kerja beserta driver dan kendaraannya dinonaktifkan.');
         }
 
         $branch->delete();
 
         return redirect()->route('admin.branches.index')->with('status', 'Cabang berhasil dihapus.');
+    }
+
+    private function deactivateWithDependents(Branch $branch): void
+    {
+        DB::transaction(function () use ($branch): void {
+            $branch->update(['status' => Branch::STATUS_INACTIVE]);
+            $branch->drivers()->update(['status' => Driver::STATUS_INACTIVE]);
+            $branch->vehicles()->update(['status' => Vehicle::STATUS_INACTIVE]);
+        });
     }
 }

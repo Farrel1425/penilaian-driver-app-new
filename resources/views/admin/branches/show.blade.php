@@ -23,7 +23,7 @@
             <div class="form-actions stack-actions">
                 <a class="primary-button" href="{{ route('admin.branches.edit', ['branch' => $branch, 'return_to' => 'detail']) }}">Edit</a>
                 <form method="POST" action="{{ route('admin.branches.toggle-status', $branch) }}">@csrf @method('PATCH')<button class="secondary-button" type="submit">{{ $branch->status === 'active' ? 'Nonaktifkan' : 'Aktifkan' }}</button></form>
-                <form method="POST" action="{{ route('admin.branches.destroy', $branch) }}">@csrf @method('DELETE')<button class="danger-button" type="submit">Hapus</button></form>
+                <form method="POST" action="{{ route('admin.branches.destroy', $branch) }}" data-delete-confirm data-no-loading data-delete-name="Unit kerja {{ $branch->name }}" data-delete-description="Jika unit kerja ini memiliki data terkait, unit kerja beserta driver dan kendaraannya akan dinonaktifkan.">@csrf @method('DELETE')<button class="danger-button" type="submit">Hapus</button></form>
             </div>
         </x-admin.panel>
     </div>

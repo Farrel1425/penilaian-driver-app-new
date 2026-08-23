@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
 use App\Services\VehicleQrCodeService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 
@@ -31,7 +32,7 @@ class VehicleQrController extends Controller
         ]);
     }
 
-    public function print(Vehicle $vehicle, VehicleQrCodeService $qrCode): View
+    public function print(Request $request, Vehicle $vehicle, VehicleQrCodeService $qrCode): View
     {
         $vehicle->load('branch');
 
@@ -39,6 +40,7 @@ class VehicleQrController extends Controller
             'vehicle' => $vehicle,
             'qrDataUri' => $qrCode->dataUri($vehicle, size: 420),
             'qrUrl' => $qrCode->vehicleUrl($vehicle),
+            'printFormat' => $request->string('format')->toString() === 'label' ? 'label' : 'a4',
         ]);
     }
 }

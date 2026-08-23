@@ -3,6 +3,9 @@
     'label',
     'value' => null,
     'folder' => 'images',
+    'aspectRatio' => 1,
+    'cropLabel' => '1:1',
+    'variant' => null,
 ])
 
 @php
@@ -12,7 +15,11 @@
         : null;
 @endphp
 
-<div class="image-cropper-field" data-image-cropper>
+<div {{ $attributes }} @class([
+    'image-cropper-field',
+    'image-cropper-field--document' => (float) $aspectRatio !== 1.0,
+    'image-cropper-field--vehicle' => $variant === 'vehicle',
+]) data-image-cropper data-image-cropper-ratio="{{ $aspectRatio }}">
     <div class="image-cropper-label-row">
         <label for="{{ $inputId }}">{{ $label }}</label>
         <span>Opsional</span>
@@ -67,7 +74,7 @@
             </div>
 
             <div class="image-cropper-controls" data-cropper-controls>
-                <span class="image-cropper-ratio-label">Crop 1:1</span>
+                <span class="image-cropper-ratio-label">Crop {{ $cropLabel }}</span>
                 <label for="{{ $inputId }}-zoom">Zoom</label>
                 <input id="{{ $inputId }}-zoom" type="range" min="-0.3" max="0.7" value="0" step="0.01" data-cropper-zoom>
                 <button type="button" class="image-cropper-text-button" data-cropper-reset>Atur Ulang</button>

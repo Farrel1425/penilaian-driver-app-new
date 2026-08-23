@@ -6,6 +6,8 @@ use App\Models\Question;
 use App\Models\RatingAnswer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class QuestionManagementTest extends TestCase
@@ -34,6 +36,37 @@ class QuestionManagementTest extends TestCase
 
         $this->assertSame(Question::TYPE_RATING, $question->answer_type);
         $this->assertCount(0, $question->options);
+    }
+
+    public function test_admin_can_store_question_display_settings_and_icon(): void
+    {
+        Storage::fake('public');
+        $this->actingAs(User::factory()->create());
+
+        $this->post(route('admin.questions.store'), [
+            'question' => 'Bagaimana keramahan driver?',
+            'indicator' => 'Sikap & Etika',
+            'instruction' => 'Berikan penilaian berdasarkan pengalaman perjalanan Anda.',
+            'placeholder' => 'Pilih rating dari 1 sampai 5',
+            'rating_min_label' => 'Sangat Buruk',
+            'rating_max_label' => 'Sangat Baik',
+            'icon' => UploadedFile::fake()->image('keramahan.png', 240, 240),
+            'target_type' => Question::TARGET_DRIVER,
+            'answer_type' => Question::TYPE_RATING,
+            'is_required' => '1',
+            'weight' => 100,
+            'sort_order' => 1,
+            'status' => Question::STATUS_ACTIVE,
+        ])->assertRedirect();
+
+        $question = Question::query()->where('question', 'Bagaimana keramahan driver?')->firstOrFail();
+
+        $this->assertSame('Berikan penilaian berdasarkan pengalaman perjalanan Anda.', $question->instruction);
+        $this->assertSame('Pilih rating dari 1 sampai 5', $question->placeholder);
+        $this->assertSame('Sangat Buruk', $question->rating_min_label);
+        $this->assertSame('Sangat Baik', $question->rating_max_label);
+        $this->assertNotNull($question->icon_path);
+        Storage::disk('public')->assertExists($question->icon_path);
     }
 
     public function test_admin_can_manage_multiple_choice_options(): void

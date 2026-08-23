@@ -39,13 +39,14 @@ class DriverController extends Controller
 
     public function create(): View
     {
-        return view('admin.drivers.create', ['driver' => new Driver(), 'branches' => Branch::query()->orderBy('name')->get()]);
+        return view('admin.drivers.create', ['driver' => new Driver, 'branches' => Branch::query()->orderBy('name')->get()]);
     }
 
     public function store(DriverRequest $request): RedirectResponse
     {
-        $data = $request->safe()->except('photo');
-        $data['photo'] = $this->storePhoto($request);
+        $data = $request->safe()->except(['photo', 'sim_photo']);
+        $data['photo'] = $this->storeImage($request, 'photo', 'drivers');
+        $data['sim_photo'] = $this->storeImage($request, 'sim_photo', 'driver-sims');
 
         $driver = Driver::query()->create($data);
 
@@ -70,11 +71,16 @@ class DriverController extends Controller
 
     public function update(DriverRequest $request, Driver $driver): RedirectResponse
     {
-        $data = $request->safe()->except('photo');
+        $data = $request->safe()->except(['photo', 'sim_photo']);
 
         if ($request->hasFile('photo')) {
             $this->deletePhoto($driver->photo);
-            $data['photo'] = $this->storePhoto($request);
+            $data['photo'] = $this->storeImage($request, 'photo', 'drivers');
+        }
+
+        if ($request->hasFile('sim_photo')) {
+            $this->deletePhoto($driver->sim_photo);
+            $data['sim_photo'] = $this->storeImage($request, 'sim_photo', 'driver-sims');
         }
 
         $driver->update($data);
@@ -102,15 +108,16 @@ class DriverController extends Controller
         }
 
         $this->deletePhoto($driver->photo);
+        $this->deletePhoto($driver->sim_photo);
         $driver->delete();
 
         return redirect()->route('admin.drivers.index')->with('status', 'Driver berhasil dihapus.');
     }
 
-    private function storePhoto(DriverRequest $request): ?string
+    private function storeImage(DriverRequest $request, string $input, string $directory): ?string
     {
-        return $request->hasFile('photo')
-            ? $request->file('photo')->store('drivers', 'public')
+        return $request->hasFile($input)
+            ? $request->file($input)->store($directory, 'public')
             : null;
     }
 

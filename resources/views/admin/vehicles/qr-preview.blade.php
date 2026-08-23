@@ -9,13 +9,19 @@
                 <img src="{{ $qrDataUri }}" alt="QR {{ $vehicle->police_number }}">
                 <strong>{{ $vehicle->police_number }}</strong>
                 <span>{{ $vehicle->brand }} {{ $vehicle->model }}</span>
-                <code>{{ $qrUrl }}</code>
             </div>
             <div class="detail-grid">
                 <x-admin.detail-row label="Cabang" :value="$vehicle->branch?->name" />
                 <x-admin.detail-row label="Status Kendaraan" :value="$vehicle->status === 'active' ? 'Aktif' : 'Nonaktif'" />
-                <x-admin.detail-row label="Token" :value="$vehicle->qr_token" />
             </div>
+            <form class="qr-print-settings" method="GET" action="{{ route('admin.vehicles.qr.print', $vehicle) }}" target="_blank">
+                <label for="qr-print-format">Atur cetak</label>
+                <select id="qr-print-format" name="format">
+                    <option value="a4">A4</option>
+                    <option value="label">Label QR kecil</option>
+                </select>
+                <button class="primary-button" type="submit"><x-lucide-printer aria-hidden="true" /><span>Buka preview cetak</span></button>
+            </form>
         </div>
     </x-admin.panel>
 </x-layouts.admin>

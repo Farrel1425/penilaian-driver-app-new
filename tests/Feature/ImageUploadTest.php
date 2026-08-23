@@ -24,15 +24,23 @@ class ImageUploadTest extends TestCase
         $this->post(route('admin.drivers.store'), [
             'branch_id' => $branch->id,
             'full_name' => 'Driver Dengan Foto',
+            'birth_place' => 'Denpasar',
+            'birth_date' => '1990-01-01',
+            'gender' => 'male',
+            'address' => 'Jalan Contoh 1',
+            'phone' => '081234567890',
             'join_date' => '2026-01-01',
             'photo' => UploadedFile::fake()->image('driver.jpg', 800, 1000),
+            'sim_photo' => UploadedFile::fake()->image('sim.jpg', 900, 600),
             'status' => Driver::STATUS_ACTIVE,
         ])->assertRedirect();
 
         $driver = Driver::query()->where('full_name', 'Driver Dengan Foto')->firstOrFail();
 
         $this->assertStringStartsWith('drivers/', $driver->photo);
+        $this->assertStringStartsWith('driver-sims/', $driver->sim_photo);
         Storage::disk('public')->assertExists($driver->photo);
+        Storage::disk('public')->assertExists($driver->sim_photo);
     }
 
     public function test_admin_can_replace_vehicle_photo_and_old_file_is_removed(): void
@@ -41,7 +49,8 @@ class ImageUploadTest extends TestCase
         $this->actingAs(User::factory()->create());
         $branch = Branch::factory()->create();
         $oldPhoto = UploadedFile::fake()->image('old.jpg')->store('vehicles', 'public');
-        $vehicle = Vehicle::factory()->for($branch)->create(['photo' => $oldPhoto]);
+        $oldInterior = UploadedFile::fake()->image('old-interior.jpg')->store('vehicles/interior', 'public');
+        $vehicle = Vehicle::factory()->for($branch)->create(['photo' => $oldPhoto, 'interior_photo' => $oldInterior]);
 
         $this->put(route('admin.vehicles.update', $vehicle), [
             'branch_id' => $branch->id,
@@ -50,12 +59,16 @@ class ImageUploadTest extends TestCase
             'model' => $vehicle->model,
             'status' => Vehicle::STATUS_ACTIVE,
             'photo' => UploadedFile::fake()->image('new.jpg', 1600, 900),
+            'interior_photo' => UploadedFile::fake()->image('new-interior.jpg', 1600, 900),
         ])->assertRedirect(route('admin.vehicles.index'));
 
         $vehicle->refresh();
 
         Storage::disk('public')->assertMissing($oldPhoto);
+        Storage::disk('public')->assertMissing($oldInterior);
         $this->assertStringStartsWith('vehicles/', $vehicle->photo);
+        $this->assertStringStartsWith('vehicles/interior/', $vehicle->interior_photo);
         Storage::disk('public')->assertExists($vehicle->photo);
+        Storage::disk('public')->assertExists($vehicle->interior_photo);
     }
 }

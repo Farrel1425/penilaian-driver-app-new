@@ -47,6 +47,15 @@
             </x-admin.select>
         </div>
 
+        <div class="form-section-title">Pengaturan Tampilan</div>
+        <div class="form-grid">
+            <x-admin.textarea label="Deskripsi / Petunjuk" name="instruction" :value="$question->instruction" data-question-instruction />
+            <x-admin.field label="Placeholder" name="placeholder" :value="$question->placeholder" data-question-placeholder />
+            <x-admin.field label="Label Skala 1" name="rating_min_label" :value="old('rating_min_label', $question->rating_min_label ?: 'Sangat Buruk')" data-question-rating-min />
+            <x-admin.field label="Label Skala 5" name="rating_max_label" :value="old('rating_max_label', $question->rating_max_label ?: 'Sangat Baik')" data-question-rating-max />
+            <x-admin.image-cropper label="Ikon / Gambar Pertanyaan" name="icon" :value="$question->icon_path" data-question-icon-cropper />
+        </div>
+
         <aside class="question-weight-summary" data-weight-summary data-driver-base="{{ $driverBaseWeight }}" data-vehicle-base="{{ $vehicleBaseWeight }}">
             <div>
                 <span>Bobot {{ old('target_type', $question->target_type ?? App\Models\Question::TARGET_DRIVER) === App\Models\Question::TARGET_DRIVER ? 'Driver' : 'Kendaraan' }}</span>
@@ -81,5 +90,7 @@
         </div>
     </div>
 
-    <x-admin.question-preview :question="$question" :options="$question->exists ? $question->options : collect()" />
+    <x-admin.panel title="Preview & Aksi" class="question-preview-panel">
+        <x-admin.question-preview :question="$question" :options="$question->exists ? $question->options : collect()" />
+    </x-admin.panel>
 </div>

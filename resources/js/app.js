@@ -48,17 +48,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.querySelector('[data-app-loading]');
+    let loadingTimer;
 
     if (!loadingOverlay) {
         return;
     }
 
     const showLoading = () => {
-        loadingOverlay.hidden = false;
-        window.requestAnimationFrame(() => loadingOverlay.classList.add('is-visible'));
+        window.clearTimeout(loadingTimer);
+        loadingTimer = window.setTimeout(() => {
+            loadingOverlay.hidden = false;
+            window.requestAnimationFrame(() => loadingOverlay.classList.add('is-visible'));
+        }, 350);
     };
 
     const hideLoading = () => {
+        window.clearTimeout(loadingTimer);
         loadingOverlay.classList.remove('is-visible');
         window.setTimeout(() => {
             loadingOverlay.hidden = true;
@@ -102,6 +107,103 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('pageshow', hideLoading);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.querySelector('[data-delete-modal]');
+    const title = modal?.querySelector('[data-delete-modal-title]');
+    const description = modal?.querySelector('[data-delete-modal-description]');
+    const confirm = modal?.querySelector('[data-delete-modal-confirm]');
+    let form;
+    let trigger;
+
+    if (!modal || !title || !description || !confirm) {
+        return;
+    }
+
+    const closeModal = () => {
+        modal.hidden = true;
+        modal.classList.remove('is-status-confirmation');
+        form = undefined;
+        trigger?.focus();
+        trigger = undefined;
+    };
+
+    const openModal = (submittedForm) => {
+        form = submittedForm;
+        trigger = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
+        const name = form.dataset.deleteName || 'data ini';
+        title.textContent = form.dataset.confirmTitle || `Hapus ${name}?`;
+        description.textContent = form.dataset.confirmDescription || form.dataset.deleteDescription || `${name} akan dihapus secara permanen.`;
+        const label = form.dataset.confirmLabel || 'Hapus';
+        confirm.querySelector('[data-delete-modal-confirm-label]').textContent = label;
+        const isPrimary = form.dataset.confirmTone === 'primary';
+        confirm.classList.toggle('primary-button', isPrimary);
+        confirm.classList.toggle('danger-button', !isPrimary);
+        modal.classList.toggle('is-status-confirmation', form.dataset.confirmIcon === 'power');
+        modal.querySelector('[data-delete-modal-icon]')?.toggleAttribute('hidden', form.dataset.confirmIcon === 'power');
+        modal.querySelector('[data-confirm-modal-power-icon]')?.toggleAttribute('hidden', form.dataset.confirmIcon !== 'power');
+        confirm.querySelector('[data-delete-modal-confirm-trash]')?.toggleAttribute('hidden', form.dataset.confirmIcon === 'power');
+        confirm.querySelector('[data-delete-modal-confirm-power]')?.toggleAttribute('hidden', form.dataset.confirmIcon !== 'power');
+        modal.hidden = false;
+        confirm.focus();
+    };
+
+    document.addEventListener('submit', (event) => {
+        const submittedForm = event.target;
+        if (!(submittedForm instanceof HTMLFormElement) || !submittedForm.matches('[data-delete-confirm], [data-confirm]') || submittedForm.dataset.deleteConfirmed === 'true') {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        openModal(submittedForm);
+    });
+
+    confirm.addEventListener('click', () => {
+        if (!form) {
+            return;
+        }
+
+        const submittedForm = form;
+        modal.hidden = true;
+        modal.classList.remove('is-status-confirmation');
+        form = undefined;
+        submittedForm.dataset.deleteConfirmed = 'true';
+        submittedForm.removeAttribute('data-no-loading');
+        submittedForm.requestSubmit();
+    });
+
+    modal.querySelectorAll('[data-delete-modal-close]').forEach((button) => {
+        button.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) {
+            closeModal();
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        document.querySelectorAll('.vehicle-qr-menu[open]').forEach((menu) => {
+            if (!menu.contains(target)) {
+                menu.removeAttribute('open');
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            document.querySelectorAll('.vehicle-qr-menu[open]').forEach((menu) => menu.removeAttribute('open'));
+        }
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -219,13 +321,20 @@ const renderQuestionPreview = () => {
     const preview = document.querySelector('[data-question-preview]');
     const questionInput = document.querySelector('[data-question-input]');
     const answerTypeInput = document.querySelector('[data-answer-type]');
+    const targetInput = document.querySelector('[data-weight-target]');
     const body = document.querySelector('[data-preview-body]');
     const title = document.querySelector('[data-preview-question]');
+    const target = document.querySelector('[data-preview-target]');
     const optionBuilder = document.querySelector('[data-option-builder]');
-
+    const instructionInput = document.querySelector('[data-question-instruction]');
+    const placeholderInput = document.querySelector('[data-question-placeholder]');
+    const ratingMinInput = document.querySelector('[data-question-rating-min]');
+    const ratingMaxInput = document.querySelector('[data-question-rating-max]');
     if (!preview || !questionInput || !answerTypeInput || !body || !title) {
         return;
     }
+
+    const instruction = preview.querySelector('[data-preview-instruction]');
 
     const options = [...document.querySelectorAll('[data-option-text]')]
         .map((input) => input.value.trim())
@@ -233,32 +342,50 @@ const renderQuestionPreview = () => {
 
     const optionLabels = options.length ? options : ['Opsi jawaban'];
     const type = answerTypeInput.value;
+    const placeholder = placeholderInput?.value.trim() || 'Tulis jawaban Anda...';
+    const ratingMin = ratingMinInput?.value.trim() || 'Sangat Buruk';
+    const ratingMax = ratingMaxInput?.value.trim() || 'Sangat Baik';
+    const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+    }[character]));
 
     title.textContent = questionInput.value.trim() || 'Bagaimana keramahan driver?';
+    if (target) {
+        target.textContent = targetInput?.value === 'vehicle' ? 'Penilaian Kendaraan' : 'Penilaian Driver';
+    }
+    if (instruction) {
+        instruction.textContent = instructionInput?.value.trim() || '';
+        instruction.hidden = !instruction.textContent;
+    }
     optionBuilder?.classList.toggle('is-hidden', !['multiple_choice', 'checkbox'].includes(type));
 
     if (type === 'rating') {
-        body.innerHTML = '<div class="rating-preview"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>';
+        const star = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"></path></svg>';
+        body.innerHTML = `<div class="passenger-star-rating question-preview-stars"><span class="is-selected">${star}</span><span class="is-selected">${star}</span><span class="is-selected">${star}</span><span class="is-selected">${star}</span><span>${star}</span></div><div class="passenger-rating-labels"><span>${escapeHtml(ratingMin)}</span><span>${escapeHtml(ratingMax)}</span></div>`;
         return;
     }
 
     if (type === 'yes_no') {
-        body.innerHTML = '<div class="choice-preview"><label><input type="radio" disabled> Ya</label><label><input type="radio" disabled> Tidak</label></div>';
+        body.innerHTML = '<div class="passenger-answer-options passenger-answer-yes-no"><label><input type="radio" disabled><span>Ya</span></label><label><input type="radio" disabled><span>Tidak</span></label></div>';
         return;
     }
 
     if (type === 'multiple_choice' || type === 'checkbox') {
         const inputType = type === 'multiple_choice' ? 'radio' : 'checkbox';
-        body.innerHTML = `<div class="choice-preview">${optionLabels.map((option) => `<label><input type="${inputType}" disabled> ${option}</label>`).join('')}</div>`;
+        body.innerHTML = `<div class="passenger-answer-options">${optionLabels.map((option) => `<label><input type="${inputType}" disabled><span>${escapeHtml(option)}</span></label>`).join('')}</div>`;
         return;
     }
 
     if (type === 'paragraph') {
-        body.innerHTML = '<textarea class="preview-input" rows="4" placeholder="Jawaban paragraf" disabled></textarea>';
+        body.innerHTML = `<textarea rows="4" placeholder="${escapeHtml(placeholder)}" disabled></textarea>`;
         return;
     }
 
-    body.innerHTML = '<input class="preview-input" type="text" placeholder="Jawaban singkat" disabled>';
+    body.innerHTML = `<input type="text" placeholder="${escapeHtml(placeholder)}" disabled>`;
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -267,6 +394,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('[data-question-input]')?.addEventListener('input', renderQuestionPreview);
     document.querySelector('[data-answer-type]')?.addEventListener('change', renderQuestionPreview);
+    document.querySelector('[data-weight-target]')?.addEventListener('change', renderQuestionPreview);
+    document.querySelector('[data-question-instruction]')?.addEventListener('input', renderQuestionPreview);
+    document.querySelector('[data-question-placeholder]')?.addEventListener('input', renderQuestionPreview);
+    document.querySelector('[data-question-rating-min]')?.addEventListener('input', renderQuestionPreview);
+    document.querySelector('[data-question-rating-max]')?.addEventListener('input', renderQuestionPreview);
     optionList?.addEventListener('input', renderQuestionPreview);
     optionList?.addEventListener('click', (event) => {
         const remove = event.target.closest('[data-remove-option]');
@@ -334,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('image-cropper-is-open');
         };
 
-        const selectedRatio = () => 1;
+        const selectedRatio = () => Number(field.dataset.imageCropperRatio) || 1;
 
         const openPicker = () => {
             stopCamera();

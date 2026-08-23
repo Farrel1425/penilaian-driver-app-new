@@ -23,6 +23,7 @@ class DriverFactory extends Factory
             'address' => $this->faker->address(),
             'phone' => $this->faker->phoneNumber(),
             'email' => $this->faker->safeEmail(),
+            'marital_status' => $this->faker->randomElement(array_keys(Driver::MARITAL_STATUSES)),
             'sim_number' => $this->faker->unique()->numerify('SIM########'),
             'sim_type' => $this->faker->randomElement(['A', 'B1', 'B2']),
             'sim_expired_at' => $this->faker->dateTimeBetween('+1 year', '+5 years')->format('Y-m-d'),

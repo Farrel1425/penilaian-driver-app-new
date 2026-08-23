@@ -23,7 +23,7 @@ class VehicleFactory extends Factory
             'color' => $this->faker->safeColorName(),
             'chassis_number' => $this->faker->unique()->bothify('CHS############'),
             'engine_number' => $this->faker->unique()->bothify('ENG############'),
-            'fuel_type' => $this->faker->randomElement(['bensin', 'diesel']),
+            'fuel_type' => $this->faker->randomElement(array_keys(Vehicle::FUEL_TYPES)),
             'transmission' => $this->faker->randomElement(['manual', 'automatic']),
             'passenger_capacity' => $this->faker->numberBetween(4, 16),
             'acquisition_date' => $this->faker->dateTimeBetween('-8 years', 'now')->format('Y-m-d'),

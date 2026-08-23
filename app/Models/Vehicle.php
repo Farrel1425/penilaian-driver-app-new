@@ -28,8 +28,11 @@ use Illuminate\Support\Str;
     'ownership_type',
     'contract_number',
     'contract_expired_at',
+    'stnk_expired_at',
+    'kir_expired_at',
     'description',
     'photo',
+    'interior_photo',
     'status',
     'qr_token',
 ])]
@@ -39,9 +42,40 @@ class Vehicle extends Model
     use HasFactory;
 
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_INACTIVE = 'inactive';
+
     public const OWNERSHIP_COMPANY = 'owned';
+
     public const OWNERSHIP_RENTAL = 'rental';
+
+    public const FUEL_TYPES = [
+        'gasoline' => 'Bensin',
+        'diesel' => 'Diesel',
+        'electric' => 'Listrik',
+        'hybrid' => 'Hybrid',
+        'gas' => 'Gas',
+    ];
+
+    public const TRANSMISSION_TYPES = [
+        'manual' => 'Manual',
+        'automatic' => 'Otomatis',
+        'cvt' => 'CVT',
+        'other' => 'Lainnya',
+    ];
+
+    public const ACQUISITION_SOURCES = [
+        'purchase' => 'Pembelian',
+        'leasing' => 'Leasing / Sewa',
+        'grant' => 'Hibah',
+        'internal_transfer' => 'Transfer Internal',
+        'other' => 'Lainnya',
+    ];
+
+    public const OWNERSHIP_TYPES = [
+        self::OWNERSHIP_COMPANY => 'Milik PT',
+        self::OWNERSHIP_RENTAL => 'Leasing (Sewa)',
+    ];
 
     protected static function booted(): void
     {
@@ -74,6 +108,8 @@ class Vehicle extends Model
             'passenger_capacity' => 'integer',
             'acquisition_date' => 'date',
             'contract_expired_at' => 'date',
+            'stnk_expired_at' => 'date',
+            'kir_expired_at' => 'date',
         ];
     }
 }

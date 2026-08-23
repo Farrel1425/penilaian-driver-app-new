@@ -13,6 +13,11 @@
                         <option value="{{ $branch->id }}" @selected((int) request('branch_id') === $branch->id)>{{ $branch->name }}</option>
                     @endforeach
                 </select>
+                <select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status">
+                    <option value="">Semua Status</option>
+                    <option value="active" @selected(request('status') === 'active')>Aktif</option>
+                    <option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option>
+                </select>
             </div>
 
             <a class="primary-button driver-create-button" href="{{ route('admin.drivers.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Driver</span></a>
@@ -33,7 +38,7 @@
                             <td>{{ $driver->branch?->name ?: '-' }}</td>
                             <td>{{ $driver->phone ?: '-' }}</td>
                             <td><span class="driver-status driver-status-{{ $driver->status }}">{{ $driver->status === 'active' ? 'Aktif' : 'Nonaktif' }}</span></td>
-                            <td><div class="table-row-actions"><a href="{{ route('admin.drivers.show', $driver) }}" aria-label="Lihat driver {{ $driver->full_name }}" title="Lihat"><x-lucide-eye aria-hidden="true" /></a><a href="{{ route('admin.drivers.edit', $driver) }}" aria-label="Edit driver {{ $driver->full_name }}" title="Edit"><x-lucide-pencil aria-hidden="true" /></a><form method="POST" action="{{ route('admin.drivers.destroy', $driver) }}" onsubmit="return confirm('Hapus driver ini?')">@csrf @method('DELETE')<button type="submit" aria-label="Hapus driver {{ $driver->full_name }}" title="Hapus"><x-lucide-trash-2 aria-hidden="true" /></button></form></div></td>
+                            <td><div class="table-row-actions"><a href="{{ route('admin.drivers.show', $driver) }}" aria-label="Lihat driver {{ $driver->full_name }}" title="Lihat"><x-lucide-eye aria-hidden="true" /></a><a href="{{ route('admin.drivers.edit', $driver) }}" aria-label="Edit driver {{ $driver->full_name }}" title="Edit"><x-lucide-pencil aria-hidden="true" /></a><form method="POST" action="{{ route('admin.drivers.destroy', $driver) }}" data-delete-confirm data-no-loading data-delete-name="Driver {{ $driver->full_name }}" data-delete-description="Driver yang sudah memiliki penilaian akan dinonaktifkan agar riwayat penilaian tetap tersimpan.">@csrf @method('DELETE')<button type="submit" aria-label="Hapus driver {{ $driver->full_name }}" title="Hapus"><x-lucide-trash-2 aria-hidden="true" /></button></form></div></td>
                         </tr>
                     @empty
                         <tr><td colspan="8"><x-admin.empty-state title="Belum ada driver" description="Tambahkan driver setelah cabang tersedia." /></td></tr>

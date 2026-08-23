@@ -68,7 +68,17 @@ class VehicleQrCodeTest extends TestCase
             ->assertOk()
             ->assertSee('Print QR')
             ->assertSee($vehicle->police_number)
-            ->assertSee('/rating/'.$vehicle->qr_token, false);
+            ->assertDontSee('/rating/'.$vehicle->qr_token, false);
+    }
+
+    public function test_admin_can_open_label_sized_qr_print_page(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $vehicle = Vehicle::factory()->create();
+
+        $this->get(route('admin.vehicles.qr.print', ['vehicle' => $vehicle, 'format' => 'label']))
+            ->assertOk()
+            ->assertSee('qr-print-card is-label', false);
     }
 
     public function test_admin_can_preview_vehicle_qr(): void
@@ -79,6 +89,7 @@ class VehicleQrCodeTest extends TestCase
         $this->get(route('admin.vehicles.qr.preview', $vehicle))
             ->assertOk()
             ->assertSee('Preview QR')
-            ->assertSee('/rating/'.$vehicle->qr_token, false);
+            ->assertDontSee('/rating/'.$vehicle->qr_token, false)
+            ->assertDontSee($vehicle->qr_token, false);
     }
 }

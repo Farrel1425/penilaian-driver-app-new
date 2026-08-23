@@ -80,7 +80,6 @@
                                     {{ str($question->answer_type)->replace('_', ' ')->title() }}
                                 @endif
                             </td>
-                            <td class="question-cell-center">{{ $question->weight }}%</td>
                             <td>
                                 @if ($question->is_required)
                                     <span class="question-required-badge">Ya</span>
@@ -88,6 +87,7 @@
                                     <span class="question-optional-label">Tidak</span>
                                 @endif
                             </td>
+                            <td class="question-cell-center">{{ $question->weight }}%</td>
                             <td class="question-cell-center"><span data-question-sort-order>{{ $question->sort_order }}</span></td>
                             <td>
                                 <span class="question-status question-status-{{ $question->status }}">
@@ -101,7 +101,7 @@
                                     <div class="table-row-actions">
                                         <a href="{{ route('admin.questions.show', $question) }}" aria-label="Lihat pertanyaan: {{ $question->question }}" title="Lihat"><x-lucide-eye aria-hidden="true" /></a>
                                         <a href="{{ route('admin.questions.edit', $question) }}" aria-label="Edit pertanyaan: {{ $question->question }}" title="Edit"><x-lucide-pencil aria-hidden="true" /></a>
-                                        <form method="POST" action="{{ route('admin.questions.destroy', $question) }}" onsubmit="return confirm('Hapus pertanyaan ini?')">@csrf @method('DELETE')<button type="submit" aria-label="Hapus pertanyaan: {{ $question->question }}" title="Hapus"><x-lucide-trash-2 aria-hidden="true" /></button></form>
+                                        <form method="POST" action="{{ route('admin.questions.destroy', $question) }}" data-delete-confirm data-no-loading data-delete-name="Pertanyaan {{ $question->question }}" data-delete-description="Pertanyaan yang sudah digunakan pada penilaian akan dinonaktifkan agar data jawaban tetap tersimpan.">@csrf @method('DELETE')<button type="submit" aria-label="Hapus pertanyaan: {{ $question->question }}" title="Hapus"><x-lucide-trash-2 aria-hidden="true" /></button></form>
                                     </div>
                                 @endif
                             </td>

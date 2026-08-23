@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'address',
     'phone',
     'email',
+    'marital_status',
     'photo',
     'sim_number',
     'sim_type',
@@ -34,7 +35,30 @@ class Driver extends Model
     use HasFactory;
 
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_INACTIVE = 'inactive';
+
+    public const MARITAL_STATUSES = [
+        'single' => 'Belum Menikah',
+        'married' => 'Menikah',
+        'divorced' => 'Cerai Hidup',
+        'widowed' => 'Cerai Mati',
+    ];
+
+    public const SIM_TYPES = [
+        'A' => 'SIM A',
+        'A Umum' => 'SIM A Umum',
+        'BI' => 'SIM BI',
+        'BI Umum' => 'SIM BI Umum',
+        'BII' => 'SIM BII',
+        'BII Umum' => 'SIM BII Umum',
+        'C' => 'SIM C',
+        'CI' => 'SIM CI',
+        'CII' => 'SIM CII',
+        'D' => 'SIM D',
+        'DI' => 'SIM DI',
+        'DII' => 'SIM DII',
+    ];
 
     public function branch(): BelongsTo
     {

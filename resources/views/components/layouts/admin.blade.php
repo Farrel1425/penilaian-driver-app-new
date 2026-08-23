@@ -20,6 +20,7 @@
             <span>Memuat halaman...</span>
         </div>
     </div>
+    <x-admin.delete-confirmation-modal />
     <div class="admin-frame">
         <x-admin.sidebar />
 

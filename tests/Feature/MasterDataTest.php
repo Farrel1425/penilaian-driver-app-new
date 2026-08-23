@@ -7,6 +7,7 @@ use App\Models\Driver;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class MasterDataTest extends TestCase
@@ -59,6 +60,26 @@ class MasterDataTest extends TestCase
 
         $this->patch(route('admin.branches.toggle-status', $branch))->assertRedirect();
         $this->assertSame(Branch::STATUS_INACTIVE, $branch->fresh()->status);
+    }
+
+    public function test_deactivating_branch_also_deactivates_its_drivers_and_vehicles(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $branch = Branch::factory()->create(['status' => Branch::STATUS_ACTIVE]);
+        $driver = Driver::factory()->for($branch)->create(['status' => Driver::STATUS_ACTIVE]);
+        $vehicle = Vehicle::factory()->for($branch)->create(['status' => Vehicle::STATUS_ACTIVE]);
+
+        $this->patch(route('admin.branches.toggle-status', $branch))->assertRedirect();
+
+        $this->assertSame(Branch::STATUS_INACTIVE, $branch->fresh()->status);
+        $this->assertSame(Driver::STATUS_INACTIVE, $driver->fresh()->status);
+        $this->assertSame(Vehicle::STATUS_INACTIVE, $vehicle->fresh()->status);
+
+        $this->patch(route('admin.branches.toggle-status', $branch->fresh()))->assertRedirect();
+
+        $this->assertSame(Branch::STATUS_ACTIVE, $branch->fresh()->status);
+        $this->assertSame(Driver::STATUS_INACTIVE, $driver->fresh()->status);
+        $this->assertSame(Vehicle::STATUS_INACTIVE, $vehicle->fresh()->status);
     }
 
     public function test_branch_requires_valid_bali_regency_and_contact_information(): void
@@ -131,7 +152,7 @@ class MasterDataTest extends TestCase
         $driver = Driver::query()->where('full_name', 'Budi Driver')->firstOrFail();
 
         $this->assertSame($branch->id, $driver->branch_id);
-        $this->assertFalse(\Illuminate\Support\Facades\Schema::hasColumn('drivers', 'vehicle_id'));
+        $this->assertFalse(Schema::hasColumn('drivers', 'vehicle_id'));
     }
 
     public function test_driver_join_date_is_required_while_sim_details_are_optional(): void
@@ -148,6 +169,11 @@ class MasterDataTest extends TestCase
         $this->post(route('admin.drivers.store'), [
             'branch_id' => $branch->id,
             'full_name' => 'Driver Dengan Tanggal Bergabung',
+            'birth_place' => 'Denpasar',
+            'birth_date' => '1990-01-01',
+            'gender' => 'male',
+            'address' => 'Jalan Contoh 1',
+            'phone' => '081234567890',
             'join_date' => '2026-01-01',
             'status' => Driver::STATUS_ACTIVE,
         ])->assertRedirect();
@@ -167,7 +193,7 @@ class MasterDataTest extends TestCase
             'color' => 'Putih',
             'chassis_number' => null,
             'engine_number' => null,
-            'fuel_type' => 'bensin',
+            'fuel_type' => 'gasoline',
             'transmission' => 'manual',
             'passenger_capacity' => 6,
             'acquisition_date' => null,
@@ -203,6 +229,7 @@ class MasterDataTest extends TestCase
             'status' => Vehicle::STATUS_ACTIVE,
         ])->assertSessionHasErrors('ownership_type');
     }
+
     public function test_admin_master_data_pages_can_be_rendered(): void
     {
         $this->actingAs(User::factory()->create());

@@ -38,13 +38,14 @@ class VehicleController extends Controller
 
     public function create(): View
     {
-        return view('admin.vehicles.create', ['vehicle' => new Vehicle(), 'branches' => Branch::query()->orderBy('name')->get()]);
+        return view('admin.vehicles.create', ['vehicle' => new Vehicle, 'branches' => Branch::query()->orderBy('name')->get()]);
     }
 
     public function store(VehicleRequest $request): RedirectResponse
     {
-        $data = $request->safe()->except('photo');
-        $data['photo'] = $this->storePhoto($request);
+        $data = $request->safe()->except(['photo', 'interior_photo']);
+        $data['photo'] = $this->storeImage($request, 'photo', 'vehicles/exterior');
+        $data['interior_photo'] = $this->storeImage($request, 'interior_photo', 'vehicles/interior');
 
         $vehicle = Vehicle::query()->create($data + ['qr_token' => Str::random(40)]);
 
@@ -69,11 +70,16 @@ class VehicleController extends Controller
 
     public function update(VehicleRequest $request, Vehicle $vehicle): RedirectResponse
     {
-        $data = $request->safe()->except('photo');
+        $data = $request->safe()->except(['photo', 'interior_photo']);
 
         if ($request->hasFile('photo')) {
             $this->deletePhoto($vehicle->photo);
-            $data['photo'] = $this->storePhoto($request);
+            $data['photo'] = $this->storeImage($request, 'photo', 'vehicles/exterior');
+        }
+
+        if ($request->hasFile('interior_photo')) {
+            $this->deletePhoto($vehicle->interior_photo);
+            $data['interior_photo'] = $this->storeImage($request, 'interior_photo', 'vehicles/interior');
         }
 
         $vehicle->update($data);
@@ -108,15 +114,16 @@ class VehicleController extends Controller
         }
 
         $this->deletePhoto($vehicle->photo);
+        $this->deletePhoto($vehicle->interior_photo);
         $vehicle->delete();
 
         return redirect()->route('admin.vehicles.index')->with('status', 'Kendaraan berhasil dihapus.');
     }
 
-    private function storePhoto(VehicleRequest $request): ?string
+    private function storeImage(VehicleRequest $request, string $input, string $directory): ?string
     {
-        return $request->hasFile('photo')
-            ? $request->file('photo')->store('vehicles', 'public')
+        return $request->hasFile($input)
+            ? $request->file($input)->store($directory, 'public')
             : null;
     }
 

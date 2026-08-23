@@ -82,7 +82,7 @@
                                 <div class="table-row-actions">
                                     <a href="{{ route('admin.vehicles.show', $vehicle) }}" aria-label="Lihat kendaraan {{ $vehicle->police_number }}" title="Lihat"><x-lucide-eye aria-hidden="true" /></a>
                                     <a href="{{ route('admin.vehicles.edit', $vehicle) }}" aria-label="Edit kendaraan {{ $vehicle->police_number }}" title="Edit"><x-lucide-pencil aria-hidden="true" /></a>
-                                    <form method="POST" action="{{ route('admin.vehicles.destroy', $vehicle) }}" onsubmit="return confirm('Hapus kendaraan ini?')">
+                                    <form method="POST" action="{{ route('admin.vehicles.destroy', $vehicle) }}" data-delete-confirm data-no-loading data-delete-name="Kendaraan {{ $vehicle->police_number }}" data-delete-description="Kendaraan yang sudah memiliki penilaian akan dinonaktifkan agar riwayat penilaian tetap tersimpan.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" aria-label="Hapus kendaraan {{ $vehicle->police_number }}" title="Hapus"><x-lucide-trash-2 aria-hidden="true" /></button>

@@ -8,6 +8,8 @@ use App\Models\Question;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class QuestionController extends Controller
@@ -45,6 +47,7 @@ class QuestionController extends Controller
         $question = DB::transaction(function () use ($request): Question {
             $data = $request->questionData();
             $data['sort_order'] = ((int) Question::query()->max('sort_order')) + 1;
+            $data['icon_path'] = $this->storeIcon($request);
             $question = Question::query()->create($data);
             $this->syncOptions($question, $request->normalizedOptions());
 
@@ -75,7 +78,14 @@ class QuestionController extends Controller
     public function update(QuestionRequest $request, Question $question): RedirectResponse
     {
         DB::transaction(function () use ($request, $question): void {
-            $question->update($request->questionData());
+            $data = $request->questionData();
+
+            if ($request->hasFile('icon')) {
+                $this->deleteIcon($question->icon_path);
+                $data['icon_path'] = $this->storeIcon($request);
+            }
+
+            $question->update($data);
             $this->syncOptions($question, $request->normalizedOptions());
         });
 
@@ -137,6 +147,7 @@ class QuestionController extends Controller
             return back()->with('status', 'Pertanyaan sudah dipakai pada rating, jadi dinonaktifkan.');
         }
 
+        $this->deleteIcon($question->icon_path);
         $question->delete();
 
         return redirect()->route('admin.questions.index')->with('status', 'Pertanyaan berhasil dihapus.');
@@ -155,6 +166,20 @@ class QuestionController extends Controller
                 'option_text' => $option['option_text'],
                 'sort_order' => $option['sort_order'] ?: $index + 1,
             ]);
+        }
+    }
+
+    private function storeIcon(QuestionRequest $request): ?string
+    {
+        return $request->hasFile('icon')
+            ? $request->file('icon')->store('question-icons', 'public')
+            : null;
+    }
+
+    private function deleteIcon(?string $iconPath): void
+    {
+        if ($iconPath && ! Str::startsWith($iconPath, ['http://', 'https://', '/'])) {
+            Storage::disk('public')->delete($iconPath);
         }
     }
 

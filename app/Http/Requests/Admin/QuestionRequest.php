@@ -24,6 +24,11 @@ class QuestionRequest extends FormRequest
     {
         return [
             'question' => ['required', 'string', 'max:1000'],
+            'instruction' => ['nullable', 'string', 'max:2000'],
+            'placeholder' => ['nullable', 'string', 'max:255'],
+            'rating_min_label' => ['nullable', 'string', 'max:100'],
+            'rating_max_label' => ['nullable', 'string', 'max:100'],
+            'icon' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'indicator' => ['required', 'string', 'max:255'],
             'target_type' => ['required', Rule::in([Question::TARGET_DRIVER, Question::TARGET_VEHICLE])],
             'answer_type' => ['required', Rule::in([
@@ -78,7 +83,19 @@ class QuestionRequest extends FormRequest
 
     public function questionData(): array
     {
-        return $this->safe()->only(['question', 'indicator', 'target_type', 'answer_type', 'is_required', 'weight', 'status']);
+        return $this->safe()->only([
+            'question',
+            'instruction',
+            'placeholder',
+            'rating_min_label',
+            'rating_max_label',
+            'indicator',
+            'target_type',
+            'answer_type',
+            'is_required',
+            'weight',
+            'status',
+        ]);
     }
 
     public function normalizedOptions(): array
