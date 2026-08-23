@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\VehicleQrController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Passenger\PassengerFlowController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,10 @@ Route::prefix('rating/{vehicleToken}')->name('passenger.rating.')->group(functio
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+    Route::get('/forgot-password', [PasswordResetController::class, 'createLinkRequest'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'storeLinkRequest'])->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'createReset'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'storeReset'])->name('password.update');
 });
 
 Route::middleware(['auth', 'active.admin'])->group(function (): void {
