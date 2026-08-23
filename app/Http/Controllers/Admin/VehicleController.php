@@ -58,9 +58,13 @@ class VehicleController extends Controller
         return view('admin.vehicles.show', compact('vehicle'));
     }
 
-    public function edit(Vehicle $vehicle): View
+    public function edit(Request $request, Vehicle $vehicle): View
     {
-        return view('admin.vehicles.edit', ['vehicle' => $vehicle, 'branches' => Branch::query()->orderBy('name')->get()]);
+        return view('admin.vehicles.edit', [
+            'vehicle' => $vehicle,
+            'branches' => Branch::query()->orderBy('name')->get(),
+            'returnTo' => $request->string('return_to')->toString() === 'detail' ? 'detail' : 'index',
+        ]);
     }
 
     public function update(VehicleRequest $request, Vehicle $vehicle): RedirectResponse
@@ -74,7 +78,11 @@ class VehicleController extends Controller
 
         $vehicle->update($data);
 
-        return redirect()->route('admin.vehicles.show', $vehicle)->with('status', 'Kendaraan berhasil diperbarui.');
+        if ($request->input('return_to') === 'detail') {
+            return redirect()->route('admin.vehicles.show', $vehicle)->with('status', 'Kendaraan berhasil diperbarui.');
+        }
+
+        return redirect()->route('admin.vehicles.index')->with('status', 'Kendaraan berhasil diperbarui.');
     }
 
     public function regenerateQrToken(Vehicle $vehicle): RedirectResponse

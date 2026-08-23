@@ -1,12 +1,10 @@
 <x-layouts.admin title="Master Kendaraan">
-    <x-admin.flash />
-
     <section class="vehicle-list-card">
-        <form class="vehicle-list-toolbar" method="GET" action="{{ route('admin.vehicles.index') }}">
+        <form class="vehicle-list-toolbar" method="GET" action="{{ route('admin.vehicles.index') }}" data-debounced-search-form>
             <div class="vehicle-list-filters">
                 <label class="vehicle-search-field">
                     <x-lucide-search aria-hidden="true" />
-                    <input name="search" value="{{ request('search') }}" placeholder="Cari no. polisi, merk, atau unit kerja..." aria-label="Cari kendaraan">
+                    <input name="search" value="{{ request('search') }}" placeholder="Cari no. polisi, merk, atau unit kerja..." aria-label="Cari kendaraan" data-debounced-search>
                 </label>
 
                 <select name="branch_id" onchange="this.form.requestSubmit()" aria-label="Filter unit kerja">
@@ -47,6 +45,7 @@
                 </thead>
                 <tbody>
                     @forelse($vehicles as $vehicle)
+                        @php($qrDataUri = app(App\Services\VehicleQrCodeService::class)->dataUri($vehicle))
                         <tr>
                             <td class="vehicle-cell-center">{{ $vehicles->firstItem() + $loop->index }}</td>
                             <td>
@@ -65,7 +64,19 @@
                             <td>{{ $vehicle->branch?->name ?: '-' }}</td>
                             <td><span class="vehicle-status vehicle-status-{{ $vehicle->status }}">{{ $vehicle->status === 'active' ? 'Aktif' : 'Nonaktif' }}</span></td>
                             <td>
-                                <img class="vehicle-qr-thumbnail" src="{{ app(App\Services\VehicleQrCodeService::class)->dataUri($vehicle) }}" alt="QR {{ $vehicle->police_number }}">
+                                <button
+                                    class="vehicle-qr-trigger"
+                                    type="button"
+                                    data-vehicle-qr-trigger
+                                    data-qr-src="{{ $qrDataUri }}"
+                                    data-qr-title="{{ $vehicle->police_number }}"
+                                    data-qr-description="{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: 'Kendaraan' }} - {{ $vehicle->branch?->name ?: 'Cabang belum tersedia' }}"
+                                    data-qr-download="{{ route('admin.vehicles.qr.download', $vehicle) }}"
+                                    aria-label="Tampilkan QR Code {{ $vehicle->police_number }}"
+                                    title="Tampilkan QR Code"
+                                >
+                                    <img class="vehicle-qr-thumbnail" src="{{ $qrDataUri }}" alt="QR {{ $vehicle->police_number }}">
+                                </button>
                             </td>
                             <td>
                                 <div class="table-row-actions">
@@ -105,4 +116,23 @@
             @endif
         </footer>
     </section>
+
+    <div class="vehicle-qr-modal" data-vehicle-qr-modal hidden>
+        <button class="vehicle-qr-modal-backdrop" type="button" data-vehicle-qr-close aria-label="Tutup popup QR"></button>
+        <section class="vehicle-qr-dialog" role="dialog" aria-modal="true" aria-labelledby="vehicle-qr-modal-title">
+            <button class="vehicle-qr-close" type="button" data-vehicle-qr-close aria-label="Tutup popup QR">
+                <x-lucide-x aria-hidden="true" />
+            </button>
+            <span class="vehicle-qr-dialog-label">QR Kendaraan</span>
+            <h2 id="vehicle-qr-modal-title" data-vehicle-qr-title>QR Kendaraan</h2>
+            <p data-vehicle-qr-description></p>
+            <div class="vehicle-qr-large-frame">
+                <img data-vehicle-qr-image src="" alt="">
+            </div>
+            <a class="primary-button vehicle-qr-download" data-vehicle-qr-download href="#">
+                <x-lucide-download aria-hidden="true" />
+                <span>Download QR</span>
+            </a>
+        </section>
+    </div>
 </x-layouts.admin>

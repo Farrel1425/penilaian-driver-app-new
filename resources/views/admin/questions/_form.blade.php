@@ -1,5 +1,13 @@
 @csrf
 @php
+    $backUrl = isset($returnTo) && $returnTo === 'detail' ? route('admin.questions.show', $question) : route('admin.questions.index');
+@endphp
+@if (isset($returnTo))
+    <input type="hidden" name="return_to" value="{{ $returnTo }}">
+@endif
+@php
+    $driverBaseWeight = $weightSummary[App\Models\Question::TARGET_DRIVER] ?? 0;
+    $vehicleBaseWeight = $weightSummary[App\Models\Question::TARGET_VEHICLE] ?? 0;
     $optionRows = collect(old('options', $question->exists ? $question->options->map(fn ($option) => ['option_text' => $option->option_text, 'sort_order' => $option->sort_order])->all() : [
         ['option_text' => '', 'sort_order' => 1],
         ['option_text' => '', 'sort_order' => 2],
@@ -11,10 +19,11 @@
         <div class="form-section-title">Informasi Pertanyaan</div>
         <div class="form-grid">
             <x-admin.textarea label="Pertanyaan" name="question" :value="$question->question" required data-question-input />
-            <x-admin.select label="Target" name="target_type" required>
+            <x-admin.select label="Target" name="target_type" required data-weight-target>
                 <option value="{{ App\Models\Question::TARGET_DRIVER }}" @selected(old('target_type', $question->target_type ?? App\Models\Question::TARGET_DRIVER) === App\Models\Question::TARGET_DRIVER)>Driver</option>
                 <option value="{{ App\Models\Question::TARGET_VEHICLE }}" @selected(old('target_type', $question->target_type) === App\Models\Question::TARGET_VEHICLE)>Kendaraan</option>
             </x-admin.select>
+            <x-admin.field label="Indikator" name="indicator" :value="$question->indicator" required data-indicator-input />
             <x-admin.select label="Tipe Jawaban" name="answer_type" required data-answer-type>
                 @foreach ([
                     App\Models\Question::TYPE_RATING => 'Rating 1-5',
@@ -31,12 +40,24 @@
                 <option value="1" @selected((string) old('is_required', (int) ($question->is_required ?? true)) === '1')>Wajib</option>
                 <option value="0" @selected((string) old('is_required', (int) ($question->is_required ?? true)) === '0')>Tidak Wajib</option>
             </x-admin.select>
-            <x-admin.field label="Urutan" name="sort_order" type="number" :value="$question->sort_order ?? 0" required />
+            <x-admin.field label="Bobot (%)" name="weight" type="number" :value="$question->weight" min="1" max="100" required data-question-weight />
             <x-admin.select label="Status" name="status" required>
                 <option value="{{ App\Models\Question::STATUS_ACTIVE }}" @selected(old('status', $question->status ?? App\Models\Question::STATUS_ACTIVE) === App\Models\Question::STATUS_ACTIVE)>Aktif</option>
                 <option value="{{ App\Models\Question::STATUS_INACTIVE }}" @selected(old('status', $question->status) === App\Models\Question::STATUS_INACTIVE)>Nonaktif</option>
             </x-admin.select>
         </div>
+
+        <aside class="question-weight-summary" data-weight-summary data-driver-base="{{ $driverBaseWeight }}" data-vehicle-base="{{ $vehicleBaseWeight }}">
+            <div>
+                <span>Bobot {{ old('target_type', $question->target_type ?? App\Models\Question::TARGET_DRIVER) === App\Models\Question::TARGET_DRIVER ? 'Driver' : 'Kendaraan' }}</span>
+                <strong data-weight-used>0%</strong>
+            </div>
+            <div>
+                <span>Sisa bobot yang dapat diinput</span>
+                <strong data-weight-remaining>100%</strong>
+            </div>
+            <p>Total bobot setiap target harus tepat 100% sebelum pertanyaannya dapat diaktifkan.</p>
+        </aside>
 
         <div class="option-builder" data-option-builder>
             <div class="form-section-title">Opsi Jawaban</div>
@@ -55,7 +76,7 @@
         </div>
 
         <div class="form-actions">
-            <a class="secondary-button" href="{{ route('admin.questions.index') }}">Batal</a>
+            <a class="secondary-button" href="{{ $backUrl }}">Batal</a>
             <button class="primary-button" type="submit">Simpan</button>
         </div>
     </div>

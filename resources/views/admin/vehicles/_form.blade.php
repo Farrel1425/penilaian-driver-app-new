@@ -1,4 +1,10 @@
 @csrf
+@php
+    $backUrl = isset($returnTo) && $returnTo === 'detail' ? route('admin.vehicles.show', $vehicle) : route('admin.vehicles.index');
+@endphp
+@if (isset($returnTo))
+    <input type="hidden" name="return_to" value="{{ $returnTo }}">
+@endif
 <div class="form-section-title">Informasi Kendaraan</div>
 <div class="form-grid">
     <x-admin.select label="Cabang" name="branch_id" required><option value="">Pilih cabang</option>@foreach($branches as $branch)<option value="{{ $branch->id }}" @selected((int) old('branch_id', $vehicle->branch_id) === $branch->id)>{{ $branch->name }}</option>@endforeach</x-admin.select>
@@ -28,4 +34,4 @@
     <x-admin.field label="Masa Berlaku Kontrak" name="contract_expired_at" type="date" :value="optional($vehicle->contract_expired_at)->format('Y-m-d')" />
     <x-admin.textarea label="Keterangan" name="description" :value="$vehicle->description" />
 </div>
-<div class="form-actions"><a class="secondary-button" href="{{ route('admin.vehicles.index') }}">Batal</a><button class="primary-button" type="submit">Simpan</button></div>
+<div class="form-actions"><a class="secondary-button" href="{{ $backUrl }}">Batal</a><button class="primary-button" type="submit">Simpan</button></div>

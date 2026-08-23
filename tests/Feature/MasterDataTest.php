@@ -28,6 +28,10 @@ class MasterDataTest extends TestCase
             'code' => 'TST-001',
             'name' => 'Cabang Test',
             'address' => 'Alamat Test',
+            'regency' => 'Kota Denpasar',
+            'pic_name' => 'Putri Admin',
+            'phone' => '081234567890',
+            'email' => 'cabang-test@example.com',
             'status' => Branch::STATUS_ACTIVE,
         ]);
 
@@ -38,11 +42,66 @@ class MasterDataTest extends TestCase
             'code' => 'TST-002',
             'name' => 'Cabang Update',
             'address' => 'Alamat Update',
+            'regency' => 'Kabupaten Badung',
+            'pic_name' => 'Made PIC',
+            'phone' => '081234567891',
+            'email' => 'cabang-update@example.com',
             'status' => Branch::STATUS_ACTIVE,
-        ])->assertRedirect(route('admin.branches.show', $branch));
+        ])->assertRedirect(route('admin.branches.index'));
+
+        $this->assertDatabaseHas('branches', [
+            'id' => $branch->id,
+            'regency' => 'Kabupaten Badung',
+            'pic_name' => 'Made PIC',
+            'phone' => '081234567891',
+            'email' => 'cabang-update@example.com',
+        ]);
 
         $this->patch(route('admin.branches.toggle-status', $branch))->assertRedirect();
         $this->assertSame(Branch::STATUS_INACTIVE, $branch->fresh()->status);
+    }
+
+    public function test_branch_requires_valid_bali_regency_and_contact_information(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->post(route('admin.branches.store'), [
+            'code' => 'TST-003',
+            'name' => 'Cabang Tidak Valid',
+            'address' => 'Alamat Test',
+            'regency' => 'Kabupaten Lain',
+            'pic_name' => 'PIC Test',
+            'phone' => 'telepon',
+            'email' => 'email-tidak-valid',
+            'status' => Branch::STATUS_ACTIVE,
+        ])->assertSessionHasErrors(['regency', 'phone', 'email']);
+    }
+
+    public function test_branch_edit_navigation_returns_to_its_origin(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $branch = Branch::factory()->create();
+
+        $this->get(route('admin.branches.edit', $branch))
+            ->assertOk()
+            ->assertSee(route('admin.branches.index'), false)
+            ->assertDontSee('<div class="page-header">', false);
+
+        $this->get(route('admin.branches.edit', ['branch' => $branch, 'return_to' => 'detail']))
+            ->assertOk()
+            ->assertSee(route('admin.branches.show', $branch), false);
+
+        $this->put(route('admin.branches.update', $branch), [
+            'code' => $branch->code,
+            'name' => $branch->name,
+            'address' => $branch->address,
+            'regency' => $branch->regency,
+            'pic_name' => $branch->pic_name,
+            'phone' => $branch->phone,
+            'email' => $branch->email,
+            'status' => $branch->status,
+            'return_to' => 'detail',
+        ])->assertRedirect(route('admin.branches.show', $branch));
     }
 
     public function test_admin_can_create_driver_without_vehicle_assignment(): void
@@ -152,7 +211,10 @@ class MasterDataTest extends TestCase
         $vehicle = Vehicle::factory()->for($branch)->create();
 
         $this->get(route('admin.branches.index'))->assertOk();
-        $this->get(route('admin.branches.create'))->assertOk();
+        $this->get(route('admin.branches.create'))
+            ->assertOk()
+            ->assertDontSee('<div class="page-header">', false)
+            ->assertDontSee('Informasi Cabang');
         $this->get(route('admin.branches.show', $branch))->assertOk();
         $this->get(route('admin.branches.edit', $branch))->assertOk();
 
@@ -165,5 +227,16 @@ class MasterDataTest extends TestCase
         $this->get(route('admin.vehicles.create'))->assertOk();
         $this->get(route('admin.vehicles.show', $vehicle))->assertOk();
         $this->get(route('admin.vehicles.edit', $vehicle))->assertOk();
+    }
+
+    public function test_vehicle_list_includes_qr_popup_and_download_link(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $vehicle = Vehicle::factory()->for(Branch::factory())->create();
+
+        $this->get(route('admin.vehicles.index'))
+            ->assertOk()
+            ->assertSee('data-vehicle-qr-modal', false)
+            ->assertSee(route('admin.vehicles.qr.download', $vehicle), false);
     }
 }

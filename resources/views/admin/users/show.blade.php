@@ -1,5 +1,4 @@
 <x-layouts.admin title="Detail Admin">
-    <x-admin.flash />
     <x-admin.page-header title="Detail Admin" description="Informasi dan pengaturan akun administrator."><x-slot:actions><a href="{{ route('admin.users.edit', $user) }}" class="admin-primary-button"><x-lucide-pencil aria-hidden="true" /> Edit Admin</a></x-slot:actions></x-admin.page-header>
     <section class="user-detail-card">
         <div class="user-detail-identity"><span class="user-photo user-photo-xl">@if ($user->photo)<img src="{{ str_starts_with($user->photo, 'http') ? $user->photo : asset('storage/'.$user->photo) }}" alt="Foto {{ $user->name }}">@else{{ str($user->name)->substr(0, 1)->upper() }}@endif</span><div><h2>{{ $user->name }}</h2><p>{{ $user->email }}</p><span class="user-role-badge">Admin - akses penuh</span></div></div>

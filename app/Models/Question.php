@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['question', 'target_type', 'answer_type', 'is_required', 'sort_order', 'status'])]
+#[Fillable(['question', 'indicator', 'target_type', 'answer_type', 'is_required', 'weight', 'sort_order', 'status'])]
 class Question extends Model
 {
     /** @use HasFactory<QuestionFactory> */
@@ -17,6 +17,7 @@ class Question extends Model
 
     public const TARGET_DRIVER = 'driver';
     public const TARGET_VEHICLE = 'vehicle';
+    public const VEHICLE_INDICATOR = 'Kendaraan';
 
     public const TYPE_RATING = 'rating';
     public const TYPE_YES_NO = 'yes_no';
@@ -52,6 +53,7 @@ class Question extends Model
     {
         return [
             'is_required' => 'boolean',
+            'weight' => 'integer',
             'sort_order' => 'integer',
         ];
     }

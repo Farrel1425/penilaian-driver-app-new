@@ -1,1 +1,4 @@
-<x-layouts.admin title="Tambah Kendaraan"><x-admin.page-header title="Tambah Kendaraan" description="Tambahkan kendaraan dan hubungkan ke cabang."><a class="secondary-button" href="{{ route('admin.vehicles.index') }}">Kembali</a></x-admin.page-header><x-admin.panel title="Informasi Kendaraan"><form method="POST" action="{{ route('admin.vehicles.store') }}" enctype="multipart/form-data">@include('admin.vehicles._form')</form></x-admin.panel></x-layouts.admin>
+<x-layouts.admin title="Tambah Kendaraan">
+    <div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.vehicles.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div>
+    <x-admin.panel><form method="POST" action="{{ route('admin.vehicles.store') }}" enctype="multipart/form-data">@include('admin.vehicles._form')</form></x-admin.panel>
+</x-layouts.admin>

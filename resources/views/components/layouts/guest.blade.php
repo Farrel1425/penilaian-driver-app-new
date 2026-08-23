@@ -13,6 +13,13 @@
     @endif
 </head>
 <body class="guest-shell">
+    <x-notifications.toast />
+    <div class="app-loading-overlay" data-app-loading hidden aria-live="polite" aria-busy="true">
+        <div class="app-loading-indicator">
+            <span class="app-loading-spinner" aria-hidden="true"></span>
+            <span>Memuat halaman...</span>
+        </div>
+    </div>
     {{ $slot }}
 </body>
 </html>

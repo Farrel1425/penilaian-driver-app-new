@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['code', 'name', 'address', 'status'])]
+#[Fillable(['code', 'name', 'address', 'regency', 'pic_name', 'phone', 'email', 'status'])]
 class Branch extends Model
 {
     /** @use HasFactory<BranchFactory> */
@@ -17,6 +17,18 @@ class Branch extends Model
 
     public const STATUS_ACTIVE = 'active';
     public const STATUS_INACTIVE = 'inactive';
+
+    public const BALI_REGENCIES = [
+        'Kabupaten Badung',
+        'Kabupaten Bangli',
+        'Kabupaten Buleleng',
+        'Kabupaten Gianyar',
+        'Kabupaten Jembrana',
+        'Kabupaten Karangasem',
+        'Kabupaten Klungkung',
+        'Kabupaten Tabanan',
+        'Kota Denpasar',
+    ];
 
     public function drivers(): HasMany
     {

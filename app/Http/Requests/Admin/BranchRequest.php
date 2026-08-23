@@ -20,7 +20,11 @@ class BranchRequest extends FormRequest
         return [
             'code' => ['required', 'string', 'max:50', Rule::unique('branches', 'code')->ignore($branch?->id)],
             'name' => ['required', 'string', 'max:255'],
-            'address' => ['nullable', 'string'],
+            'address' => ['required', 'string', 'max:1000'],
+            'regency' => ['required', Rule::in(Branch::BALI_REGENCIES)],
+            'pic_name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'min:8', 'max:30', 'regex:/^[0-9+()\\-\\s]+$/'],
+            'email' => ['required', 'email:rfc', 'max:255'],
             'status' => ['required', Rule::in([Branch::STATUS_ACTIVE, Branch::STATUS_INACTIVE])],
         ];
     }

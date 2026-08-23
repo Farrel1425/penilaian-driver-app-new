@@ -59,9 +59,13 @@ class DriverController extends Controller
         return view('admin.drivers.show', compact('driver'));
     }
 
-    public function edit(Driver $driver): View
+    public function edit(Request $request, Driver $driver): View
     {
-        return view('admin.drivers.edit', ['driver' => $driver, 'branches' => Branch::query()->orderBy('name')->get()]);
+        return view('admin.drivers.edit', [
+            'driver' => $driver,
+            'branches' => Branch::query()->orderBy('name')->get(),
+            'returnTo' => $request->string('return_to')->toString() === 'detail' ? 'detail' : 'index',
+        ]);
     }
 
     public function update(DriverRequest $request, Driver $driver): RedirectResponse
@@ -75,7 +79,11 @@ class DriverController extends Controller
 
         $driver->update($data);
 
-        return redirect()->route('admin.drivers.show', $driver)->with('status', 'Driver berhasil diperbarui.');
+        if ($request->input('return_to') === 'detail') {
+            return redirect()->route('admin.drivers.show', $driver)->with('status', 'Driver berhasil diperbarui.');
+        }
+
+        return redirect()->route('admin.drivers.index')->with('status', 'Driver berhasil diperbarui.');
     }
 
     public function toggleStatus(Driver $driver): RedirectResponse

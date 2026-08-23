@@ -22,6 +22,7 @@ class DatabaseLayerTest extends TestCase
             $this->assertTrue(Schema::hasTable($table), "Table {$table} does not exist.");
         }
 
+        $this->assertTrue(Schema::hasColumns('branches', ['code', 'name', 'address', 'regency', 'pic_name', 'phone', 'email', 'status']));
         $this->assertTrue(Schema::hasColumns('drivers', ['branch_id', 'full_name', 'status']));
         $this->assertFalse(Schema::hasColumn('drivers', 'vehicle_id'));
         $this->assertTrue(Schema::hasColumns('vehicles', ['branch_id', 'police_number', 'qr_token', 'status']));

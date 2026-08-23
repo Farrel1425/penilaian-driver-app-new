@@ -49,6 +49,7 @@ Route::middleware(['auth', 'active.admin'])->group(function (): void {
         Route::get('monitoring', MonitoringController::class)->name('monitoring.index');
         Route::get('reports/drivers', ReportDriverController::class)->name('reports.drivers');
         Route::get('reports/vehicles', ReportVehicleController::class)->name('reports.vehicles');
+        Route::patch('questions/reorder', [QuestionController::class, 'reorder'])->name('questions.reorder');
         Route::resource('questions', QuestionController::class);
         Route::patch('questions/{question}/toggle-status', [QuestionController::class, 'toggleStatus'])->name('questions.toggle-status');
         Route::resource('users', UserController::class);

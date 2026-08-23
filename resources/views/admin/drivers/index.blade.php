@@ -1,12 +1,10 @@
 <x-layouts.admin title="Master Driver">
-    <x-admin.flash />
-
     <section class="driver-list-card">
-        <form class="driver-list-toolbar" method="GET" action="{{ route('admin.drivers.index') }}">
+        <form class="driver-list-toolbar" method="GET" action="{{ route('admin.drivers.index') }}" data-debounced-search-form>
             <div class="driver-list-filters">
                 <label class="driver-search-field">
                     <x-lucide-search aria-hidden="true" />
-                    <input name="search" value="{{ request('search') }}" placeholder="Cari nama driver, no. SIM..." aria-label="Cari driver">
+                    <input name="search" value="{{ request('search') }}" placeholder="Cari nama driver, no. SIM..." aria-label="Cari driver" data-debounced-search>
                 </label>
 
                 <select name="branch_id" onchange="this.form.requestSubmit()" aria-label="Filter unit kerja">

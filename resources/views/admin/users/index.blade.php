@@ -1,5 +1,4 @@
 <x-layouts.admin title="Pengguna">
-    <x-admin.flash />
     <section class="user-list-card vehicle-list-card">
         <div class="user-list-toolbar vehicle-list-toolbar">
             <form method="GET" class="user-filter-form vehicle-list-filters">

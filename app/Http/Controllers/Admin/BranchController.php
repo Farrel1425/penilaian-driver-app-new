@@ -19,7 +19,11 @@ class BranchController extends Controller
                 $query->where(function ($query) use ($search): void {
                     $query->where('code', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%")
-                        ->orWhere('address', 'like', "%{$search}%");
+                        ->orWhere('address', 'like', "%{$search}%")
+                        ->orWhere('regency', 'like', "%{$search}%")
+                        ->orWhere('pic_name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
                 });
             })
             ->when($request->string('status')->toString(), fn ($query, string $status) => $query->where('status', $status))
@@ -49,16 +53,23 @@ class BranchController extends Controller
         return view('admin.branches.show', compact('branch'));
     }
 
-    public function edit(Branch $branch): View
+    public function edit(Request $request, Branch $branch): View
     {
-        return view('admin.branches.edit', compact('branch'));
+        return view('admin.branches.edit', [
+            'branch' => $branch,
+            'returnTo' => $request->string('return_to')->toString() === 'detail' ? 'detail' : 'index',
+        ]);
     }
 
     public function update(BranchRequest $request, Branch $branch): RedirectResponse
     {
         $branch->update($request->validated());
 
-        return redirect()->route('admin.branches.show', $branch)->with('status', 'Cabang berhasil diperbarui.');
+        if ($request->input('return_to') === 'detail') {
+            return redirect()->route('admin.branches.show', $branch)->with('status', 'Cabang berhasil diperbarui.');
+        }
+
+        return redirect()->route('admin.branches.index')->with('status', 'Cabang berhasil diperbarui.');
     }
 
     public function toggleStatus(Branch $branch): RedirectResponse

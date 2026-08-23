@@ -46,6 +46,175 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const loadingOverlay = document.querySelector('[data-app-loading]');
+
+    if (!loadingOverlay) {
+        return;
+    }
+
+    const showLoading = () => {
+        loadingOverlay.hidden = false;
+        window.requestAnimationFrame(() => loadingOverlay.classList.add('is-visible'));
+    };
+
+    const hideLoading = () => {
+        loadingOverlay.classList.remove('is-visible');
+        window.setTimeout(() => {
+            loadingOverlay.hidden = true;
+        }, 160);
+    };
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement) || form.method.toLowerCase() === 'get' || form.matches('[data-no-loading]') || form.target === '_blank') {
+            return;
+        }
+
+        showLoading();
+    }, true);
+
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a');
+        if (!link || link.matches('[data-no-loading], [download]') || link.target === '_blank' || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+            return;
+        }
+
+        const href = link.getAttribute('href');
+        if (!href || href === '#' || href.startsWith('#') || href.includes('/download')) {
+            return;
+        }
+
+        const url = new URL(link.href, window.location.href);
+        if (url.origin === window.location.origin && url.href !== window.location.href) {
+            showLoading();
+        }
+    }, true);
+
+    document.querySelectorAll('[data-toast]').forEach((toast) => {
+        const dismiss = () => {
+            toast.classList.add('is-leaving');
+            window.setTimeout(() => toast.remove(), 180);
+        };
+
+        toast.querySelector('[data-toast-dismiss]')?.addEventListener('click', dismiss);
+        window.setTimeout(dismiss, 6000);
+    });
+
+    window.addEventListener('pageshow', hideLoading);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-debounced-search-form]').forEach((form) => {
+        const input = form.querySelector('[data-debounced-search]');
+        if (!input) return;
+
+        const focusKey = `${window.location.pathname}:debounced-search-focus`;
+        let searchTimeout;
+
+        const restoreFocus = () => {
+            const focusState = window.sessionStorage.getItem(focusKey);
+            if (!focusState) return;
+
+            window.sessionStorage.removeItem(focusKey);
+            input.focus();
+            const cursorPosition = Math.min(Number(focusState) || input.value.length, input.value.length);
+            input.setSelectionRange(cursorPosition, cursorPosition);
+        };
+
+        input.addEventListener('input', () => {
+            window.clearTimeout(searchTimeout);
+            searchTimeout = window.setTimeout(() => {
+                window.sessionStorage.setItem(focusKey, String(input.selectionStart ?? input.value.length));
+                form.requestSubmit();
+            }, 1000);
+        });
+
+        form.addEventListener('submit', () => window.clearTimeout(searchTimeout));
+        restoreFocus();
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.querySelector('[data-vehicle-qr-modal]');
+    const image = modal?.querySelector('[data-vehicle-qr-image]');
+    const title = modal?.querySelector('[data-vehicle-qr-title]');
+    const description = modal?.querySelector('[data-vehicle-qr-description]');
+    const download = modal?.querySelector('[data-vehicle-qr-download]');
+
+    if (!modal || !image || !title || !description || !download) {
+        return;
+    }
+
+    const closeModal = () => {
+        modal.hidden = true;
+        image.removeAttribute('src');
+    };
+
+    document.querySelectorAll('[data-vehicle-qr-trigger]').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+            image.src = trigger.dataset.qrSrc ?? '';
+            image.alt = `QR ${trigger.dataset.qrTitle ?? 'Kendaraan'}`;
+            title.textContent = trigger.dataset.qrTitle ?? 'QR Kendaraan';
+            description.textContent = trigger.dataset.qrDescription ?? '';
+            download.href = trigger.dataset.qrDownload ?? '#';
+            modal.hidden = false;
+            modal.querySelector('[data-vehicle-qr-close]')?.focus();
+        });
+    });
+
+    modal.querySelectorAll('[data-vehicle-qr-close]').forEach((button) => {
+        button.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) {
+            closeModal();
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const targetInput = document.querySelector('[data-weight-target]');
+    const weightInput = document.querySelector('[data-question-weight]');
+    const indicatorInput = document.querySelector('[data-indicator-input]');
+    const summary = document.querySelector('[data-weight-summary]');
+
+    if (!targetInput || !weightInput || !indicatorInput || !summary) {
+        return;
+    }
+
+    const used = summary.querySelector('[data-weight-used]');
+    const remaining = summary.querySelector('[data-weight-remaining]');
+
+    const renderWeight = () => {
+        const isVehicle = targetInput.value === 'vehicle';
+        const baseWeight = Number(isVehicle ? summary.dataset.vehicleBase : summary.dataset.driverBase) || 0;
+        const currentWeight = Math.max(0, Number(weightInput.value) || 0);
+        const totalWeight = baseWeight + currentWeight;
+        const remainingWeight = Math.max(0, 100 - totalWeight);
+
+        indicatorInput.readOnly = isVehicle;
+        indicatorInput.classList.toggle('is-readonly', isVehicle);
+        if (isVehicle) {
+            indicatorInput.value = 'Kendaraan';
+        } else if (indicatorInput.value === 'Kendaraan') {
+            indicatorInput.value = '';
+        }
+
+        weightInput.max = String(Math.max(0, 100 - baseWeight));
+        used.textContent = `${totalWeight}%`;
+        remaining.textContent = `${remainingWeight}%`;
+        summary.classList.toggle('is-complete', totalWeight === 100);
+        summary.classList.toggle('is-over', totalWeight > 100);
+        summary.querySelector('span')?.replaceChildren(`Bobot ${isVehicle ? 'Kendaraan' : 'Driver'}`);
+    };
+
+    targetInput.addEventListener('change', renderWeight);
+    weightInput.addEventListener('input', renderWeight);
+    renderWeight();
+});
+
 const renderQuestionPreview = () => {
     const preview = document.querySelector('[data-question-preview]');
     const questionInput = document.querySelector('[data-question-input]');
@@ -368,4 +537,108 @@ document.addEventListener('DOMContentLoaded', () => {
             updateStars(selected.value);
         }
     });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const list = document.querySelector('[data-question-reorder-list]');
+    const form = document.querySelector('[data-question-reorder-form]');
+    const inputs = document.querySelector('[data-question-order-inputs]');
+
+    if (!list || !form || !inputs) {
+        return;
+    }
+
+    let draggedRow;
+
+    const rows = () => [...list.querySelectorAll('[data-question-row]')];
+
+    const positions = () => new Map(rows().map((row) => [row, row.getBoundingClientRect()]));
+
+    const animateReposition = (before) => {
+        rows().forEach((row) => {
+            const previous = before.get(row);
+            const current = row.getBoundingClientRect();
+            const distance = previous ? previous.top - current.top : 0;
+
+            if (Math.abs(distance) < 1) {
+                return;
+            }
+
+            row.querySelectorAll('td').forEach((cell) => {
+                cell.animate([
+                    { transform: `translateY(${distance}px)` },
+                    { transform: 'translateY(0)' },
+                ], {
+                    duration: 260,
+                    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                });
+            });
+        });
+    };
+
+    const syncOrder = () => {
+        inputs.replaceChildren();
+
+        rows().forEach((row, index) => {
+            const position = String(index + 1);
+            row.querySelector('[data-question-position]')?.replaceChildren(position);
+            row.querySelector('[data-question-sort-order]')?.replaceChildren(position);
+
+            const input = document.createElement('input');
+            input.name = 'order[]';
+            input.type = 'hidden';
+            input.value = row.dataset.questionId ?? '';
+            inputs.appendChild(input);
+        });
+    };
+
+    list.addEventListener('dragstart', (event) => {
+        const row = event.target.closest('[data-question-row]');
+        if (!(row instanceof HTMLTableRowElement)) {
+            return;
+        }
+
+        draggedRow = row;
+        row.classList.add('is-dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', row.dataset.questionId ?? '');
+    });
+
+    list.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        const target = event.target.closest('[data-question-row]');
+        if (!draggedRow || !(target instanceof HTMLTableRowElement) || target === draggedRow) {
+            return;
+        }
+
+        rows().forEach((row) => row.classList.remove('is-drag-over'));
+        target.classList.add('is-drag-over');
+
+        const targetBounds = target.getBoundingClientRect();
+        const insertAfter = event.clientY > targetBounds.top + targetBounds.height / 2;
+        const reference = insertAfter ? target.nextSibling : target;
+        if (reference === draggedRow) {
+            return;
+        }
+
+        const before = positions();
+        list.insertBefore(draggedRow, reference);
+        animateReposition(before);
+        syncOrder();
+    });
+
+    list.addEventListener('drop', (event) => {
+        event.preventDefault();
+        syncOrder();
+    });
+
+    list.addEventListener('dragend', () => {
+        draggedRow?.classList.remove('is-dragging');
+        rows().forEach((row) => row.classList.remove('is-drag-over'));
+        draggedRow = undefined;
+        syncOrder();
+    });
+
+    form.addEventListener('submit', syncOrder);
+    syncOrder();
 });

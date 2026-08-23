@@ -1,11 +1,7 @@
 <x-layouts.admin title="Detail Kendaraan">
-    <x-admin.page-header title="{{ $vehicle->police_number }}" description="Detail kendaraan dan QR untuk akses penumpang.">
-        <a class="secondary-button" href="{{ route('admin.vehicles.index') }}">Kembali</a>
-    </x-admin.page-header>
+    <div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.vehicles.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div>
 
-    <x-admin.flash />
-
-    <div class="detail-layout">
+    <div class="detail-layout branch-detail-layout">
         <x-admin.panel title="Data Kendaraan">
             <div class="detail-grid">
                 <x-admin.detail-row label="Cabang" :value="$vehicle->branch?->name" />
@@ -39,7 +35,7 @@
                 <a class="secondary-button" href="{{ route('admin.vehicles.qr.download', $vehicle) }}">Download QR</a>
                 <a class="secondary-button" href="{{ route('admin.vehicles.qr.print', $vehicle) }}" target="_blank" rel="noopener">Print QR</a>
                 <form method="POST" action="{{ route('admin.vehicles.regenerate-qr', $vehicle) }}">@csrf @method('PATCH')<button class="secondary-button" type="submit">Regenerate QR</button></form>
-                <a class="secondary-button" href="{{ route('admin.vehicles.edit', $vehicle) }}">Edit Kendaraan</a>
+                <a class="secondary-button" href="{{ route('admin.vehicles.edit', ['vehicle' => $vehicle, 'return_to' => 'detail']) }}">Edit Kendaraan</a>
                 <form method="POST" action="{{ route('admin.vehicles.toggle-status', $vehicle) }}">@csrf @method('PATCH')<button class="secondary-button" type="submit">{{ $vehicle->status === 'active' ? 'Nonaktifkan' : 'Aktifkan' }}</button></form>
                 <form method="POST" action="{{ route('admin.vehicles.destroy', $vehicle) }}">@csrf @method('DELETE')<button class="danger-button" type="submit">Hapus</button></form>
             </div>

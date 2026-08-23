@@ -7,14 +7,14 @@
                 </div>
                 <p>Evaluasi kendaraan dan driver secara<br>mudah, akurat, dan terstruktur</p>
             </div>
-            <small>&copy; {{ now()->year }} LAIS. Semua hak dilindungi.</small>
+            <small>&copy; {{ now()->year }}. Semua hak dilindungi.</small>
         </aside>
 
         <section class="lais-auth-form-area" aria-labelledby="login-title">
             <div class="lais-auth-card">
                 <header>
-                    <h1 id="login-title">Selamat datang</h1>
-                    <p>Masuk menggunakan akun administrator LAIS.</p>
+                    <h1 id="login-title">Selamat Datang!</h1>
+                    <p>Masuk menggunakan akun administrator</p>
                 </header>
 
                 <form class="lais-auth-form" method="POST" action="{{ route('login.store') }}">

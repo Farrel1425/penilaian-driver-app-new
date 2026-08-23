@@ -50,7 +50,7 @@ class ImageUploadTest extends TestCase
             'model' => $vehicle->model,
             'status' => Vehicle::STATUS_ACTIVE,
             'photo' => UploadedFile::fake()->image('new.jpg', 1600, 900),
-        ])->assertRedirect(route('admin.vehicles.show', $vehicle));
+        ])->assertRedirect(route('admin.vehicles.index'));
 
         $vehicle->refresh();
 

@@ -14,28 +14,38 @@ class QuestionController extends Controller
 {
     public function index(Request $request): View
     {
-        $questions = Question::query()
-            ->withCount('options')
-            ->when($request->string('search')->toString(), fn ($query, string $search) => $query->where('question', 'like', "%{$search}%"))
-            ->when($request->string('target_type')->toString(), fn ($query, string $target) => $query->where('target_type', $target))
-            ->when($request->string('answer_type')->toString(), fn ($query, string $type) => $query->where('answer_type', $type))
-            ->when($request->string('status')->toString(), fn ($query, string $status) => $query->where('status', $status))
-            ->ordered()
-            ->paginate(10)
-            ->withQueryString();
+        $isReordering = $request->boolean('reorder');
+        $query = Question::query()->withCount('options')->ordered();
 
-        return view('admin.questions.index', ['questions' => $questions]);
+        if ($isReordering) {
+            $questions = $query->get();
+        } else {
+            $questions = $query
+                ->when($request->string('search')->toString(), fn ($query, string $search) => $query->where('question', 'like', "%{$search}%"))
+                ->when($request->string('target_type')->toString(), fn ($query, string $target) => $query->where('target_type', $target))
+                ->when($request->string('answer_type')->toString(), fn ($query, string $type) => $query->where('answer_type', $type))
+                ->when($request->string('status')->toString(), fn ($query, string $status) => $query->where('status', $status))
+                ->paginate(10)
+                ->withQueryString();
+        }
+
+        return view('admin.questions.index', compact('questions', 'isReordering'));
     }
 
     public function create(): View
     {
-        return view('admin.questions.create', ['question' => new Question()]);
+        return view('admin.questions.create', [
+            'question' => new Question(['status' => Question::STATUS_INACTIVE]),
+            'weightSummary' => $this->weightSummary(),
+        ]);
     }
 
     public function store(QuestionRequest $request): RedirectResponse
     {
         $question = DB::transaction(function () use ($request): Question {
-            $question = Question::query()->create($request->questionData());
+            $data = $request->questionData();
+            $data['sort_order'] = ((int) Question::query()->max('sort_order')) + 1;
+            $question = Question::query()->create($data);
             $this->syncOptions($question, $request->normalizedOptions());
 
             return $question;
@@ -51,11 +61,15 @@ class QuestionController extends Controller
         return view('admin.questions.show', compact('question'));
     }
 
-    public function edit(Question $question): View
+    public function edit(Request $request, Question $question): View
     {
         $question->load('options');
 
-        return view('admin.questions.edit', compact('question'));
+        return view('admin.questions.edit', [
+            'question' => $question,
+            'weightSummary' => $this->weightSummary($question),
+            'returnTo' => $request->string('return_to')->toString() === 'detail' ? 'detail' : 'index',
+        ]);
     }
 
     public function update(QuestionRequest $request, Question $question): RedirectResponse
@@ -65,14 +79,54 @@ class QuestionController extends Controller
             $this->syncOptions($question, $request->normalizedOptions());
         });
 
-        return redirect()->route('admin.questions.show', $question)->with('status', 'Pertanyaan berhasil diperbarui.');
+        if ($request->input('return_to') === 'detail') {
+            return redirect()->route('admin.questions.show', $question)->with('status', 'Pertanyaan berhasil diperbarui.');
+        }
+
+        return redirect()->route('admin.questions.index')->with('status', 'Pertanyaan berhasil diperbarui.');
     }
 
     public function toggleStatus(Question $question): RedirectResponse
     {
-        $question->update(['status' => $question->status === Question::STATUS_ACTIVE ? Question::STATUS_INACTIVE : Question::STATUS_ACTIVE]);
+        if ($question->status === Question::STATUS_INACTIVE && $this->weightTotal($question->target_type) !== 100) {
+            $targetLabel = $question->target_type === Question::TARGET_DRIVER ? 'Driver' : 'Kendaraan';
+
+            return back()->with('error', "Pertanyaan {$targetLabel} hanya dapat diaktifkan bila total bobot tepat 100%.");
+        }
+
+        $question->update([
+            'status' => $question->status === Question::STATUS_ACTIVE
+                ? Question::STATUS_INACTIVE
+                : Question::STATUS_ACTIVE,
+        ]);
 
         return back()->with('status', 'Status pertanyaan berhasil diperbarui.');
+    }
+
+    public function reorder(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'order' => ['required', 'array', 'min:1'],
+            'order.*' => ['required', 'integer', 'distinct', 'exists:questions,id'],
+        ]);
+
+        $order = array_map('intval', $data['order']);
+        $currentIds = Question::query()->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $submittedIds = $order;
+        sort($currentIds);
+        sort($submittedIds);
+
+        if ($currentIds !== $submittedIds) {
+            return back()->with('error', 'Urutan tidak dapat disimpan karena data pertanyaan telah berubah. Silakan muat ulang halaman.');
+        }
+
+        DB::transaction(function () use ($order): void {
+            foreach ($order as $index => $questionId) {
+                Question::query()->whereKey($questionId)->update(['sort_order' => $index + 1]);
+            }
+        });
+
+        return redirect()->route('admin.questions.index')->with('status', 'Urutan pertanyaan berhasil diperbarui.');
     }
 
     public function destroy(Question $question): RedirectResponse
@@ -102,5 +156,21 @@ class QuestionController extends Controller
                 'sort_order' => $option['sort_order'] ?: $index + 1,
             ]);
         }
+    }
+
+    private function weightSummary(?Question $question = null): array
+    {
+        return [
+            Question::TARGET_DRIVER => $this->weightTotal(Question::TARGET_DRIVER, $question),
+            Question::TARGET_VEHICLE => $this->weightTotal(Question::TARGET_VEHICLE, $question),
+        ];
+    }
+
+    private function weightTotal(string $targetType, ?Question $excluding = null): int
+    {
+        return (int) Question::query()
+            ->where('target_type', $targetType)
+            ->when($excluding && $excluding->target_type === $targetType, fn ($query) => $query->whereKeyNot($excluding->id))
+            ->sum('weight');
     }
 }

@@ -1,4 +1,10 @@
 @csrf
+@php
+    $backUrl = isset($returnTo) && $returnTo === 'detail' ? route('admin.drivers.show', $driver) : route('admin.drivers.index');
+@endphp
+@if (isset($returnTo))
+    <input type="hidden" name="return_to" value="{{ $returnTo }}">
+@endif
 <div class="form-section-title">Data Pribadi</div>
 <div class="form-grid">
     <x-admin.select label="Cabang" name="branch_id" required>
@@ -36,6 +42,6 @@
     <x-admin.field label="Path Foto SIM" name="sim_photo" :value="$driver->sim_photo" />
 </div>
 <div class="form-actions">
-    <a class="secondary-button" href="{{ route('admin.drivers.index') }}">Batal</a>
+    <a class="secondary-button" href="{{ $backUrl }}">Batal</a>
     <button class="primary-button" type="submit">Simpan</button>
 </div>

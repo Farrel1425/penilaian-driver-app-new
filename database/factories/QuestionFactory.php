@@ -14,6 +14,7 @@ class QuestionFactory extends Factory
     {
         return [
             'question' => $this->faker->sentence(),
+            'indicator' => 'Indikator Uji',
             'target_type' => $this->faker->randomElement([Question::TARGET_DRIVER, Question::TARGET_VEHICLE]),
             'answer_type' => $this->faker->randomElement([
                 Question::TYPE_RATING,
@@ -22,6 +23,7 @@ class QuestionFactory extends Factory
                 Question::TYPE_PARAGRAPH,
             ]),
             'is_required' => true,
+            'weight' => 10,
             'sort_order' => $this->faker->numberBetween(1, 20),
             'status' => Question::STATUS_ACTIVE,
         ];
