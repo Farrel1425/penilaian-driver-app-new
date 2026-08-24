@@ -1,4 +1,4 @@
 <x-layouts.admin title="Edit Admin">
-    <x-admin.page-header title="Edit Admin" description="Perbarui data dan akses akun administrator."><x-slot:actions><a href="{{ route('admin.users.show', $user) }}" class="admin-secondary-button">Kembali</a></x-slot:actions></x-admin.page-header>
-    @include('admin.users._form', ['user' => $user])
+    <div class="resource-page-navigation"><a class="primary-button" href="{{ $returnTo === 'detail' ? route('admin.users.show', $user) : route('admin.users.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div>
+    @include('admin.users._form', ['user' => $user, 'returnTo' => $returnTo])
 </x-layouts.admin>

@@ -27,6 +27,7 @@
                         <option value="">Semua Kategori</option>
                         <option value="driver" @selected(request('target_type') === 'driver')>Driver</option>
                         <option value="vehicle" @selected(request('target_type') === 'vehicle')>Kendaraan</option>
+                        <option value="feedback" @selected(request('target_type') === 'feedback')>Feedback/Keluhan</option>
                     </select>
 
                     <select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status">
@@ -69,7 +70,7 @@
                             <td class="question-cell-question">{{ $question->question }}</td>
                             <td>
                                 <span class="question-target-badge question-target-{{ $question->target_type }}">
-                                    {{ $question->target_type === 'driver' ? 'Driver' : 'Kendaraan' }}
+                                    {{ App\Models\Question::targetLabel($question->target_type) }}
                                 </span>
                             </td>
                             <td>{{ $question->indicator }}</td>

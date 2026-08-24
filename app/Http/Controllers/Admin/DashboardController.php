@@ -18,6 +18,7 @@ class DashboardController extends Controller
             'filters' => $filters,
             'branches' => $analytics->branches(),
             'data' => $analytics->dashboard($filters),
+            'analytics' => $analytics,
         ]);
     }
 }

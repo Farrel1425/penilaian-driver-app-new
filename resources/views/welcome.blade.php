@@ -4,8 +4,8 @@
             <div class="login-brand">
                 <div class="brand-mark">PD</div>
                 <div>
-                    <p class="brand-title">Penilaian</p>
-                    <p class="brand-subtitle">Driver & Kendaraan</p>
+                    <p class="brand-title">Sistem Penilaian Driver</p>
+                    <p class="brand-subtitle">Evaluasi Driver &amp; Kendaraan</p>
                 </div>
             </div>
             <div class="login-copy">

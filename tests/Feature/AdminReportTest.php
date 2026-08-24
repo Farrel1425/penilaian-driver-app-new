@@ -37,7 +37,7 @@ class AdminReportTest extends TestCase
 
         $this->get(route('admin.reports.drivers'))
             ->assertOk()
-            ->assertSee('Average Rating')
+            ->assertSee('Rating Rata-rata')
             ->assertSee('5')
             ->assertDontSee('2.5');
     }
@@ -47,15 +47,17 @@ class AdminReportTest extends TestCase
         $this->actingAs(User::factory()->create());
         [$branchA, $driverA, $vehicleA] = $this->makeEntities();
         [$branchB, $driverB, $vehicleB] = $this->makeEntities();
+        $driverA->update(['photo' => 'drivers/dashboard-test.jpg']);
         $question = Question::factory()->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_RATING]);
         $this->makeRating($branchA, $driverA, $vehicleA, $question, 5);
         $this->makeRating($branchB, $driverB, $vehicleB, $question, 1);
 
         $this->get(route('admin.dashboard', ['branch_id' => $branchA->id]))
             ->assertOk()
-            ->assertSee('1 penilaian')
-            ->assertSee('Avg 5')
-            ->assertDontSee('Avg 1');
+            ->assertSee('Total Penilaian')
+            ->assertSee($driverA->full_name)
+            ->assertSee('storage/drivers/dashboard-test.jpg')
+            ->assertDontSee($driverB->full_name);
     }
 
     public function test_date_range_filter_limits_monitoring_data(): void
@@ -89,9 +91,56 @@ class AdminReportTest extends TestCase
         $this->get(route('admin.reports.vehicles'))->assertOk()->assertSee($vehicle->police_number)->assertSee('3');
     }
 
+    public function test_history_recap_and_branch_report_use_actual_ratings(): void
+    {
+        $this->actingAs(User::factory()->create());
+        [$branch, $driver, $vehicle] = $this->makeEntities();
+        $ratingQuestion = Question::factory()->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_RATING]);
+        $commentQuestion = Question::factory()->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_PARAGRAPH]);
+        $rating = $this->makeRating($branch, $driver, $vehicle, $ratingQuestion, 5);
+        $rating->answers()->create(['question_id' => $commentQuestion->id, 'answer_text' => 'Pelayanan sangat baik.']);
+
+        $this->get(route('admin.assessments.index', ['search' => $driver->full_name]))
+            ->assertOk()
+            ->assertSee($driver->full_name)
+            ->assertSee('Pelayanan sangat baik.');
+        $this->get(route('admin.assessments.show', $rating))->assertOk()->assertSee('Detail Penilaian')->assertSee('Pelayanan sangat baik.');
+        $this->get(route('admin.assessments.recap', ['group' => 'branch']))->assertOk()->assertSee($branch->name);
+        $this->get(route('admin.reports.branches'))->assertOk()->assertSee('Report Unit Kerja')->assertSee($branch->name);
+        $this->get(route('admin.assessments.export'))->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    }
+
+    public function test_system_profile_update_and_activity_log_are_recorded(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('admin.settings.edit'))
+            ->assertOk()
+            ->assertSee('Profil Sistem');
+
+        $this->actingAs($user)
+            ->put(route('admin.settings.update'), [
+                'system_name' => 'Sistem Penilaian Driver',
+                'support_contact' => 'admin@example.com',
+                'copyright_text' => '© 2026. Seluruh hak dilindungi.',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('system_settings', ['key' => 'system_name', 'value' => 'Sistem Penilaian Driver']);
+        $this->assertDatabaseHas('activity_logs', ['user_id' => $user->id, 'module' => 'Pengaturan Sistem', 'action' => 'Edit']);
+
+        $this->actingAs($user)
+            ->get(route('admin.activity-logs.index'))
+            ->assertOk()
+            ->assertSee('Pengaturan Sistem')
+            ->assertSee('Export Excel');
+    }
+
     private function makeEntities(): array
     {
         $branch = Branch::factory()->create();
+
         return [$branch, Driver::factory()->for($branch)->create(), Vehicle::factory()->for($branch)->create()];
     }
 
@@ -99,6 +148,7 @@ class AdminReportTest extends TestCase
     {
         $rating = Rating::factory()->for($branch)->for($driver)->for($vehicle)->create(['submitted_at' => $date]);
         $rating->answers()->create(['question_id' => $question->id, 'answer_value' => [$value]]);
+
         return $rating;
     }
 }

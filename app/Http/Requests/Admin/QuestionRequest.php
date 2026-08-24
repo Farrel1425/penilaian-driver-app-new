@@ -13,6 +13,13 @@ class QuestionRequest extends FormRequest
         if ($this->input('target_type') === Question::TARGET_VEHICLE) {
             $this->merge(['indicator' => Question::VEHICLE_INDICATOR]);
         }
+
+        if ($this->input('target_type') === Question::TARGET_FEEDBACK) {
+            $this->merge([
+                'indicator' => Question::FEEDBACK_INDICATOR,
+                'weight' => 0,
+            ]);
+        }
     }
 
     public function authorize(): bool
@@ -30,7 +37,7 @@ class QuestionRequest extends FormRequest
             'rating_max_label' => ['nullable', 'string', 'max:100'],
             'icon' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'indicator' => ['required', 'string', 'max:255'],
-            'target_type' => ['required', Rule::in([Question::TARGET_DRIVER, Question::TARGET_VEHICLE])],
+            'target_type' => ['required', Rule::in([Question::TARGET_DRIVER, Question::TARGET_VEHICLE, Question::TARGET_FEEDBACK])],
             'answer_type' => ['required', Rule::in([
                 Question::TYPE_RATING,
                 Question::TYPE_YES_NO,
@@ -40,7 +47,7 @@ class QuestionRequest extends FormRequest
                 Question::TYPE_PARAGRAPH,
             ])],
             'is_required' => ['required', 'boolean'],
-            'weight' => ['required', 'integer', 'min:1', 'max:100'],
+            'weight' => ['required', 'integer', 'min:0', 'max:100'],
             'status' => ['required', Rule::in([Question::STATUS_ACTIVE, Question::STATUS_INACTIVE])],
             'options' => ['nullable', 'array'],
             'options.*.option_text' => ['nullable', 'string', 'max:255'],
@@ -61,6 +68,10 @@ class QuestionRequest extends FormRequest
             }
 
             $targetType = $this->string('target_type')->toString();
+
+            if ($targetType === Question::TARGET_FEEDBACK) {
+                return;
+            }
             $currentQuestion = $this->route('question');
             $currentQuestionId = $currentQuestion instanceof Question ? $currentQuestion->id : null;
             $existingWeight = Question::query()

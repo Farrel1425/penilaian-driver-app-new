@@ -13,11 +13,15 @@ class ReportDriverController extends Controller
     public function __invoke(Request $request, RatingAnalyticsService $analytics): View
     {
         $filters = RatingReportFilters::fromRequest($request);
+        $ratings = $analytics->history($filters);
 
         return view('admin.reports.drivers', [
             'filters' => $filters,
             'branches' => $analytics->branches(),
+            'drivers' => $analytics->drivers($filters->branchId),
             'data' => $analytics->driverReport($filters),
+            'questionScores' => $analytics->questionScores($filters, 'driver'),
+            'comments' => $analytics->comments($ratings, 'driver')->take(6),
         ]);
     }
 }

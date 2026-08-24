@@ -1,5 +1,5 @@
 @php($field = "answers[{$question->id}]")
-<fieldset class="passenger-assessment-question">
+<fieldset class="passenger-assessment-question" @if($question->target_type === App\Models\Question::TARGET_FEEDBACK && $question->answer_type === App\Models\Question::TYPE_PARAGRAPH) data-feedback-followup hidden @endif>
     @if ($question->icon_path)
         <div class="passenger-question-icon"><img src="{{ Str::startsWith($question->icon_path, ['http://', 'https://', '/']) ? $question->icon_path : asset('storage/'.$question->icon_path) }}" alt="" aria-hidden="true"></div>
     @endif
@@ -25,7 +25,7 @@
     @elseif($question->answer_type === App\Models\Question::TYPE_MULTIPLE_CHOICE)
         <div class="passenger-answer-options">
             @foreach($question->options as $option)
-                <label><input type="radio" name="{{ $field }}" value="{{ $option->id }}" @checked((string) old("answers.{$question->id}") === (string) $option->id)><span>{{ $option->option_text }}</span></label>
+                <label><input type="radio" name="{{ $field }}" value="{{ $option->id }}" @if($question->target_type === App\Models\Question::TARGET_FEEDBACK) data-feedback-choice data-feedback-empty="{{ $option->sort_order === 1 ? 'true' : 'false' }}" @endif @checked((string) old("answers.{$question->id}") === (string) $option->id)><span>{{ $option->option_text }}</span></label>
             @endforeach
         </div>
     @elseif($question->answer_type === App\Models\Question::TYPE_CHECKBOX)

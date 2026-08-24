@@ -98,8 +98,10 @@ class QuestionController extends Controller
 
     public function toggleStatus(Question $question): RedirectResponse
     {
-        if ($question->status === Question::STATUS_INACTIVE && $this->weightTotal($question->target_type) !== 100) {
-            $targetLabel = $question->target_type === Question::TARGET_DRIVER ? 'Driver' : 'Kendaraan';
+        if (in_array($question->target_type, [Question::TARGET_DRIVER, Question::TARGET_VEHICLE], true)
+            && $question->status === Question::STATUS_INACTIVE
+            && $this->weightTotal($question->target_type) !== 100) {
+            $targetLabel = Question::targetLabel($question->target_type);
 
             return back()->with('error', "Pertanyaan {$targetLabel} hanya dapat diaktifkan bila total bobot tepat 100%.");
         }

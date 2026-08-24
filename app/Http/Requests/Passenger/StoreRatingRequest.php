@@ -33,6 +33,7 @@ class StoreRatingRequest extends FormRequest
 
             if ($question->is_required && $missing) {
                 $errors["answers.{$question->id}"] = 'Pertanyaan ini wajib dijawab.';
+
                 continue;
             }
 
@@ -45,12 +46,14 @@ class StoreRatingRequest extends FormRequest
             if ($question->answer_type === Question::TYPE_RATING) {
                 if (! in_array((int) $raw, [1, 2, 3, 4, 5], true)) {
                     $errors["answers.{$question->id}"] = 'Rating harus bernilai 1 sampai 5.';
+
                     continue;
                 }
                 $answer['answer_value'] = [(int) $raw];
             } elseif ($question->answer_type === Question::TYPE_YES_NO) {
                 if (! in_array((string) $raw, ['0', '1'], true)) {
                     $errors["answers.{$question->id}"] = 'Jawaban harus Ya atau Tidak.';
+
                     continue;
                 }
                 $answer['answer_value'] = [(int) $raw];
@@ -58,6 +61,7 @@ class StoreRatingRequest extends FormRequest
                 $allowed = $question->options->pluck('id')->map(fn ($id) => (string) $id)->all();
                 if (! in_array((string) $raw, $allowed, true)) {
                     $errors["answers.{$question->id}"] = 'Opsi jawaban tidak valid.';
+
                     continue;
                 }
                 $answer['answer_value'] = [(int) $raw];
@@ -67,6 +71,7 @@ class StoreRatingRequest extends FormRequest
                 $invalid = collect($values)->contains(fn ($value) => ! in_array((string) $value, $allowed, true));
                 if ($invalid) {
                     $errors["answers.{$question->id}"] = 'Opsi jawaban tidak valid.';
+
                     continue;
                 }
                 $answer['answer_value'] = collect($values)->map(fn ($value) => (int) $value)->values()->all();
@@ -75,6 +80,20 @@ class StoreRatingRequest extends FormRequest
             }
 
             $answers[] = $answer;
+        }
+
+        $feedbackChoice = $questions->first(fn (Question $question): bool => $question->target_type === Question::TARGET_FEEDBACK
+            && $question->answer_type === Question::TYPE_MULTIPLE_CHOICE);
+        $feedbackFollowUp = $questions->first(fn (Question $question): bool => $question->target_type === Question::TARGET_FEEDBACK
+            && $question->answer_type === Question::TYPE_PARAGRAPH);
+
+        if ($feedbackChoice && $feedbackFollowUp && filled($input[$feedbackChoice->id] ?? null)) {
+            $selectedOption = $feedbackChoice->options->firstWhere('id', (int) $input[$feedbackChoice->id]);
+            $followUp = trim((string) ($input[$feedbackFollowUp->id] ?? ''));
+
+            if ($selectedOption && $selectedOption->sort_order > 1 && $followUp === '') {
+                $errors["answers.{$feedbackFollowUp->id}"] = 'Mohon jelaskan kondisi yang perlu ditindaklanjuti.';
+            }
         }
 
         if ($errors !== []) {

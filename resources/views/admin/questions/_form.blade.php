@@ -22,6 +22,7 @@
             <x-admin.select label="Target" name="target_type" required data-weight-target>
                 <option value="{{ App\Models\Question::TARGET_DRIVER }}" @selected(old('target_type', $question->target_type ?? App\Models\Question::TARGET_DRIVER) === App\Models\Question::TARGET_DRIVER)>Driver</option>
                 <option value="{{ App\Models\Question::TARGET_VEHICLE }}" @selected(old('target_type', $question->target_type) === App\Models\Question::TARGET_VEHICLE)>Kendaraan</option>
+                <option value="{{ App\Models\Question::TARGET_FEEDBACK }}" @selected(old('target_type', $question->target_type) === App\Models\Question::TARGET_FEEDBACK)>Feedback/Keluhan</option>
             </x-admin.select>
             <x-admin.field label="Indikator" name="indicator" :value="$question->indicator" required data-indicator-input />
             <x-admin.select label="Tipe Jawaban" name="answer_type" required data-answer-type>
@@ -40,7 +41,7 @@
                 <option value="1" @selected((string) old('is_required', (int) ($question->is_required ?? true)) === '1')>Wajib</option>
                 <option value="0" @selected((string) old('is_required', (int) ($question->is_required ?? true)) === '0')>Tidak Wajib</option>
             </x-admin.select>
-            <x-admin.field label="Bobot (%)" name="weight" type="number" :value="$question->weight" min="1" max="100" required data-question-weight />
+            <x-admin.field label="Bobot (%)" name="weight" type="number" :value="$question->weight" min="0" max="100" required data-question-weight />
             <x-admin.select label="Status" name="status" required>
                 <option value="{{ App\Models\Question::STATUS_ACTIVE }}" @selected(old('status', $question->status ?? App\Models\Question::STATUS_ACTIVE) === App\Models\Question::STATUS_ACTIVE)>Aktif</option>
                 <option value="{{ App\Models\Question::STATUS_INACTIVE }}" @selected(old('status', $question->status) === App\Models\Question::STATUS_INACTIVE)>Nonaktif</option>

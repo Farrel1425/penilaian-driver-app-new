@@ -27,8 +27,34 @@
             @endforelse
         </section>
 
+        <section class="passenger-assessment-group passenger-feedback-group">
+            <h2>Feedback / Keluhan</h2>
+            <p class="passenger-feedback-intro">Sampaikan bila ada kondisi yang perlu kami tindak lanjuti.</p>
+            @forelse($questions->get(App\Models\Question::TARGET_FEEDBACK, collect()) as $question)
+                @include('passenger.partials.question', ['question' => $question, 'number' => ++$number])
+            @empty
+                <div class="passenger-assessment-empty">Tidak ada feedback tambahan.</div>
+            @endforelse
+        </section>
+
         <footer class="passenger-assessment-footer">
             <button type="submit">Kirim Penilaian</button>
         </footer>
     </form>
+
+    <script>
+        const feedbackFollowUp = document.querySelector('[data-feedback-followup]');
+        const selectedFeedbackChoice = document.querySelector('[data-feedback-choice]:checked');
+
+        if (feedbackFollowUp && selectedFeedbackChoice) {
+            feedbackFollowUp.hidden = selectedFeedbackChoice.dataset.feedbackEmpty === 'true';
+        }
+
+        document.querySelectorAll('[data-feedback-choice]').forEach((input) => {
+            input.addEventListener('change', (event) => {
+                if (!feedbackFollowUp) return;
+                feedbackFollowUp.hidden = event.target.dataset.feedbackEmpty === 'true';
+            });
+        });
+    </script>
 </x-passenger.layout>

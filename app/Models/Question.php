@@ -19,7 +19,21 @@ class Question extends Model
 
     public const TARGET_VEHICLE = 'vehicle';
 
+    public const TARGET_FEEDBACK = 'feedback';
+
     public const VEHICLE_INDICATOR = 'Kendaraan';
+
+    public const FEEDBACK_INDICATOR = 'Feedback/Keluhan';
+
+    public static function targetLabel(string $targetType): string
+    {
+        return match ($targetType) {
+            self::TARGET_DRIVER => 'Driver',
+            self::TARGET_VEHICLE => 'Kendaraan',
+            self::TARGET_FEEDBACK => 'Feedback/Keluhan',
+            default => $targetType,
+        };
+    }
 
     public const TYPE_RATING = 'rating';
 

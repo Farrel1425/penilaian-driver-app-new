@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.querySelector('[data-app-loading]');
     let loadingTimer;
+    let loadingSafetyTimer;
 
     if (!loadingOverlay) {
         return;
@@ -56,18 +57,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showLoading = () => {
         window.clearTimeout(loadingTimer);
+        window.clearTimeout(loadingSafetyTimer);
         loadingTimer = window.setTimeout(() => {
             loadingOverlay.hidden = false;
+            loadingOverlay.setAttribute('aria-busy', 'true');
             window.requestAnimationFrame(() => loadingOverlay.classList.add('is-visible'));
+
+            // A canceled navigation must never leave the interface blocked.
+            loadingSafetyTimer = window.setTimeout(hideLoading, 7000);
         }, 350);
     };
 
     const hideLoading = () => {
         window.clearTimeout(loadingTimer);
+        window.clearTimeout(loadingSafetyTimer);
         loadingOverlay.classList.remove('is-visible');
-        window.setTimeout(() => {
-            loadingOverlay.hidden = true;
-        }, 160);
+        loadingOverlay.setAttribute('aria-busy', 'false');
+        loadingOverlay.hidden = true;
     };
 
     document.addEventListener('submit', (event) => {
@@ -106,7 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
         window.setTimeout(dismiss, 6000);
     });
 
+    // Cover normal loads, browser back/forward cache restores, and failed navigation.
+    hideLoading();
     window.addEventListener('pageshow', hideLoading);
+    window.addEventListener('popstate', hideLoading);
+    window.addEventListener('focus', hideLoading);
+    window.addEventListener('error', hideLoading);
+    window.addEventListener('unhandledrejection', hideLoading);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            hideLoading();
+        }
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -291,23 +308,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderWeight = () => {
         const isVehicle = targetInput.value === 'vehicle';
+        const isFeedback = targetInput.value === 'feedback';
         const baseWeight = Number(isVehicle ? summary.dataset.vehicleBase : summary.dataset.driverBase) || 0;
-        const currentWeight = Math.max(0, Number(weightInput.value) || 0);
+        const currentWeight = isFeedback ? 0 : Math.max(0, Number(weightInput.value) || 0);
         const totalWeight = baseWeight + currentWeight;
         const remainingWeight = Math.max(0, 100 - totalWeight);
 
-        indicatorInput.readOnly = isVehicle;
-        indicatorInput.classList.toggle('is-readonly', isVehicle);
+        indicatorInput.readOnly = isVehicle || isFeedback;
+        indicatorInput.classList.toggle('is-readonly', isVehicle || isFeedback);
         if (isVehicle) {
             indicatorInput.value = 'Kendaraan';
+        } else if (isFeedback) {
+            indicatorInput.value = 'Feedback/Keluhan';
         } else if (indicatorInput.value === 'Kendaraan') {
             indicatorInput.value = '';
         }
 
-        weightInput.max = String(Math.max(0, 100 - baseWeight));
+        weightInput.readOnly = isFeedback;
+        weightInput.classList.toggle('is-readonly', isFeedback);
+        if (isFeedback) {
+            weightInput.value = '0';
+        }
+        weightInput.max = String(isFeedback ? 0 : Math.max(0, 100 - baseWeight));
         used.textContent = `${totalWeight}%`;
         remaining.textContent = `${remainingWeight}%`;
-        summary.classList.toggle('is-complete', totalWeight === 100);
+        summary.hidden = isFeedback;
+        summary.classList.toggle('is-complete', totalWeight === 100 && !isFeedback);
         summary.classList.toggle('is-over', totalWeight > 100);
         summary.querySelector('span')?.replaceChildren(`Bobot ${isVehicle ? 'Kendaraan' : 'Driver'}`);
     };
@@ -355,7 +381,11 @@ const renderQuestionPreview = () => {
 
     title.textContent = questionInput.value.trim() || 'Bagaimana keramahan driver?';
     if (target) {
-        target.textContent = targetInput?.value === 'vehicle' ? 'Penilaian Kendaraan' : 'Penilaian Driver';
+        target.textContent = targetInput?.value === 'vehicle'
+            ? 'Penilaian Kendaraan'
+            : targetInput?.value === 'feedback'
+                ? 'Feedback / Keluhan'
+                : 'Penilaian Driver';
     }
     if (instruction) {
         instruction.textContent = instructionInput?.value.trim() || '';
@@ -773,4 +803,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', syncOrder);
     syncOrder();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-chart-controls]').forEach((controls) => {
+        const card = controls.closest('.dashboard-trend-card');
+        const canvas = card?.querySelector('[data-chart-canvas]');
+        const scrollArea = card?.querySelector('[data-chart-scroll]');
+        const label = controls.querySelector('[data-chart-zoom-label]');
+
+        if (!(canvas instanceof HTMLElement) || !(scrollArea instanceof HTMLElement) || !label) {
+            return;
+        }
+
+        const baseWidth = Number(canvas.dataset.chartBaseWidth) || 760;
+        let zoom = 1;
+
+        const renderZoom = () => {
+            canvas.style.width = `${Math.round(baseWidth * zoom)}px`;
+            label.textContent = `${Math.round(zoom * 100)}%`;
+        };
+
+        controls.querySelector('[data-chart-zoom-in]')?.addEventListener('click', () => {
+            zoom = Math.min(1.8, zoom + 0.2);
+            renderZoom();
+        });
+
+        controls.querySelector('[data-chart-zoom-out]')?.addEventListener('click', () => {
+            zoom = Math.max(0.7, zoom - 0.2);
+            renderZoom();
+        });
+
+        scrollArea.addEventListener('wheel', (event) => {
+            if (!event.shiftKey) {
+                return;
+            }
+
+            event.preventDefault();
+            scrollArea.scrollLeft += event.deltaY;
+        }, { passive: false });
+
+        renderZoom();
+    });
 });

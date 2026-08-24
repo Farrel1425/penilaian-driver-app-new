@@ -52,9 +52,11 @@ class UserController extends Controller
         return view('admin.users.show', compact('user'));
     }
 
-    public function edit(User $user): View
+    public function edit(Request $request, User $user): View
     {
-        return view('admin.users.edit', compact('user'));
+        $returnTo = $request->string('return_to')->toString() === 'detail' ? 'detail' : 'index';
+
+        return view('admin.users.edit', compact('user', 'returnTo'));
     }
 
     public function update(UserRequest $request, User $user): RedirectResponse
@@ -81,7 +83,9 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('admin.users.show', $user)->with('status', 'Admin berhasil diperbarui.');
+        return $request->string('return_to')->toString() === 'detail'
+            ? redirect()->route('admin.users.show', $user)->with('status', 'Admin berhasil diperbarui.')
+            : redirect()->route('admin.users.index')->with('status', 'Admin berhasil diperbarui.');
     }
 
     public function toggleStatus(User $user): RedirectResponse

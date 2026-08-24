@@ -1,4 +1,4 @@
 <x-layouts.admin title="Tambah Admin">
-    <x-admin.page-header title="Tambah Admin" description="Buat akun administrator baru untuk mengelola LAIS."><x-slot:actions><a href="{{ route('admin.users.index') }}" class="admin-secondary-button">Kembali</a></x-slot:actions></x-admin.page-header>
+    <div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.users.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div>
     @include('admin.users._form', ['user' => $user])
 </x-layouts.admin>
