@@ -24,7 +24,16 @@
         </button>
 
         <div class="admin-profile-dropdown" data-profile-dropdown role="menu">
-            <div class="admin-profile-dropdown-user"><strong>{{ auth()->user()->name ?? 'Admin' }}</strong><span>{{ auth()->user()->email ?? '' }}</span></div>
+            <a class="admin-profile-dropdown-user" href="{{ route('admin.users.show', auth()->user()) }}" role="menuitem">
+                <span class="admin-profile-dropdown-avatar">
+                    @if (auth()->user()?->photo)
+                        <img src="{{ str_starts_with(auth()->user()->photo, 'http') ? auth()->user()->photo : asset('storage/'.auth()->user()->photo) }}" alt="Foto profil {{ auth()->user()->name }}">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    @endif
+                </span>
+                <span class="admin-profile-dropdown-copy"><strong>{{ auth()->user()->name ?? 'Admin' }}</strong><span>{{ auth()->user()->email ?? '' }}</span></span>
+            </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" role="menuitem"><x-lucide-log-out aria-hidden="true" /><span>Logout</span></button>

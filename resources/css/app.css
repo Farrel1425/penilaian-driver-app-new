@@ -3258,6 +3258,35 @@ button {
 .activity-log-filter .primary-button { height: 42px; justify-content: center; white-space: nowrap; }
 .activity-log-export { margin-left: auto; }
 .activity-log-table-panel { padding-bottom: 0; }
+.activity-log-pagination {
+    align-items: center;
+    border-top: 1px solid #e0e3e5;
+    color: #667085;
+    display: flex;
+    font-size: 12px;
+    justify-content: space-between;
+    padding: 16px 20px;
+}
+.activity-log-pagination nav { display: flex; gap: 5px; }
+.activity-log-page-button {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dfe3e8;
+    border-radius: 4px;
+    color: #667085;
+    display: inline-flex;
+    height: 32px;
+    justify-content: center;
+    min-width: 32px;
+    text-decoration: none;
+}
+.activity-log-page-button:hover { background: #edf3ff; border-color: #c6d7f5; color: #2463eb; }
+.activity-log-page-button.is-current { background: #2463eb; border-color: #2463eb; color: #ffffff; font-weight: 700; }
+.activity-log-page-button.is-disabled { background: #f8fafc; color: #c0cad8; cursor: not-allowed; }
+.activity-log-page-button svg { height: 16px; width: 16px; }
+@media (max-width: 720px) {
+    .activity-log-pagination { align-items: flex-start; flex-direction: column; gap: 12px; padding: 14px 16px; }
+}
 .activity-module-badge,
 .activity-action-badge { border-radius: 999px; display: inline-flex; font-size: 12px; font-weight: 650; padding: 5px 10px; white-space: nowrap; }
 .activity-module-badge { background: #e8f0ff; color: #2455bc; }
@@ -7201,16 +7230,41 @@ button {
     display: block;
 }
 .admin-profile-dropdown-user {
+    align-items: center;
     border-bottom: 1px solid #edf1f6;
+    color: inherit;
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px 12px;
+    text-decoration: none;
+}
+.admin-profile-dropdown-user:hover { background: #f5f8fe; }
+.admin-profile-dropdown-avatar {
+    align-items: center;
+    background: #e8eef8;
+    border: 1px solid #d8e2f0;
+    border-radius: 50%;
+    color: #526b90;
+    display: inline-flex;
+    flex: 0 0 36px;
+    font-size: 13px;
+    font-weight: 750;
+    height: 36px;
+    justify-content: center;
+    overflow: hidden;
+    width: 36px;
+}
+.admin-profile-dropdown-avatar img { height: 100%; object-fit: cover; width: 100%; }
+.admin-profile-dropdown-copy {
     display: grid;
     gap: 3px;
-    padding: 10px 12px 12px;
+    min-width: 0;
 }
 .admin-profile-dropdown-user strong {
     color: #17233b;
     font-size: 13px;
 }
-.admin-profile-dropdown-user span {
+.admin-profile-dropdown-copy > span {
     color: #71809a;
     font-size: 11px;
     overflow: hidden;

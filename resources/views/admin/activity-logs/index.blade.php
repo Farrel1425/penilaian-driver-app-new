@@ -39,6 +39,23 @@
                 </tbody>
             </table>
         </div>
-        <div class="table-footer">{{ $logs->links() }}</div>
+        <footer class="activity-log-pagination">
+            <span>Menampilkan {{ $logs->firstItem() ?? 0 }} - {{ $logs->lastItem() ?? 0 }} dari {{ $logs->total() }} aktivitas</span>
+            @if ($logs->hasPages())
+                <nav aria-label="Pagination log aktivitas">
+                    @if ($logs->onFirstPage())
+                        <span class="activity-log-page-button is-disabled"><x-lucide-chevron-left aria-hidden="true" /></span>
+                    @else
+                        <a class="activity-log-page-button" href="{{ $logs->previousPageUrl() }}" aria-label="Halaman sebelumnya"><x-lucide-chevron-left aria-hidden="true" /></a>
+                    @endif
+                    <span class="activity-log-page-button is-current" aria-current="page">{{ $logs->currentPage() }}</span>
+                    @if ($logs->hasMorePages())
+                        <a class="activity-log-page-button" href="{{ $logs->nextPageUrl() }}" aria-label="Halaman berikutnya"><x-lucide-chevron-right aria-hidden="true" /></a>
+                    @else
+                        <span class="activity-log-page-button is-disabled"><x-lucide-chevron-right aria-hidden="true" /></span>
+                    @endif
+                </nav>
+            @endif
+        </footer>
     </x-admin.panel>
 </x-layouts.admin>

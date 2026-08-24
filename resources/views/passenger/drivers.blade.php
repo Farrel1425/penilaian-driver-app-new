@@ -34,7 +34,7 @@
 
         <aside class="passenger-driver-help">
             <x-lucide-info aria-hidden="true" />
-            <p>Tidak menemukan driver?<br>Hubungi unit kerja Anda</p>
+            <p>Sesuaikan dengan driver yang bertugas</p>
         </aside>
     </section>
 </x-passenger.layout>
