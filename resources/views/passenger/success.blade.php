@@ -4,6 +4,6 @@
         <h1>Terima Kasih!</h1>
         <p>Penilaian Anda telah berhasil dikirim.</p>
         <p class="passenger-success-note">Partisipasi Anda sangat berarti bagi kami untuk pelayanan yang lebih baik.</p>
-        <a class="passenger-success-finish" href="{{ route('passenger.rating.vehicle', $vehicle->qr_token) }}">Selesai</a>
+        <a class="passenger-success-finish" href="{{ route('passenger.rating.vehicle', $vehicle->qr_token) }}">Detail Kendaraan</a>
     </section>
 </x-passenger.layout>

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['branch_id', 'vehicle_id', 'driver_id', 'submitted_at'])]
+#[Fillable(['branch_id', 'vehicle_id', 'driver_id', 'passenger_name', 'submitted_at'])]
 class Rating extends Model
 {
     /** @use HasFactory<RatingFactory> */

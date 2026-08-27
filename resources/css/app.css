@@ -1877,6 +1877,53 @@ button {
     color: #1746b3;
     transform: translateY(-1px);
 }
+.assessment-pagination {
+    align-items: center;
+    border-top: 1px solid #e2e7ee;
+    color: #71809a;
+    display: flex;
+    font-size: 13px;
+    justify-content: space-between;
+    min-height: 66px;
+    padding: 18px 20px;
+}
+.assessment-pagination nav {
+    display: flex;
+    gap: 5px;
+}
+.assessment-page-button {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #dfe6f0;
+    border-radius: 4px;
+    color: #667085;
+    display: inline-flex;
+    height: 30px;
+    justify-content: center;
+    min-width: 30px;
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.assessment-page-button:hover {
+    background: #edf3ff;
+    border-color: #c6d7f5;
+    color: #2463eb;
+}
+.assessment-page-button.is-current {
+    background: #2463eb;
+    border-color: #2463eb;
+    color: #fff;
+    font-weight: 700;
+}
+.assessment-page-button.is-disabled {
+    background: #f8fafc;
+    color: #c0cad8;
+    cursor: not-allowed;
+}
+.assessment-page-button svg {
+    height: 16px;
+    width: 16px;
+}
 @media (max-width: 1440px) {
     .assessment-list-toolbar {
         align-items: flex-end;
@@ -1904,6 +1951,12 @@ button {
     .assessment-list-toolbar .assessment-filter .text-button,
     .assessment-export-button {
         width: 100%;
+    }
+    .assessment-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px 16px;
     }
 }
 
@@ -5566,6 +5619,8 @@ button {
     background: #fff;
     border-top: 1px solid rgba(198, 198, 207, 0.42);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    display: grid;
+    gap: 10px;
     padding: 16px 20px max(24px, env(safe-area-inset-bottom));
     position: sticky;
     bottom: 0;
@@ -5591,6 +5646,52 @@ button {
     background: #1641bd;
     border-color: #1641bd;
 }
+.passenger-vehicle-rescan {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #c8d6ed;
+    border-radius: 6px;
+    color: #2455bc;
+    display: inline-flex;
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    gap: 8px;
+    height: 44px;
+    justify-content: center;
+    width: 100%;
+}
+.passenger-vehicle-rescan svg { height: 18px; width: 18px; }
+.passenger-vehicle-rescan:hover { background: #eef4ff; border-color: #9fb9e6; }
+.passenger-qr-scanner[hidden] { display: none; }
+.passenger-qr-scanner { inset: 0; position: fixed; z-index: 100; }
+.passenger-qr-scanner-backdrop { background: rgba(7, 28, 60, 0.72); border: 0; inset: 0; position: absolute; width: 100%; }
+.passenger-qr-scanner-dialog {
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    bottom: 0;
+    box-sizing: border-box;
+    left: 50%;
+    max-width: 480px;
+    padding: 20px;
+    position: absolute;
+    transform: translateX(-50%);
+    width: 100%;
+}
+.passenger-qr-scanner-dialog header { align-items: flex-start; display: flex; justify-content: space-between; margin-bottom: 18px; }
+.passenger-qr-scanner-dialog header span { color: #2463eb; display: block; font-family: Inter, "Segoe UI", sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 0.08em; }
+.passenger-qr-scanner-dialog h2 { color: #10284d; font-family: Inter, "Segoe UI", sans-serif; font-size: 17px; line-height: 1.35; margin: 5px 0 0; }
+.passenger-qr-scanner-dialog header button { align-items: center; background: #f4f7fc; border: 1px solid #dce5f2; border-radius: 8px; color: #3d5d8e; display: inline-flex; height: 36px; justify-content: center; width: 36px; }
+.passenger-qr-scanner-dialog header button svg { height: 19px; width: 19px; }
+.passenger-qr-scanner-viewport { background: #0b1d3b; border-radius: 12px; overflow: hidden; position: relative; }
+.passenger-qr-scanner-viewport video { display: block; height: 270px; object-fit: cover; width: 100%; }
+.passenger-qr-scanner-frame { border: 2px solid #fff; border-radius: 12px; box-shadow: 0 0 0 999px rgba(5, 19, 42, 0.12); height: 158px; left: 50%; position: absolute; top: 50%; transform: translate(-50%, -50%); width: 158px; }
+.passenger-qr-scanner-frame::before, .passenger-qr-scanner-frame::after { background: #4d8aff; content: ""; height: 4px; left: 18px; position: absolute; right: 18px; }
+.passenger-qr-scanner-frame::before { top: -2px; }
+.passenger-qr-scanner-frame::after { bottom: -2px; }
+.passenger-qr-scanner-dialog > p { color: #64748b; font-family: Inter, "Segoe UI", sans-serif; font-size: 12px; line-height: 1.5; margin: 15px 4px 0; text-align: center; }
+.passenger-qr-scanner-retry { align-items: center; background: #eef4ff; border: 1px solid #c8d9f5; border-radius: 7px; color: #2455bc; display: flex; font-size: 12px; font-weight: 700; gap: 7px; height: 42px; justify-content: center; margin: 14px auto 0; width: 100%; }
+.passenger-qr-scanner-retry svg { height: 16px; width: 16px; }
 @media (min-width: 481px) {
     .passenger-flow-vehicle {
         box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
@@ -5892,6 +5993,80 @@ button {
     box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
     color: #fff;
 }
+
+.passenger-flow-assessor {
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    max-width: 480px;
+    min-height: 100vh;
+}
+.passenger-flow-assessor .passenger-mobile-header {
+    background: #ffffff;
+    border-bottom: 1px solid rgba(198, 198, 207, 0.42);
+}
+.passenger-assessor-page {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 28px 24px 0;
+}
+.passenger-assessor-card {
+    background: #ffffff;
+    border: 1px solid rgba(198, 198, 207, 0.48);
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(15, 35, 68, 0.06);
+    padding: 28px 20px 24px;
+    text-align: center;
+}
+.passenger-assessor-icon {
+    align-items: center;
+    background: #e8f0ff;
+    border-radius: 50%;
+    color: #1d4ed8;
+    display: inline-flex;
+    height: 52px;
+    justify-content: center;
+    margin-bottom: 16px;
+    width: 52px;
+}
+.passenger-assessor-icon svg { height: 25px; width: 25px; }
+.passenger-assessor-card h2 { color: #10284d; font-family: "Trebuchet MS", Inter, sans-serif; font-size: 21px; margin: 0; }
+.passenger-assessor-card > p { color: #64748b; font-size: 13px; line-height: 1.55; margin: 9px auto 24px; max-width: 280px; }
+.passenger-assessor-card label { color: #203c67; display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; text-align: left; }
+.passenger-assessor-card input {
+    background: #ffffff;
+    border: 1px solid #b7c9e7;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #19345d;
+    font-size: 15px;
+    height: 48px;
+    outline: 0;
+    padding: 0 14px;
+    width: 100%;
+}
+.passenger-assessor-card input:focus { border-color: #2463eb; box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.14); }
+.passenger-assessor-card input::placeholder { color: #94a3b8; }
+.passenger-assessor-error { color: #d92d20 !important; font-size: 12px !important; margin: 0 0 12px !important; max-width: none !important; text-align: left; }
+.passenger-assessor-footer { margin-top: auto; padding: 20px 0 max(20px, env(safe-area-inset-bottom)); }
+.passenger-assessor-footer button {
+    align-items: center;
+    background: #1d4ed8;
+    border: 1px solid #1d4ed8;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+    color: #ffffff;
+    display: flex;
+    font-size: 13px;
+    font-weight: 700;
+    gap: 8px;
+    height: 48px;
+    justify-content: center;
+    width: 100%;
+}
+.passenger-assessor-footer button svg { height: 17px; width: 17px; }
 .passenger-driver-select:hover {
     background: #1641bd;
     border-color: #1641bd;

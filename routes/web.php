@@ -27,6 +27,8 @@ Route::prefix('rating/{vehicleToken}')->name('passenger.rating.')->group(functio
     Route::get('/vehicle', [PassengerFlowController::class, 'vehicle'])->name('vehicle');
     Route::get('/drivers', [PassengerFlowController::class, 'drivers'])->name('drivers');
     Route::get('/driver/{driver}', [PassengerFlowController::class, 'driver'])->name('driver');
+    Route::get('/driver/{driver}/assessor', [PassengerFlowController::class, 'assessor'])->name('assessor');
+    Route::post('/driver/{driver}/assessor', [PassengerFlowController::class, 'storeAssessor'])->name('assessor.store');
     Route::get('/driver/{driver}/assessment', [PassengerFlowController::class, 'assessment'])->name('assessment');
     Route::post('/driver/{driver}/assessment', [PassengerFlowController::class, 'submit'])->name('submit');
     Route::get('/success/{rating}', [PassengerFlowController::class, 'success'])->name('success');

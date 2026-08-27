@@ -38,5 +38,31 @@
 
     <footer class="passenger-vehicle-footer">
         <a class="passenger-vehicle-continue" href="{{ route('passenger.rating.drivers', $vehicle->qr_token) }}">Lanjutkan</a>
+        <button class="passenger-vehicle-rescan" type="button" data-passenger-qr-scanner-open>
+            <x-lucide-scan-line aria-hidden="true" />
+            <span>Scan Ulang QR</span>
+        </button>
     </footer>
+
+    <div class="passenger-qr-scanner" data-passenger-qr-scanner hidden>
+        <button class="passenger-qr-scanner-backdrop" type="button" data-passenger-qr-scanner-close aria-label="Tutup pemindai QR"></button>
+        <section class="passenger-qr-scanner-dialog" role="dialog" aria-modal="true" aria-labelledby="passenger-qr-scanner-title">
+            <header>
+                <div>
+                    <span>SCAN QR</span>
+                    <h2 id="passenger-qr-scanner-title">Arahkan kamera ke QR kendaraan</h2>
+                </div>
+                <button type="button" data-passenger-qr-scanner-close aria-label="Tutup pemindai QR"><x-lucide-x aria-hidden="true" /></button>
+            </header>
+            <div class="passenger-qr-scanner-viewport">
+                <video data-passenger-qr-scanner-video autoplay muted playsinline></video>
+                <span class="passenger-qr-scanner-frame" aria-hidden="true"></span>
+            </div>
+            <p data-passenger-qr-scanner-status>Menyiapkan kamera...</p>
+            <button class="passenger-qr-scanner-retry" type="button" data-passenger-qr-scanner-retry hidden>
+                <x-lucide-refresh-cw aria-hidden="true" />
+                <span>Coba Lagi</span>
+            </button>
+        </section>
+    </div>
 </x-passenger.layout>

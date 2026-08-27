@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Passenger;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Passenger\StorePassengerNameRequest;
 use App\Http\Requests\Passenger\StoreRatingRequest;
 use App\Models\Driver;
 use App\Models\Question;
@@ -60,10 +61,39 @@ class PassengerFlowController extends Controller
         return view('passenger.driver-detail', compact('vehicle', 'driver'));
     }
 
-    public function assessment(string $vehicleToken, Driver $driver): View
+    public function assessor(string $vehicleToken, Driver $driver): View
     {
         $vehicle = $this->activeVehicle($vehicleToken);
         $this->ensureSelectableDriver($vehicle, $driver);
+        $passengerName = session($this->passengerNameSessionKey($vehicle, $driver));
+
+        return view('passenger.assessor', compact('vehicle', 'driver', 'passengerName'));
+    }
+
+    public function storeAssessor(StorePassengerNameRequest $request, string $vehicleToken, Driver $driver): RedirectResponse
+    {
+        $vehicle = $this->activeVehicle($vehicleToken);
+        $this->ensureSelectableDriver($vehicle, $driver);
+
+        session()->put(
+            $this->passengerNameSessionKey($vehicle, $driver),
+            trim($request->validated('passenger_name')),
+        );
+
+        return redirect()->route('passenger.rating.assessment', [$vehicle->qr_token, $driver]);
+    }
+
+    public function assessment(string $vehicleToken, Driver $driver): View|RedirectResponse
+    {
+        $vehicle = $this->activeVehicle($vehicleToken);
+        $this->ensureSelectableDriver($vehicle, $driver);
+        $passengerName = session($this->passengerNameSessionKey($vehicle, $driver));
+
+        if (! is_string($passengerName) || trim($passengerName) === '') {
+            return redirect()
+                ->route('passenger.rating.assessor', [$vehicle->qr_token, $driver])
+                ->with('error', 'Silakan isi nama Anda sebelum memberikan penilaian.');
+        }
 
         $questions = Question::query()
             ->with('options')
@@ -72,7 +102,7 @@ class PassengerFlowController extends Controller
             ->get()
             ->groupBy('target_type');
 
-        return view('passenger.assessment', compact('vehicle', 'driver', 'questions'));
+        return view('passenger.assessment', compact('vehicle', 'driver', 'questions', 'passengerName'));
     }
 
     public function submit(StoreRatingRequest $request, string $vehicleToken, Driver $driver): RedirectResponse
@@ -81,12 +111,14 @@ class PassengerFlowController extends Controller
         $this->ensureSelectableDriver($vehicle, $driver);
         $questions = Question::query()->with('options')->active()->ordered()->get();
         $answers = $request->validatedAnswers($questions);
+        $passengerName = trim($request->validated('passenger_name'));
 
-        $rating = DB::transaction(function () use ($vehicle, $driver, $answers): Rating {
+        $rating = DB::transaction(function () use ($vehicle, $driver, $answers, $passengerName): Rating {
             $rating = Rating::query()->create([
                 'branch_id' => $vehicle->branch_id,
                 'vehicle_id' => $vehicle->id,
                 'driver_id' => $driver->id,
+                'passenger_name' => $passengerName,
                 'submitted_at' => now(),
             ]);
 
@@ -96,6 +128,8 @@ class PassengerFlowController extends Controller
 
             return $rating;
         });
+
+        session()->forget($this->passengerNameSessionKey($vehicle, $driver));
 
         return redirect()->route('passenger.rating.success', [$vehicle->qr_token, $rating]);
     }
@@ -124,5 +158,10 @@ class PassengerFlowController extends Controller
     {
         abort_unless($driver->status === Driver::STATUS_ACTIVE, 404);
         abort_unless($driver->branch_id === $vehicle->branch_id, 404);
+    }
+
+    private function passengerNameSessionKey(Vehicle $vehicle, Driver $driver): string
+    {
+        return "passenger_name_{$vehicle->id}_{$driver->id}";
     }
 }

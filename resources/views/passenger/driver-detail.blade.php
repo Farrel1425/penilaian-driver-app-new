@@ -34,7 +34,7 @@
     </section>
 
     <footer class="passenger-driver-detail-footer">
-        <a class="passenger-driver-select" href="{{ route('passenger.rating.assessment', [$vehicle->qr_token, $driver]) }}">Pilih Driver Ini</a>
+        <a class="passenger-driver-select" href="{{ route('passenger.rating.assessor', [$vehicle->qr_token, $driver]) }}">Pilih Driver Ini</a>
         <a class="passenger-driver-other" href="{{ route('passenger.rating.drivers', $vehicle->qr_token) }}">Pilih Driver Lain</a>
     </footer>
 </x-passenger.layout>

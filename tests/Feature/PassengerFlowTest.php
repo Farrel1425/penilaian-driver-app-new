@@ -24,12 +24,19 @@ class PassengerFlowTest extends TestCase
         $choice = Question::factory()->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_MULTIPLE_CHOICE, 'sort_order' => 3, 'status' => Question::STATUS_ACTIVE]);
         $option = $choice->options()->create(['option_text' => 'AC', 'sort_order' => 1]);
 
-        $this->get(route('passenger.rating.entry', $vehicle->qr_token))->assertOk()->assertSee($vehicle->police_number);
+        $this->get(route('passenger.rating.entry', $vehicle->qr_token))
+            ->assertOk()
+            ->assertSee($vehicle->police_number)
+            ->assertSee('Scan Ulang QR');
         $this->get(route('passenger.rating.drivers', $vehicle->qr_token))->assertOk()->assertSee($driver->full_name);
         $this->get(route('passenger.rating.driver', [$vehicle->qr_token, $driver]))->assertOk()->assertSee($driver->full_name);
+        $this->get(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]))->assertOk()->assertSee('Siapa nama Anda?');
+        $this->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => 'Made Penilai'])
+            ->assertRedirect(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]));
         $this->get(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))->assertOk()->assertSee($driverRating->question)->assertSee($yesNo->question);
 
         $response = $this->post(route('passenger.rating.submit', [$vehicle->qr_token, $driver]), [
+            'passenger_name' => 'Made Penilai',
             'answers' => [
                 $driverRating->id => '5',
                 $yesNo->id => '1',
@@ -42,6 +49,7 @@ class PassengerFlowTest extends TestCase
         $this->assertSame($branch->id, $rating->branch_id);
         $this->assertSame($vehicle->id, $rating->vehicle_id);
         $this->assertSame($driver->id, $rating->driver_id);
+        $this->assertSame('Made Penilai', $rating->passenger_name);
         $this->assertCount(3, $rating->answers);
         $this->get(route('passenger.rating.success', [$vehicle->qr_token, $rating]))->assertOk()->assertSee('Terima Kasih');
     }
@@ -74,6 +82,8 @@ class PassengerFlowTest extends TestCase
         Question::factory()->create(['question' => 'Nonaktif', 'sort_order' => 2, 'status' => Question::STATUS_INACTIVE]);
         Question::factory()->create(['question' => 'Kedua', 'sort_order' => 2, 'status' => Question::STATUS_ACTIVE]);
 
+        $this->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => 'Penilai Uji']);
+
         $this->get(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))
             ->assertOk()
             ->assertSee('Pertama')
@@ -95,12 +105,27 @@ class PassengerFlowTest extends TestCase
 
         $this->from(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))
             ->post(route('passenger.rating.submit', [$vehicle->qr_token, $driver]), [
+                'passenger_name' => 'Penilai Uji',
                 'answers' => [
                     $rating->id => '6',
                     $yesNo->id => '2',
                     $choice->id => (string) $invalidOption->id,
                 ],
             ])->assertSessionHasErrors(["answers.{$rating->id}", "answers.{$yesNo->id}", "answers.{$choice->id}"]);
+    }
+
+    public function test_assessment_requires_passenger_name_step(): void
+    {
+        $branch = Branch::factory()->create();
+        $vehicle = Vehicle::factory()->for($branch)->create(['status' => Vehicle::STATUS_ACTIVE]);
+        $driver = Driver::factory()->for($branch)->create(['status' => Driver::STATUS_ACTIVE]);
+
+        $this->get(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))
+            ->assertRedirect(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]));
+
+        $this->from(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]))
+            ->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => ' '])
+            ->assertSessionHasErrors('passenger_name');
     }
 
     public function test_inactive_vehicle_is_rejected_in_passenger_flow(): void

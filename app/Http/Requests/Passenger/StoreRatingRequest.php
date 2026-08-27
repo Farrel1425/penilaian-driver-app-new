@@ -16,6 +16,7 @@ class StoreRatingRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'passenger_name' => ['required', 'string', 'min:2', 'max:100'],
             'answers' => ['nullable', 'array'],
             'answers.*' => ['nullable'],
         ];

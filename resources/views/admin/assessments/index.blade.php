@@ -12,6 +12,23 @@
                 <tr><td colspan="7"><x-admin.empty-state title="Belum ada penilaian" description="Riwayat akan muncul setelah penumpang mengirim penilaian." /></td></tr>
             @endforelse
         </tbody></table></div>
-        {{ $ratings->links() }}
+        <footer class="assessment-pagination">
+            <span>Menampilkan {{ $ratings->firstItem() ?? 0 }} - {{ $ratings->lastItem() ?? 0 }} dari {{ $ratings->total() }} penilaian</span>
+            @if ($ratings->hasPages())
+                <nav aria-label="Pagination riwayat penilaian">
+                    @if ($ratings->onFirstPage())
+                        <span class="assessment-page-button is-disabled"><x-lucide-chevron-left aria-hidden="true" /></span>
+                    @else
+                        <a class="assessment-page-button" href="{{ $ratings->previousPageUrl() }}" aria-label="Halaman sebelumnya"><x-lucide-chevron-left aria-hidden="true" /></a>
+                    @endif
+                    <span class="assessment-page-button is-current" aria-current="page">{{ $ratings->currentPage() }}</span>
+                    @if ($ratings->hasMorePages())
+                        <a class="assessment-page-button" href="{{ $ratings->nextPageUrl() }}" aria-label="Halaman berikutnya"><x-lucide-chevron-right aria-hidden="true" /></a>
+                    @else
+                        <span class="assessment-page-button is-disabled"><x-lucide-chevron-right aria-hidden="true" /></span>
+                    @endif
+                </nav>
+            @endif
+        </footer>
     </x-admin.panel>
 </x-layouts.admin>

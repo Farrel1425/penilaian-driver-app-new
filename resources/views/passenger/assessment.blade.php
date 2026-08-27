@@ -1,11 +1,12 @@
 <x-passenger.layout title="Penilaian" variant="assessment">
     <header class="passenger-mobile-header">
-        <a href="{{ route('passenger.rating.driver', [$vehicle->qr_token, $driver]) }}" aria-label="Kembali ke detail driver"><x-lucide-chevron-left aria-hidden="true" /></a>
+        <a href="{{ route('passenger.rating.assessor', [$vehicle->qr_token, $driver]) }}" aria-label="Kembali ke isi nama"><x-lucide-chevron-left aria-hidden="true" /></a>
         <h1>Penilaian</h1>
     </header>
 
     <form class="passenger-assessment-page" method="POST" action="{{ route('passenger.rating.submit', [$vehicle->qr_token, $driver]) }}">
         @csrf
+        <input type="hidden" name="passenger_name" value="{{ $passengerName }}">
         <p class="passenger-assessment-intro">Berikan penilaian terbaik Anda</p>
         @php($number = 0)
 
