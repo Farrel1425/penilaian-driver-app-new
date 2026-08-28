@@ -67,6 +67,7 @@ Route::middleware(['auth', 'active.admin', LogAdminActivity::class])->group(func
         Route::get('reports/vehicles', ReportVehicleController::class)->name('reports.vehicles');
         Route::get('reports/branches', ReportBranchController::class)->name('reports.branches');
         Route::get('reports/{type}/export', [ReportExportController::class, 'excel'])->name('reports.export');
+        Route::get('reports/{type}/pdf', [ReportExportController::class, 'pdf'])->name('reports.pdf');
         Route::get('reports/{type}/print', [ReportExportController::class, 'print'])->name('reports.print');
         Route::patch('questions/reorder', [QuestionController::class, 'reorder'])->name('questions.reorder');
         Route::resource('questions', QuestionController::class);

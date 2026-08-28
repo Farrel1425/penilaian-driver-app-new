@@ -29,7 +29,7 @@ class RatingAnalyticsService
                 'average_vehicle_rating' => $this->average($vehicleRatingAnswers),
                 'rated_drivers' => $ratings->pluck('driver_id')->filter()->unique()->count(),
                 'rated_vehicles' => $ratings->pluck('vehicle_id')->filter()->unique()->count(),
-                'today_assessments' => $ratings->filter(fn ($rating) => $rating->submitted_at?->isToday())->count(),
+                'today_assessments' => $ratings->filter(fn ($rating) => $rating->submitted_at?->timezone(config('app.display_timezone'))?->isToday())->count(),
             ],
             'trend' => $this->dashboardTrend($driverRatingAnswers, $vehicleRatingAnswers),
             'driverDistribution' => $this->distribution($driverRatingAnswers),
@@ -70,6 +70,11 @@ class RatingAnalyticsService
     {
         $ratings = $this->history($filters);
         $answers = $ratings->flatMap->answers;
+        $answers = match ($group) {
+            'driver' => $answers->where('question.target_type', Question::TARGET_DRIVER),
+            'vehicle' => $answers->where('question.target_type', Question::TARGET_VEHICLE),
+            default => $answers,
+        };
 
         $rows = match ($group) {
             'vehicle' => $this->vehicleRanking($answers),
@@ -253,7 +258,7 @@ class RatingAnalyticsService
     {
         return $answers
             ->filter(fn ($answer) => $answer->rating?->submitted_at && $this->value($answer) !== null)
-            ->groupBy(fn ($answer) => $answer->rating->submitted_at->toDateString())
+            ->groupBy(fn ($answer) => $answer->rating->submitted_at->timezone(config('app.display_timezone'))->toDateString())
             ->map(fn ($items, $date) => ['date' => $date, 'average' => $this->average($items), 'count' => $items->pluck('rating_id')->unique()->count()])
             ->sortBy('date')
             ->values();

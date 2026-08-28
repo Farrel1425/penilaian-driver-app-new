@@ -26,7 +26,7 @@
                 <tbody>
                     @forelse ($logs as $log)
                         <tr>
-                            <td>{{ $log->created_at?->format('d M Y, H:i') }}</td>
+                            <td>{{ $log->created_at?->timezone(config('app.display_timezone'))?->format('d M Y, H:i') }}</td>
                             <td><strong>{{ $log->user?->name ?? 'Sistem' }}</strong></td>
                             <td><span class="activity-module-badge">{{ $log->module }}</span></td>
                             <td><span class="activity-action-badge">{{ $log->action }}</span></td>

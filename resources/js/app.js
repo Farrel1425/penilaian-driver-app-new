@@ -26,22 +26,22 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordToggle.setAttribute('aria-label', isVisible ? 'Tampilkan password' : 'Sembunyikan password');
     });
 
-    profileTrigger?.addEventListener('click', () => {
-        const isOpen = profileMenu?.classList.toggle('is-open') ?? false;
-        profileTrigger.setAttribute('aria-expanded', String(isOpen));
+    profileMenu?.addEventListener('toggle', () => {
+        const isOpen = profileMenu.open;
+        profileMenu.classList.toggle('is-open', isOpen);
+        profileTrigger?.setAttribute('aria-expanded', String(isOpen));
     });
 
     document.addEventListener('click', (event) => {
         if (profileMenu && !profileMenu.contains(event.target)) {
-            profileMenu.classList.remove('is-open');
-            profileTrigger?.setAttribute('aria-expanded', 'false');
+            profileMenu.open = false;
         }
     });
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
-            profileMenu?.classList.remove('is-open');
-            profileTrigger?.setAttribute('aria-expanded', 'false');
+            profileMenu.open = false;
+            profileTrigger?.focus();
         }
     });
 });
@@ -932,29 +932,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const baseWidth = Number(canvas.dataset.chartBaseWidth) || 760;
         let zoom = 1;
+        let zoomAnchorX = null;
+        let zoomAnchorTimer;
 
         const renderZoom = () => {
             canvas.style.width = `${Math.round(baseWidth * zoom)}px`;
             label.textContent = `${Math.round(zoom * 100)}%`;
         };
 
-        controls.querySelector('[data-chart-zoom-in]')?.addEventListener('click', () => {
-            zoom = Math.min(1.8, zoom + 0.2);
-            renderZoom();
-        });
-
-        controls.querySelector('[data-chart-zoom-out]')?.addEventListener('click', () => {
-            zoom = Math.max(0.7, zoom - 0.2);
-            renderZoom();
-        });
-
-        scrollArea.addEventListener('wheel', (event) => {
-            if (!event.shiftKey) {
+        const changeZoom = (nextZoom, focalX = scrollArea.clientWidth / 2) => {
+            if (nextZoom === zoom) {
                 return;
             }
 
-            event.preventDefault();
-            scrollArea.scrollLeft += event.deltaY;
+            const currentWidth = canvas.getBoundingClientRect().width;
+            const pointInCanvas = scrollArea.scrollLeft + focalX;
+            const focalPoint = currentWidth > 0 ? pointInCanvas / currentWidth : 0;
+
+            zoom = nextZoom;
+            renderZoom();
+
+            const nextWidth = canvas.getBoundingClientRect().width;
+            scrollArea.scrollLeft = Math.max(0, (focalPoint * nextWidth) - focalX);
+        };
+
+        controls.querySelector('[data-chart-zoom-in]')?.addEventListener('click', () => {
+            changeZoom(Math.min(1.8, zoom + 0.2));
+        });
+
+        controls.querySelector('[data-chart-zoom-out]')?.addEventListener('click', () => {
+            changeZoom(Math.max(0.7, zoom - 0.2));
+        });
+
+        scrollArea.addEventListener('wheel', (event) => {
+            if (event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+
+                if (zoomAnchorX === null) {
+                    const bounds = scrollArea.getBoundingClientRect();
+                    zoomAnchorX = Math.min(Math.max(event.clientX - bounds.left, 0), scrollArea.clientWidth);
+                }
+
+                clearTimeout(zoomAnchorTimer);
+                zoomAnchorTimer = window.setTimeout(() => {
+                    zoomAnchorX = null;
+                }, 220);
+
+                const step = event.deltaY < 0 ? 0.1 : -0.1;
+                changeZoom(Math.min(1.8, Math.max(0.7, zoom + step)), zoomAnchorX);
+                return;
+            }
+
+            if (event.shiftKey) {
+                event.preventDefault();
+                scrollArea.scrollLeft += event.deltaY;
+            }
         }, { passive: false });
 
         renderZoom();

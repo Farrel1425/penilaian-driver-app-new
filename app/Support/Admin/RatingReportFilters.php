@@ -18,8 +18,9 @@ class RatingReportFilters
 
     public static function fromRequest(Request $request): self
     {
-        $start = $request->date('start_date') ? CarbonImmutable::parse($request->date('start_date'))->startOfDay() : null;
-        $end = $request->date('end_date') ? CarbonImmutable::parse($request->date('end_date'))->endOfDay() : null;
+        $timezone = config('app.display_timezone', 'Asia/Makassar');
+        $start = $request->filled('start_date') ? CarbonImmutable::parse($request->input('start_date'), $timezone)->startOfDay()->utc() : null;
+        $end = $request->filled('end_date') ? CarbonImmutable::parse($request->input('end_date'), $timezone)->endOfDay()->utc() : null;
 
         return new self(
             $start,
@@ -34,8 +35,8 @@ class RatingReportFilters
     public function queryString(): array
     {
         return array_filter([
-            'start_date' => $this->startDate?->toDateString(),
-            'end_date' => $this->endDate?->toDateString(),
+            'start_date' => $this->startDate?->timezone(config('app.display_timezone'))->toDateString(),
+            'end_date' => $this->endDate?->timezone(config('app.display_timezone'))->toDateString(),
             'branch_id' => $this->branchId,
             'driver_id' => $this->driverId,
             'vehicle_id' => $this->vehicleId,

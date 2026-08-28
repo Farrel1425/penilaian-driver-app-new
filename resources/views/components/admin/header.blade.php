@@ -11,8 +11,8 @@
         <p>{{ $subtitles[$title] ?? 'Kelola sistem penilaian driver dan kendaraan.' }}</p>
     </div>
 
-    <div class="admin-profile-menu" data-profile-menu>
-        <button class="admin-profile-trigger" type="button" data-profile-trigger aria-expanded="false" aria-haspopup="menu">
+    <details class="admin-profile-menu" data-profile-menu>
+        <summary class="admin-profile-trigger" data-profile-trigger aria-expanded="false" aria-haspopup="menu" aria-label="Buka menu akun" title="Menu akun">
             <span class="admin-profile-copy"><strong>{{ auth()->user()->name ?? 'Admin' }}</strong><small>Super Admin</small></span>
             <span class="admin-profile-avatar">
                 @if (auth()->user()?->photo)
@@ -21,7 +21,8 @@
                     {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
                 @endif
             </span>
-        </button>
+            <x-lucide-chevron-down class="admin-profile-chevron" aria-hidden="true" />
+        </summary>
 
         <div class="admin-profile-dropdown" data-profile-dropdown role="menu">
             <a class="admin-profile-dropdown-user" href="{{ route('admin.users.show', auth()->user()) }}" role="menuitem">
@@ -39,5 +40,5 @@
                 <button type="submit" role="menuitem"><x-lucide-log-out aria-hidden="true" /><span>Logout</span></button>
             </form>
         </div>
-    </div>
+    </details>
 </header>

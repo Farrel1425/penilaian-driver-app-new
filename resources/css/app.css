@@ -1785,7 +1785,7 @@ button {
     display: grid;
     flex: 1;
     gap: 10px;
-    grid-template-columns: minmax(210px, 1fr) 140px 140px minmax(180px, 0.9fr) auto auto;
+    grid-template-columns: minmax(200px, 1.25fr) 132px 132px repeat(3, minmax(145px, 0.85fr)) auto auto;
     margin: 0;
 }
 .assessment-report-toolbar .assessment-filter input,
@@ -1803,13 +1803,84 @@ button {
     flex: 0 0 auto;
     margin: 0;
 }
+
+.recap-analytics-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+}
+
+.recap-chart-description {
+    color: #71809a;
+    font-size: 12px;
+    margin: -4px 0 14px;
+}
+
+.recap-chart-scroll {
+    background: linear-gradient(180deg, #f9fbff 0%, #ffffff 100%);
+    border: 1px solid #e1e9f5;
+    border-radius: 8px;
+    overflow-x: auto;
+    padding: 8px 8px 0;
+    scrollbar-color: #b8c7df #eff4fa;
+    scrollbar-width: thin;
+}
+
+.recap-summary-chart {
+    display: block;
+    height: 244px;
+    min-width: 620px;
+    overflow: visible;
+    width: 100%;
+}
+
+.recap-chart-grid {
+    stroke: #dce7f5;
+    stroke-dasharray: 3 4;
+    stroke-width: 1;
+}
+
+.recap-chart-axis {
+    fill: #7b8ca6;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.recap-chart-line {
+    fill: none;
+    stroke: #2859df;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+
+.recap-chart-point {
+    fill: #ffffff;
+    stroke: #2859df;
+    stroke-width: 3;
+    transition: r 160ms ease, fill 160ms ease;
+}
+
+.recap-chart-point:hover {
+    fill: #2859df;
+    r: 6;
+}
 @media (max-width: 1280px) {
     .assessment-report-toolbar-inner {
         align-items: flex-end;
         flex-direction: column;
     }
     .assessment-report-toolbar .assessment-filter {
+        grid-template-columns: minmax(200px, 1.2fr) 132px 132px repeat(3, minmax(150px, 1fr)) auto auto;
         width: 100%;
+    }
+}
+
+@media (max-width: 1080px) {
+    .assessment-report-toolbar .assessment-filter {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .recap-analytics-grid {
+        grid-template-columns: 1fr;
     }
 }
 .assessment-data-table {
@@ -6965,6 +7036,17 @@ button {
     object-fit: cover;
 }
 
+.admin-profile-chevron {
+    color: #71809a;
+    height: 16px;
+    transition: transform 0.16s ease;
+    width: 16px;
+}
+
+.admin-profile-menu.is-open .admin-profile-chevron {
+    transform: rotate(180deg);
+}
+
 /* User management */
 .user-list-card,
 .user-form-card,
@@ -7401,8 +7483,18 @@ button {
     top: calc(100% + 8px);
     z-index: 40;
 }
-.admin-profile-menu.is-open .admin-profile-dropdown {
+.admin-profile-menu.is-open .admin-profile-dropdown,
+.admin-profile-menu[open] .admin-profile-dropdown {
     display: block;
+}
+
+.admin-profile-trigger {
+    cursor: pointer;
+    list-style: none;
+}
+
+.admin-profile-trigger::-webkit-details-marker {
+    display: none;
 }
 .admin-profile-dropdown-user {
     align-items: center;

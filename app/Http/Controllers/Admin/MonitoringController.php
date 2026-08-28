@@ -47,7 +47,7 @@ class MonitoringController extends Controller
             fputcsv($output, ['Tanggal & Jam', 'Unit Kerja', 'Kendaraan', 'Driver', 'Rating', 'Komentar']);
             foreach ($ratings as $rating) {
                 fputcsv($output, [
-                    $rating->submitted_at?->format('Y-m-d H:i'),
+                    $rating->submitted_at?->timezone(config('app.display_timezone'))?->format('Y-m-d H:i'),
                     $rating->branch?->name,
                     trim(($rating->vehicle?->police_number ?? '').' '.($rating->vehicle?->brand ?? '').' '.($rating->vehicle?->model ?? '')),
                     $rating->driver?->full_name,
@@ -68,6 +68,8 @@ class MonitoringController extends Controller
         return view('admin.assessments.recap', [
             'filters' => $filters,
             'branches' => $analytics->branches(),
+            'drivers' => $analytics->drivers($filters->branchId),
+            'vehicles' => $analytics->vehicles($filters->branchId),
             'group' => $group,
             'data' => $analytics->recap($filters, $group),
         ]);

@@ -110,6 +110,31 @@ class AdminReportTest extends TestCase
         $this->get(route('admin.assessments.export'))->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
     }
 
+    public function test_recap_separates_driver_and_vehicle_scores_and_exports_files(): void
+    {
+        $this->actingAs(User::factory()->create());
+        [$branch, $driver, $vehicle] = $this->makeEntities();
+        $driverQuestion = Question::factory()->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_RATING]);
+        $vehicleQuestion = Question::factory()->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_RATING]);
+        $rating = Rating::factory()->for($branch)->for($driver)->for($vehicle)->create(['submitted_at' => '2026-08-14 09:00:00']);
+        $rating->answers()->create(['question_id' => $driverQuestion->id, 'answer_value' => [5]]);
+        $rating->answers()->create(['question_id' => $vehicleQuestion->id, 'answer_value' => [1]]);
+
+        $this->get(route('admin.assessments.recap', ['group' => 'driver']))
+            ->assertOk()
+            ->assertSee('5')
+            ->assertDontSee('1.00');
+        $this->get(route('admin.assessments.recap', ['group' => 'vehicle']))
+            ->assertOk()
+            ->assertSee('1');
+        $this->get(route('admin.reports.export', ['type' => 'driver']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->get(route('admin.reports.pdf', ['type' => 'driver']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+    }
+
     public function test_system_profile_update_and_activity_log_are_recorded(): void
     {
         $user = User::factory()->create();
@@ -135,6 +160,11 @@ class AdminReportTest extends TestCase
             ->assertOk()
             ->assertSee('Pengaturan Sistem')
             ->assertSee('Export Excel');
+
+        $this->actingAs($user)
+            ->get(route('admin.activity-logs.export', ['user_id' => $user->id]))
+            ->assertOk()
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
     }
 
     private function makeEntities(): array

@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ActivityLogController extends Controller
 {
@@ -19,9 +20,9 @@ class ActivityLogController extends Controller
         ]);
     }
 
-    public function export(Request $request): Response
+    public function export(Request $request): StreamedResponse
     {
-        $filename = 'log-aktivitas-'.now()->format('Ymd-His').'.csv';
+        $filename = 'log-aktivitas-'.now(config('app.display_timezone'))->format('Ymd-His').'.csv';
         $logs = $this->filtered($request)->with('user:id,name')->get();
 
         return response()->streamDownload(function () use ($logs): void {
@@ -31,7 +32,7 @@ class ActivityLogController extends Controller
 
             foreach ($logs as $log) {
                 fputcsv($output, [
-                    $log->created_at?->format('d/m/Y H:i:s'),
+                    $log->created_at?->timezone(config('app.display_timezone'))?->format('d/m/Y H:i:s'),
                     $log->user?->name ?? 'Sistem',
                     $log->module,
                     $log->action,
@@ -48,8 +49,8 @@ class ActivityLogController extends Controller
     {
         return ActivityLog::query()
             ->with('user:id,name')
-            ->when($request->filled('start_date'), fn ($query) => $query->whereDate('created_at', '>=', $request->date('start_date')))
-            ->when($request->filled('end_date'), fn ($query) => $query->whereDate('created_at', '<=', $request->date('end_date')))
+            ->when($request->filled('start_date'), fn ($query) => $query->where('created_at', '>=', CarbonImmutable::parse($request->input('start_date'), config('app.display_timezone'))->startOfDay()->utc()))
+            ->when($request->filled('end_date'), fn ($query) => $query->where('created_at', '<=', CarbonImmutable::parse($request->input('end_date'), config('app.display_timezone'))->endOfDay()->utc()))
             ->when($request->integer('user_id'), fn ($query, int $id) => $query->where('user_id', $id))
             ->when($request->string('search')->toString(), function ($query, string $search): void {
                 $query->where(function ($query) use ($search): void {
