@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
+use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $users = User::query()
+            ->with('branch:id,name')
             ->when($request->string('search')->toString(), function ($query, string $search): void {
                 $query->where(fn ($query) => $query
                     ->where('name', 'like', "%{$search}%")
@@ -30,13 +32,15 @@ class UserController extends Controller
 
     public function create(): View
     {
-        return view('admin.users.create', ['user' => new User(['status' => User::STATUS_ACTIVE])]);
+        return view('admin.users.create', [
+            'user' => new User(['role' => User::ROLE_ADMIN, 'status' => User::STATUS_ACTIVE]),
+            'branches' => Branch::query()->orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function store(UserRequest $request): RedirectResponse
     {
-        $data = $request->safe()->except('photo');
-        $data['role'] = User::ROLE_ADMIN;
+        $data = $this->normalizedData($request);
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('profiles', 'public');
@@ -44,11 +48,13 @@ class UserController extends Controller
 
         $user = User::query()->create($data);
 
-        return redirect()->route('admin.users.show', $user)->with('status', 'Admin berhasil ditambahkan.');
+        return redirect()->route('admin.users.show', $user)->with('status', 'Akun pengguna berhasil ditambahkan.');
     }
 
     public function show(User $user): View
     {
+        $user->load('branch:id,name');
+
         return view('admin.users.show', compact('user'));
     }
 
@@ -56,17 +62,19 @@ class UserController extends Controller
     {
         $returnTo = $request->string('return_to')->toString() === 'detail' ? 'detail' : 'index';
 
-        return view('admin.users.edit', compact('user', 'returnTo'));
+        return view('admin.users.edit', [
+            'user' => $user,
+            'returnTo' => $returnTo,
+            'branches' => Branch::query()->orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     public function update(UserRequest $request, User $user): RedirectResponse
     {
-        $data = $request->safe()->except('photo');
+        $data = $this->normalizedData($request);
 
         if ($user->is(auth()->user()) && ($data['status'] ?? null) === User::STATUS_INACTIVE) {
-            return back()
-                ->withInput()
-                ->withErrors(['status' => 'Akun yang sedang digunakan tidak dapat dinonaktifkan.']);
+            return back()->withInput()->withErrors(['status' => 'Akun yang sedang digunakan tidak dapat dinonaktifkan.']);
         }
 
         if (blank($data['password'] ?? null)) {
@@ -84,8 +92,8 @@ class UserController extends Controller
         $user->update($data);
 
         return $request->string('return_to')->toString() === 'detail'
-            ? redirect()->route('admin.users.show', $user)->with('status', 'Admin berhasil diperbarui.')
-            : redirect()->route('admin.users.index')->with('status', 'Admin berhasil diperbarui.');
+            ? redirect()->route('admin.users.show', $user)->with('status', 'Akun pengguna berhasil diperbarui.')
+            : redirect()->route('admin.users.index')->with('status', 'Akun pengguna berhasil diperbarui.');
     }
 
     public function toggleStatus(User $user): RedirectResponse
@@ -94,13 +102,13 @@ class UserController extends Controller
             return back()->with('status', 'Akun yang sedang digunakan tidak dapat dinonaktifkan.');
         }
 
-        if ($user->status === User::STATUS_ACTIVE && $this->activeAdminCount() <= 1) {
-            return back()->with('status', 'Minimal satu admin aktif harus tersedia.');
+        if ($user->role === User::ROLE_ADMIN && $user->status === User::STATUS_ACTIVE && $this->activeAdminCount() <= 1) {
+            return back()->with('status', 'Minimal satu admin utama aktif harus tersedia.');
         }
 
         $user->update(['status' => $user->status === User::STATUS_ACTIVE ? User::STATUS_INACTIVE : User::STATUS_ACTIVE]);
 
-        return back()->with('status', 'Status admin berhasil diperbarui.');
+        return back()->with('status', 'Status akun berhasil diperbarui.');
     }
 
     public function destroy(User $user): RedirectResponse
@@ -109,8 +117,8 @@ class UserController extends Controller
             return back()->with('status', 'Akun yang sedang digunakan tidak dapat dihapus.');
         }
 
-        if ($user->status === User::STATUS_ACTIVE && $this->activeAdminCount() <= 1) {
-            return back()->with('status', 'Minimal satu admin aktif harus tersedia.');
+        if ($user->role === User::ROLE_ADMIN && $user->status === User::STATUS_ACTIVE && $this->activeAdminCount() <= 1) {
+            return back()->with('status', 'Minimal satu admin utama aktif harus tersedia.');
         }
 
         if ($user->photo && ! str_starts_with($user->photo, 'http')) {
@@ -119,7 +127,15 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('status', 'Admin berhasil dihapus.');
+        return redirect()->route('admin.users.index')->with('status', 'Akun pengguna berhasil dihapus.');
+    }
+
+    private function normalizedData(UserRequest $request): array
+    {
+        $data = $request->safe()->except('photo');
+        $data['branch_id'] = $data['role'] === User::ROLE_BRANCH_ADMIN ? $data['branch_id'] : null;
+
+        return $data;
     }
 
     private function activeAdminCount(): int

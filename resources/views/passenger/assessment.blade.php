@@ -7,6 +7,7 @@
     <form class="passenger-assessment-page" method="POST" action="{{ route('passenger.rating.submit', [$vehicle->qr_token, $driver]) }}">
         @csrf
         <input type="hidden" name="passenger_name" value="{{ $passengerName }}">
+        <input type="hidden" name="submission_token" value="{{ $submissionToken }}">
         <p class="passenger-assessment-intro">Berikan penilaian terbaik Anda</p>
         @php($number = 0)
 
@@ -39,7 +40,7 @@
         </section>
 
         <footer class="passenger-assessment-footer">
-            <button type="submit">Kirim Penilaian</button>
+            <button type="submit" data-submitting-label="Mengirim Penilaian...">Kirim Penilaian</button>
         </footer>
     </form>
 

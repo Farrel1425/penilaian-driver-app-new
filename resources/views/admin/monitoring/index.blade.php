@@ -7,6 +7,6 @@
             @empty
                 <tr><td colspan="6"><x-admin.empty-state title="Belum ada penilaian" description="Data monitoring akan muncul setelah penumpang mengirim penilaian." /></td></tr>
             @endforelse
-        </tbody></table></div>{{ $ratings->links() }}
+        </tbody></table></div><x-admin.pagination :paginator="$ratings" label="Pagination monitoring" />
     </x-admin.panel>
 </x-layouts.admin>

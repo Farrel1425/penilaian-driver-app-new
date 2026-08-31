@@ -85,6 +85,33 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading();
     }, true);
 
+    document.addEventListener('submit', (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement) || form.method.toLowerCase() === 'get' || form.target === '_blank') {
+            return;
+        }
+
+        if (form.matches('[data-delete-confirm], [data-confirm]') && form.dataset.deleteConfirmed !== 'true') {
+            return;
+        }
+
+        if (form.dataset.isSubmitting === 'true') {
+            event.preventDefault();
+            return;
+        }
+
+        form.dataset.isSubmitting = 'true';
+        form.setAttribute('aria-busy', 'true');
+        form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach((button) => {
+            button.disabled = true;
+            button.classList.add('is-submitting');
+
+            if (button instanceof HTMLButtonElement && button.dataset.submittingLabel) {
+                button.textContent = button.dataset.submittingLabel;
+            }
+        });
+    }, true);
+
     document.addEventListener('click', (event) => {
         const link = event.target.closest('a');
         if (!link || link.matches('[data-no-loading], [download]') || link.target === '_blank' || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
@@ -990,5 +1017,113 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: false });
 
         renderZoom();
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const body = document.body;
+    const timeout = Number(body.dataset.adminSessionTimeout);
+    const pingUrl = body.dataset.adminSessionPing;
+    const logoutUrl = body.dataset.adminLogout;
+    const loginUrl = body.dataset.adminLogin;
+
+    if (!timeout || !pingUrl || !logoutUrl || !loginUrl) {
+        return;
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    let lastInteraction = Date.now();
+    let lastPing = Date.now();
+    let timer;
+    let hasExpired = false;
+
+    const expire = () => {
+        if (hasExpired) return;
+        hasExpired = true;
+        window.fetch(`${logoutUrl}?reason=idle`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken ?? '', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            keepalive: true,
+        }).finally(() => window.location.assign(`${loginUrl}?expired=1`));
+    };
+
+    const schedule = () => {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(expire, timeout);
+    };
+
+    const ping = () => {
+        lastPing = Date.now();
+        window.fetch(pingUrl, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken ?? '', 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin',
+            keepalive: true,
+        });
+    };
+
+    const registerActivity = () => {
+        if (hasExpired) return;
+        const now = Date.now();
+        if (now - lastInteraction >= timeout) {
+            expire();
+            return;
+        }
+        lastInteraction = now;
+        if (now - lastPing >= 60000) ping();
+        schedule();
+    };
+
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
+        window.addEventListener(eventName, registerActivity, { passive: true });
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') registerActivity();
+    });
+    schedule();
+});
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-dashboard-auto-filter]').forEach((form) => {
+        let filterTimer;
+        const submit = () => {
+            window.clearTimeout(filterTimer);
+            filterTimer = window.setTimeout(() => form.requestSubmit(), 500);
+        };
+
+        form.querySelectorAll('input[type="date"], select').forEach((field) => {
+            field.addEventListener('change', submit);
+        });
+    });
+});
+// Open native date pickers from the whole input area, not only the calendar icon.
+document.addEventListener('click', (event) => {
+    const input = event.target instanceof Element ? event.target.closest('input[type="date"]') : null;
+
+    if (!(input instanceof HTMLInputElement) || input.disabled || input.readOnly) {
+        return;
+    }
+
+    input.focus({ preventScroll: true });
+
+    if (typeof input.showPicker === 'function') {
+        try {
+            input.showPicker();
+        } catch {
+            // Browsers without picker support still retain their normal focused date input behavior.
+        }
+    }
+});
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-auto-filter-form]').forEach((form) => {
+        let filterTimer;
+        const submit = () => {
+            window.clearTimeout(filterTimer);
+            filterTimer = window.setTimeout(() => form.requestSubmit(), 350);
+        };
+
+        form.querySelectorAll('input[type="date"], select').forEach((field) => {
+            field.addEventListener('change', submit);
+        });
     });
 });

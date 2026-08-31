@@ -14,7 +14,7 @@ class EnsureActiveAdmin
     {
         $user = $request->user();
 
-        if ($user?->status === User::STATUS_ACTIVE && $user->role === User::ROLE_ADMIN) {
+        if ($user?->status === User::STATUS_ACTIVE && in_array($user->role, [User::ROLE_ADMIN, User::ROLE_BRANCH_ADMIN], true)) {
             return $next($request);
         }
 

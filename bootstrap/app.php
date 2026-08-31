@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Middleware\EnsureActiveAdmin;
+use App\Http\Middleware\EnsureAdminInactivity;
+use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\ScopeBranchAdminReadAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '127.0.0.1');
         $middleware->alias([
             'active.admin' => EnsureActiveAdmin::class,
+            'admin.inactivity' => EnsureAdminInactivity::class,
+            'super.admin' => EnsureSuperAdmin::class,
+            'branch.read' => ScopeBranchAdminReadAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

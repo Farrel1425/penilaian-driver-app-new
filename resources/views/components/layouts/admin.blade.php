@@ -12,7 +12,7 @@
         <script defer>{!! file_get_contents(resource_path('js/app.js')) !!}</script>
     @endif
 </head>
-<body class="admin-shell">
+<body class="admin-shell" data-admin-session-timeout="1800000" data-admin-session-ping="{{ route('admin.session.ping') }}" data-admin-logout="{{ route('logout') }}" data-admin-login="{{ route('login') }}">
     <x-notifications.toast />
     <div class="app-loading-overlay" data-app-loading hidden aria-live="polite" aria-busy="true">
         <div class="app-loading-indicator">

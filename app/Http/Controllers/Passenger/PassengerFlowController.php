@@ -11,7 +11,9 @@ use App\Models\Rating;
 use App\Models\RatingAnswer;
 use App\Models\Vehicle;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -75,6 +77,7 @@ class PassengerFlowController extends Controller
         $vehicle = $this->activeVehicle($vehicleToken);
         $this->ensureSelectableDriver($vehicle, $driver);
 
+        session()->forget($this->passengerSubmissionTokenSessionKey($vehicle, $driver));
         session()->put(
             $this->passengerNameSessionKey($vehicle, $driver),
             trim($request->validated('passenger_name')),
@@ -95,6 +98,13 @@ class PassengerFlowController extends Controller
                 ->with('error', 'Silakan isi nama Anda sebelum memberikan penilaian.');
         }
 
+        $submissionToken = session($this->passengerSubmissionTokenSessionKey($vehicle, $driver));
+
+        if (! is_string($submissionToken)) {
+            $submissionToken = (string) Str::uuid();
+            session()->put($this->passengerSubmissionTokenSessionKey($vehicle, $driver), $submissionToken);
+        }
+
         $questions = Question::query()
             ->with('options')
             ->active()
@@ -102,7 +112,7 @@ class PassengerFlowController extends Controller
             ->get()
             ->groupBy('target_type');
 
-        return view('passenger.assessment', compact('vehicle', 'driver', 'questions', 'passengerName'));
+        return view('passenger.assessment', compact('vehicle', 'driver', 'questions', 'passengerName', 'submissionToken'));
     }
 
     public function submit(StoreRatingRequest $request, string $vehicleToken, Driver $driver): RedirectResponse
@@ -112,23 +122,49 @@ class PassengerFlowController extends Controller
         $questions = Question::query()->with('options')->active()->ordered()->get();
         $answers = $request->validatedAnswers($questions);
         $passengerName = trim($request->validated('passenger_name'));
+        $submissionToken = $request->string('submission_token')->toString();
+        abort_unless(
+            $submissionToken !== '' && hash_equals((string) session($this->passengerSubmissionTokenSessionKey($vehicle, $driver)), $submissionToken),
+            419,
+        );
 
-        $rating = DB::transaction(function () use ($vehicle, $driver, $answers, $passengerName): Rating {
-            $rating = Rating::query()->create([
-                'branch_id' => $vehicle->branch_id,
-                'vehicle_id' => $vehicle->id,
-                'driver_id' => $driver->id,
-                'passenger_name' => $passengerName,
-                'submitted_at' => now(),
-            ]);
+        $submissionKey = "passenger-rating-submission:{$submissionToken}";
 
-            foreach ($answers as $answer) {
-                $rating->answers()->create($answer);
+        if (! Cache::add($submissionKey, 'processing', now()->addMinutes(5))) {
+            $existingRatingId = Cache::get($submissionKey);
+
+            if (is_int($existingRatingId) || ctype_digit((string) $existingRatingId)) {
+                return redirect()->route('passenger.rating.success', [$vehicle->qr_token, $existingRatingId]);
             }
 
-            return $rating;
-        });
+            return redirect()
+                ->route('passenger.rating.assessment', [$vehicle->qr_token, $driver])
+                ->with('error', 'Penilaian sedang dikirim. Mohon tunggu sebentar.');
+        }
 
+        try {
+            $rating = DB::transaction(function () use ($vehicle, $driver, $answers, $passengerName): Rating {
+                $rating = Rating::query()->create([
+                    'branch_id' => $vehicle->branch_id,
+                    'vehicle_id' => $vehicle->id,
+                    'driver_id' => $driver->id,
+                    'passenger_name' => $passengerName,
+                    'submitted_at' => now(),
+                ]);
+
+                foreach ($answers as $answer) {
+                    $rating->answers()->create($answer);
+                }
+
+                return $rating;
+            });
+        } catch (\Throwable $exception) {
+            Cache::forget($submissionKey);
+
+            throw $exception;
+        }
+
+        Cache::put($submissionKey, $rating->id, now()->addDay());
         session()->forget($this->passengerNameSessionKey($vehicle, $driver));
 
         return redirect()->route('passenger.rating.success', [$vehicle->qr_token, $rating]);
@@ -163,5 +199,10 @@ class PassengerFlowController extends Controller
     private function passengerNameSessionKey(Vehicle $vehicle, Driver $driver): string
     {
         return "passenger_name_{$vehicle->id}_{$driver->id}";
+    }
+
+    private function passengerSubmissionTokenSessionKey(Vehicle $vehicle, Driver $driver): string
+    {
+        return "passenger_submission_token_{$vehicle->id}_{$driver->id}";
     }
 }

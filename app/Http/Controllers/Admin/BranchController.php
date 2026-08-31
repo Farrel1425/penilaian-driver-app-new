@@ -17,7 +17,10 @@ class BranchController extends Controller
     public function index(Request $request): View
     {
         $branches = Branch::query()
-            ->withCount(['drivers', 'vehicles'])
+            ->withCount([
+                'drivers as drivers_count' => fn ($query) => $query->where('status', Driver::STATUS_ACTIVE),
+                'vehicles as vehicles_count' => fn ($query) => $query->where('status', Vehicle::STATUS_ACTIVE),
+            ])
             ->when($request->string('search')->toString(), function ($query, string $search): void {
                 $query->where(function ($query) use ($search): void {
                     $query->where('code', 'like', "%{$search}%")

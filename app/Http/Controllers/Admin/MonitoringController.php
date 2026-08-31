@@ -19,7 +19,7 @@ class MonitoringController extends Controller
 
         return view('admin.assessments.index', [
             'filters' => $filters,
-            'branches' => $analytics->branches(),
+            'branches' => $analytics->branches($filters->branchId),
             'drivers' => $analytics->drivers($filters->branchId),
             'vehicles' => $analytics->vehicles($filters->branchId),
             'ratings' => $ratings,
@@ -67,7 +67,7 @@ class MonitoringController extends Controller
 
         return view('admin.assessments.recap', [
             'filters' => $filters,
-            'branches' => $analytics->branches(),
+            'branches' => $analytics->branches($filters->branchId),
             'drivers' => $analytics->drivers($filters->branchId),
             'vehicles' => $analytics->vehicles($filters->branchId),
             'group' => $group,

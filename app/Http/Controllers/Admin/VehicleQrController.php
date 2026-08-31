@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
 use App\Services\VehicleQrCodeService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class VehicleQrController extends Controller
@@ -22,14 +22,15 @@ class VehicleQrController extends Controller
         ]);
     }
 
-    public function download(Vehicle $vehicle, VehicleQrCodeService $qrCode): Response
+    public function download(Vehicle $vehicle, VehicleQrCodeService $qrCode)
     {
-        $filename = 'qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.svg';
+        $vehicle->load('branch');
+        $filename = 'qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.pdf';
 
-        return response($qrCode->svg($vehicle), 200, [
-            'Content-Type' => 'image/svg+xml',
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-        ]);
+        return Pdf::loadView('admin.vehicles.qr-download', [
+            'vehicle' => $vehicle,
+            'qrDataUri' => $qrCode->dataUri($vehicle, size: 420),
+        ])->setPaper('a4')->download($filename);
     }
 
     public function print(Request $request, Vehicle $vehicle, VehicleQrCodeService $qrCode): View

@@ -16,7 +16,7 @@ class ReportBranchController extends Controller
 
         return view('admin.reports.branches', [
             'filters' => $filters,
-            'branches' => $analytics->branches(),
+            'branches' => $analytics->branches($filters->branchId),
             'data' => $analytics->branchReport($filters),
         ]);
     }

@@ -24,13 +24,12 @@
     @endphp
 
     <x-admin.panel class="dashboard-filter-panel">
-        <form class="dashboard-filter" method="GET" action="{{ route('admin.dashboard') }}">
+        <form class="dashboard-filter" method="GET" action="{{ route('admin.dashboard') }}" data-dashboard-auto-filter>
             <div class="dashboard-filter-label"><x-lucide-calendar-days aria-hidden="true" /><span>Periode</span></div>
             <input type="date" name="start_date" value="{{ $filters->startDate?->toDateString() }}" aria-label="Tanggal mulai">
             <span class="dashboard-filter-divider">sampai</span>
             <input type="date" name="end_date" value="{{ $filters->endDate?->toDateString() }}" aria-label="Tanggal akhir">
             <select name="branch_id" aria-label="Filter unit kerja"><option value="">Semua Unit Kerja</option>@foreach($branches as $branch)<option value="{{ $branch->id }}" @selected($filters->branchId === $branch->id)>{{ $branch->name }}</option>@endforeach</select>
-            <button class="secondary-button" type="submit"><x-lucide-filter aria-hidden="true" /><span>Terapkan</span></button>
             <a class="dashboard-filter-reset" href="{{ route('admin.dashboard') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /></a>
         </form>
     </x-admin.panel>

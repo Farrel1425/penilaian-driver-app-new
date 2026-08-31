@@ -54,8 +54,8 @@
                         <th>Indikator</th>
                         <th>Tipe Jawaban</th>
                         <th>Wajib</th>
-                        <th>Bobot</th>
-                        <th>Urutan</th>
+                        <th class="question-column-center">Bobot</th>
+                        <th class="question-column-center">Urutan</th>
                         <th>Status</th>
                         <th class="question-column-actions">Aksi</th>
                     </tr>
@@ -121,19 +121,7 @@
                 <span>Menampilkan {{ $questions->firstItem() ?? 0 }} - {{ $questions->lastItem() ?? 0 }} dari {{ $questions->total() }} data</span>
             @endif
             @if (! $isReordering && $questions->hasPages())
-                <nav aria-label="Pagination pertanyaan">
-                    @if ($questions->onFirstPage())
-                        <span class="question-page-button is-disabled"><x-lucide-chevron-left aria-hidden="true" /></span>
-                    @else
-                        <a class="question-page-button" href="{{ $questions->previousPageUrl() }}" aria-label="Halaman sebelumnya"><x-lucide-chevron-left aria-hidden="true" /></a>
-                    @endif
-                    <span class="question-page-button is-current">{{ $questions->currentPage() }}</span>
-                    @if ($questions->hasMorePages())
-                        <a class="question-page-button" href="{{ $questions->nextPageUrl() }}" aria-label="Halaman berikutnya"><x-lucide-chevron-right aria-hidden="true" /></a>
-                    @else
-                        <span class="question-page-button is-disabled"><x-lucide-chevron-right aria-hidden="true" /></span>
-                    @endif
-                </nav>
+                <x-admin.pagination :paginator="$questions" label="Pagination pertanyaan" />
             @endif
         </footer>
     </section>

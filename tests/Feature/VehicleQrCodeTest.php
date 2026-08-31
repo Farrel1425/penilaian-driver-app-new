@@ -47,16 +47,15 @@ class VehicleQrCodeTest extends TestCase
         $this->assertSame(40, strlen($vehicle->fresh()->qr_token));
     }
 
-    public function test_admin_can_download_vehicle_qr_svg(): void
+    public function test_admin_can_download_print_ready_vehicle_qr_pdf(): void
     {
         $this->actingAs(User::factory()->create());
-        $vehicle = Vehicle::factory()->create();
+        $vehicle = Vehicle::factory()->for(Branch::factory())->create();
 
         $this->get(route('admin.vehicles.qr.download', $vehicle))
             ->assertOk()
-            ->assertHeader('Content-Type', 'image/svg+xml')
-            ->assertHeader('Content-Disposition', 'attachment; filename="qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.svg"')
-            ->assertSee('<svg', false);
+            ->assertHeader('Content-Type', 'application/pdf')
+            ->assertHeader('Content-Disposition', 'attachment; filename=qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.pdf');
     }
 
     public function test_admin_can_open_vehicle_qr_print_page(): void

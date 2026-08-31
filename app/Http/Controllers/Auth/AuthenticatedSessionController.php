@@ -44,6 +44,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('status', 'Anda berhasil logout.');
+        return redirect()->route('login')->with('status', $request->string('reason')->toString() === 'idle'
+            ? 'Sesi Anda berakhir setelah 30 menit tidak ada aktivitas. Silakan login kembali.'
+            : 'Anda berhasil logout.');
     }
 }

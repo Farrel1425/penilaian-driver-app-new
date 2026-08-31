@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Admin Development', 'password' => Hash::make('password')]
         );
 
-        $this->call(DevelopmentSeeder::class);
+        $this->call([
+            DevelopmentSeeder::class,
+            BranchAdminSeeder::class,
+        ]);
     }
 }

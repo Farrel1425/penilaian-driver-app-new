@@ -29,6 +29,18 @@
 
         <div class="table-wrap vehicle-table-wrap">
             <table class="data-table vehicle-data-table">
+                <colgroup>
+                    <col class="vehicle-col-number">
+                    <col class="vehicle-col-photo">
+                    <col class="vehicle-col-police">
+                    <col class="vehicle-col-brand">
+                    <col class="vehicle-col-year">
+                    <col class="vehicle-col-color">
+                    <col class="vehicle-col-branch">
+                    <col class="vehicle-col-status">
+                    <col class="vehicle-col-qr">
+                    <col class="vehicle-col-actions">
+                </colgroup>
                 <thead>
                     <tr>
                         <th class="vehicle-column-number">No.</th>
@@ -37,8 +49,8 @@
                         <th>Merk / Tipe</th>
                         <th>Tahun</th>
                         <th>Warna</th>
-                        <th>Unit Kerja (Cabang)</th>
-                        <th>Status</th>
+                        <th class="vehicle-column-branch">Unit Kerja (Cabang)</th>
+                        <th class="vehicle-column-status">Status</th>
                         <th class="vehicle-column-qr">QR Code</th>
                         <th class="vehicle-column-actions">Aksi</th>
                     </tr>
@@ -61,8 +73,8 @@
                             <td>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: '-' }}</td>
                             <td>{{ $vehicle->year ?: '-' }}</td>
                             <td>{{ $vehicle->color ?: '-' }}</td>
-                            <td>{{ $vehicle->branch?->name ?: '-' }}</td>
-                            <td><span class="vehicle-status vehicle-status-{{ $vehicle->status }}">{{ $vehicle->status === 'active' ? 'Aktif' : 'Nonaktif' }}</span></td>
+                            <td class="vehicle-cell-branch">{{ $vehicle->branch?->name ?: '-' }}</td>
+                            <td class="vehicle-cell-status"><span class="vehicle-status vehicle-status-{{ $vehicle->status }}">{{ $vehicle->status === 'active' ? 'Aktif' : 'Nonaktif' }}</span></td>
                             <td>
                                 <button
                                     class="vehicle-qr-trigger"
@@ -100,19 +112,7 @@
         <footer class="vehicle-pagination">
             <span>Menampilkan {{ $vehicles->firstItem() ?? 0 }} - {{ $vehicles->lastItem() ?? 0 }} dari {{ $vehicles->total() }} data</span>
             @if ($vehicles->hasPages())
-                <nav aria-label="Pagination kendaraan">
-                    @if ($vehicles->onFirstPage())
-                        <span class="vehicle-page-button is-disabled"><x-lucide-chevron-left aria-hidden="true" /></span>
-                    @else
-                        <a class="vehicle-page-button" href="{{ $vehicles->previousPageUrl() }}" aria-label="Halaman sebelumnya"><x-lucide-chevron-left aria-hidden="true" /></a>
-                    @endif
-                    <span class="vehicle-page-button is-current">{{ $vehicles->currentPage() }}</span>
-                    @if ($vehicles->hasMorePages())
-                        <a class="vehicle-page-button" href="{{ $vehicles->nextPageUrl() }}" aria-label="Halaman berikutnya"><x-lucide-chevron-right aria-hidden="true" /></a>
-                    @else
-                        <span class="vehicle-page-button is-disabled"><x-lucide-chevron-right aria-hidden="true" /></span>
-                    @endif
-                </nav>
+                <x-admin.pagination :paginator="$vehicles" label="Pagination kendaraan" />
             @endif
         </footer>
     </section>

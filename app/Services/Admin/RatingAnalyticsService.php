@@ -15,10 +15,12 @@ use Illuminate\Support\Collection;
 
 class RatingAnalyticsService
 {
-    public function dashboard(RatingReportFilters $filters): array
+    public function dashboard(RatingReportFilters $filters, bool $includeAdminActivities = true): array
     {
-        $ratings = $this->ratings($filters)->with(['branch', 'driver.branch', 'vehicle.branch', 'answers.question'])->latest('submitted_at')->get();
-        $ratingAnswers = $this->ratingAnswers($filters)->with(['rating.driver.branch', 'rating.vehicle.branch', 'rating.branch', 'question'])->get();
+        $ratings = $this->history($filters);
+        $ratingAnswers = $ratings->flatMap->answers
+            ->filter(fn (RatingAnswer $answer) => $answer->question?->answer_type === Question::TYPE_RATING)
+            ->values();
         $driverRatingAnswers = $ratingAnswers->where('question.target_type', Question::TARGET_DRIVER);
         $vehicleRatingAnswers = $ratingAnswers->where('question.target_type', Question::TARGET_VEHICLE);
 
@@ -37,7 +39,7 @@ class RatingAnalyticsService
             'latestRatings' => $ratings->take(8),
             'branchStats' => $this->branchStats($ratings, $ratingAnswers),
             'driverRanking' => $this->driverRanking($ratingAnswers)->take(5),
-            'latestActivities' => $this->latestActivities($ratings),
+            'latestActivities' => $this->latestActivities($ratings, $includeAdminActivities),
         ];
     }
 
@@ -60,10 +62,17 @@ class RatingAnalyticsService
 
     public function history(RatingReportFilters $filters): Collection
     {
-        return $this->ratings($filters)
+        $ratings = $this->ratings($filters)
             ->with(['branch', 'driver.branch', 'vehicle.branch', 'answers.question'])
             ->latest('submitted_at')
             ->get();
+
+        // Reuse the already eager-loaded rating for each answer and avoid N+1 queries in reports.
+        $ratings->each(function (Rating $rating): void {
+            $rating->answers->each(fn (RatingAnswer $answer) => $answer->setRelation('rating', $rating));
+        });
+
+        return $ratings;
     }
 
     public function recap(RatingReportFilters $filters, string $group = 'driver'): array
@@ -177,9 +186,9 @@ class RatingAnalyticsService
         ];
     }
 
-    public function branches(): Collection
+    public function branches(?int $branchId = null): Collection
     {
-        return Branch::query()->orderBy('name')->get();
+        return Branch::query()->when($branchId, fn ($query) => $query->whereKey($branchId))->orderBy('name')->get();
     }
 
     public function ratingScore(Rating $rating, ?string $targetType = null): ?float
@@ -279,9 +288,12 @@ class RatingAnalyticsService
     private function branchStats(Collection $ratings, Collection $answers): Collection
     {
         $branches = Branch::query()->withCount(['drivers', 'vehicles'])->whereIn('id', $ratings->pluck('branch_id')->unique())->get()->keyBy('id');
+        $answersByBranch = $answers
+            ->filter(fn (RatingAnswer $answer) => $answer->rating?->branch_id !== null)
+            ->groupBy(fn (RatingAnswer $answer) => $answer->rating->branch_id);
 
-        return $ratings->groupBy('branch_id')->map(function ($items, $branchId) use ($answers, $branches) {
-            $branchAnswers = $answers->filter(fn ($answer) => $answer->rating?->branch_id === (int) $branchId);
+        return $ratings->groupBy('branch_id')->map(function ($items, $branchId) use ($answersByBranch, $branches) {
+            $branchAnswers = $answersByBranch->get((int) $branchId, collect());
             $branch = $branches->get($branchId);
             $drivers = $this->driverRanking($branchAnswers);
             $vehicles = $this->vehicleRanking($branchAnswers);
@@ -319,7 +331,7 @@ class RatingAnalyticsService
         })->sortByDesc(fn ($row) => [$row['average'] ?? 0, $row['total']])->values();
     }
 
-    private function latestActivities(Collection $ratings): Collection
+    private function latestActivities(Collection $ratings, bool $includeAdminActivities): Collection
     {
         $ratingActivities = $ratings->take(6)->map(fn (Rating $rating) => [
             'type' => 'rating',
@@ -327,11 +339,11 @@ class RatingAnalyticsService
             'created_at' => $rating->submitted_at,
         ]);
 
-        $adminActivities = ActivityLog::query()->latest('created_at')->take(6)->get()->map(fn (ActivityLog $log) => [
+        $adminActivities = $includeAdminActivities ? ActivityLog::query()->latest('created_at')->take(6)->get()->map(fn (ActivityLog $log) => [
             'type' => 'admin',
             'description' => $log->description,
             'created_at' => $log->created_at,
-        ]);
+        ]) : collect();
 
         return $ratingActivities->merge($adminActivities)->sortByDesc('created_at')->take(6)->values();
     }

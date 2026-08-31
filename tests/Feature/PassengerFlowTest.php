@@ -35,17 +35,22 @@ class PassengerFlowTest extends TestCase
             ->assertRedirect(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]));
         $this->get(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))->assertOk()->assertSee($driverRating->question)->assertSee($yesNo->question);
 
-        $response = $this->post(route('passenger.rating.submit', [$vehicle->qr_token, $driver]), [
+        $payload = [
             'passenger_name' => 'Made Penilai',
+            'submission_token' => $this->app['session.store']->get("passenger_submission_token_{$vehicle->id}_{$driver->id}"),
             'answers' => [
                 $driverRating->id => '5',
                 $yesNo->id => '1',
                 $choice->id => (string) $option->id,
             ],
-        ]);
+        ];
+        $response = $this->post(route('passenger.rating.submit', [$vehicle->qr_token, $driver]), $payload);
 
         $rating = Rating::query()->firstOrFail();
         $response->assertRedirect(route('passenger.rating.success', [$vehicle->qr_token, $rating]));
+        $this->post(route('passenger.rating.submit', [$vehicle->qr_token, $driver]), $payload)
+            ->assertRedirect(route('passenger.rating.success', [$vehicle->qr_token, $rating]));
+        $this->assertSame(1, Rating::query()->count());
         $this->assertSame($branch->id, $rating->branch_id);
         $this->assertSame($vehicle->id, $rating->vehicle_id);
         $this->assertSame($driver->id, $rating->driver_id);

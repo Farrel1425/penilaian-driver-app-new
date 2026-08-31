@@ -17,7 +17,7 @@ class ReportDriverController extends Controller
 
         return view('admin.reports.drivers', [
             'filters' => $filters,
-            'branches' => $analytics->branches(),
+            'branches' => $analytics->branches($filters->branchId),
             'drivers' => $analytics->drivers($filters->branchId),
             'data' => $analytics->driverReport($filters),
             'questionScores' => $analytics->questionScores($filters, 'driver'),

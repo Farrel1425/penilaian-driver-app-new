@@ -17,7 +17,7 @@ class ReportVehicleController extends Controller
 
         return view('admin.reports.vehicles', [
             'filters' => $filters,
-            'branches' => $analytics->branches(),
+            'branches' => $analytics->branches($filters->branchId),
             'vehicles' => $analytics->vehicles($filters->branchId),
             'data' => $analytics->vehicleReport($filters),
             'questionScores' => $analytics->questionScores($filters, 'vehicle'),

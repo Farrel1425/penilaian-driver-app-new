@@ -10750,3 +10750,385 @@ button {
         min-width: 0;
     }
 }
+
+form[aria-busy="true"] button[type="submit"].is-submitting,
+form[aria-busy="true"] input[type="submit"].is-submitting {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.form-field[hidden] {
+    display: none !important;
+}
+
+.vehicle-qr-preview-page { max-width: 1080px; margin: 0 auto; }
+.qr-preview-page-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 22px; border-bottom: 1px solid #e1e8f2; }
+.qr-preview-eyebrow { display: block; color: #2860d8; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+.qr-preview-page-toolbar h2 { margin: 5px 0 2px; color: #10284d; font-size: 24px; line-height: 1.2; }
+.qr-preview-page-toolbar p { margin: 0; color: #71819c; }
+.vehicle-qr-preview-layout { display: grid; grid-template-columns: minmax(320px, .88fr) minmax(300px, 1.12fr); gap: 34px; align-items: stretch; padding-top: 28px; }
+.qr-preview-card-large { min-height: 430px; justify-content: center; padding: 34px; border-color: #cddcf3; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
+.qr-preview-card-large img { width: min(100%, 274px); }
+.qr-preview-card-large small { margin-top: 9px; color: #7584a0; font-size: 13px; }
+.qr-vehicle-information { display: flex; min-width: 0; flex-direction: column; justify-content: center; }
+.qr-info-heading { display: flex; align-items: center; gap: 13px; padding-bottom: 21px; border-bottom: 1px solid #e1e8f2; }
+.qr-info-heading > svg { width: 42px; height: 42px; padding: 10px; color: #2358dc; background: #edf3ff; border: 1px solid #cfddf7; border-radius: 10px; }
+.qr-info-heading span { display: block; color: #74849e; font-size: 13px; }
+.qr-info-heading strong { display: block; margin-top: 3px; color: #10284d; font-size: 19px; }
+.qr-info-list { display: grid; gap: 0; margin: 16px 0 24px; }
+.qr-info-list > div { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 72px; border-bottom: 1px solid #e7edf5; }
+.qr-info-list dt { display: inline-flex; align-items: center; gap: 9px; color: #74849e; font-size: 14px; }
+.qr-info-list dt svg { width: 17px; color: #285de0; }
+.qr-info-list dd { margin: 0; color: #142b4f; font-weight: 700; text-align: right; }
+.qr-print-settings { margin-top: auto; padding: 17px; border: 1px solid #d9e5f4; border-radius: 8px; background: #f7faff; }
+.qr-print-settings .primary-button { min-height: 42px; }
+@media (max-width: 760px) {
+    .qr-preview-page-toolbar, .vehicle-qr-preview-layout { grid-template-columns: 1fr; flex-direction: column; align-items: stretch; }
+    .qr-preview-page-toolbar .secondary-button { justify-content: center; }
+    .vehicle-qr-preview-layout { gap: 20px; }
+    .qr-preview-card-large { min-height: 0; }
+    .qr-info-list > div { align-items: flex-start; flex-direction: column; justify-content: center; gap: 6px; padding: 13px 0; }
+    .qr-info-list dd { text-align: left; }
+}
+/* Persistent logout control at the bottom of the admin navigation. */
+.admin-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+.sidebar-nav {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 16px;
+}
+.sidebar-footer {
+    border-top: 1px solid rgba(184, 198, 218, 0.2);
+    flex: 0 0 auto;
+    margin: 0 -14px -32px;
+    padding: 14px;
+}
+.sidebar-logout-button {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(254, 202, 202, 0.32);
+    border-radius: 8px;
+    color: #fecaca;
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    gap: 10px;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 14px;
+    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+    width: 100%;
+}
+.sidebar-logout-button svg {
+    height: 17px;
+    width: 17px;
+}
+.sidebar-logout-button:hover,
+.sidebar-logout-button:focus-visible {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+    outline: 0;
+}
+.sidebar-logout-button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(254, 202, 202, 0.24);
+}
+/* Compact, centered metadata for the Master Driver table. */
+.driver-data-table .driver-column-number,
+.driver-data-table .driver-cell-center,
+.driver-data-table .driver-column-status,
+.driver-data-table .driver-cell-status,
+.driver-data-table .driver-column-actions,
+.driver-data-table .driver-cell-actions {
+    text-align: center;
+}
+.driver-data-table .driver-column-status,
+.driver-data-table .driver-cell-status {
+    width: 104px;
+}
+.driver-data-table .driver-cell-status {
+    vertical-align: middle;
+}
+.driver-data-table .driver-status {
+    align-items: center;
+    color: #1d2736;
+    font-size: 11px;
+    justify-content: center;
+    line-height: 1.2;
+    min-width: 0;
+    padding: 3px 7px;
+}
+.driver-data-table .driver-cell-actions {
+    vertical-align: middle;
+}
+.driver-data-table {
+    table-layout: fixed;
+}
+.driver-data-table .driver-col-number { width: 4%; }
+.driver-data-table .driver-col-photo { width: 5%; }
+.driver-data-table .driver-col-name { width: 18%; }
+.driver-data-table .driver-col-sim { width: 13%; }
+.driver-data-table .driver-col-branch { width: 15%; }
+.driver-data-table .driver-col-phone { width: 13%; }
+.driver-data-table .driver-col-status { width: 140px; }
+.driver-data-table .driver-col-actions { width: 17%; }
+.driver-data-table th,
+.driver-data-table td {
+    vertical-align: middle;
+}
+.driver-data-table th:not(.driver-column-number):not(.driver-column-status):not(.driver-column-actions),
+.driver-data-table td:not(.driver-cell-center):not(.driver-cell-status):not(.driver-cell-actions) {
+    text-align: left;
+}
+.driver-data-table .driver-cell-name,
+.driver-data-table td:nth-child(4),
+.driver-data-table td:nth-child(5),
+.driver-data-table td:nth-child(6) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.driver-data-table .driver-cell-actions .table-row-actions {
+    justify-content: center;
+}
+/* Unified colored badges across Master Data tables. */
+.branch-data-table td .driver-status,
+.driver-data-table td .driver-status,
+.vehicle-data-table td .vehicle-status,
+.question-data-table td .question-target-badge,
+.question-data-table td .question-required-badge,
+.question-data-table td .question-status {
+    align-items: center;
+    border-radius: 6px;
+    box-sizing: border-box;
+    display: flex;
+    font-size: 11px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 1.2;
+    min-height: 26px;
+    padding: 5px 8px;
+    text-align: center;
+    width: 100%;
+}
+.branch-data-table th:nth-child(6),
+.branch-data-table td:nth-child(6),
+.driver-data-table .driver-column-status,
+.driver-data-table .driver-cell-status,
+.vehicle-data-table th:nth-child(8),
+.vehicle-data-table td:nth-child(8),
+.question-data-table th:nth-child(3),
+.question-data-table td:nth-child(3),
+.question-data-table th:nth-child(6),
+.question-data-table td:nth-child(6),
+.question-data-table th:nth-child(9),
+.question-data-table td:nth-child(9) {
+    text-align: center;
+}
+.branch-data-table td .driver-status-active,
+.driver-data-table td .driver-status-active,
+.vehicle-data-table td .vehicle-status-active,
+.question-data-table td .question-status-active {
+    background: #d9f8eb;
+    color: #006b4f;
+}
+.branch-data-table td .driver-status-inactive,
+.driver-data-table td .driver-status-inactive,
+.vehicle-data-table td .vehicle-status-inactive,
+.question-data-table td .question-status-inactive {
+    background: #fff1f0;
+    color: #e03131;
+}
+/* Compact final columns in the Master Kendaraan table. */
+.vehicle-data-table .vehicle-column-branch,
+.vehicle-data-table .vehicle-cell-branch {
+    width: auto;
+}
+.vehicle-data-table .vehicle-column-status,
+.vehicle-data-table .vehicle-cell-status {
+    text-align: center;
+    width: 150px;
+}
+.vehicle-data-table .vehicle-column-qr,
+.vehicle-data-table td:nth-child(9) {
+    width: 76px;
+}
+.vehicle-data-table .vehicle-column-actions,
+.vehicle-data-table td:nth-child(10) {
+    text-align: center;
+    width: 132px;
+}
+.vehicle-data-table .vehicle-column-status,
+.vehicle-data-table .vehicle-cell-status,
+.vehicle-data-table .vehicle-column-qr,
+.vehicle-data-table td:nth-child(9),
+.vehicle-data-table .vehicle-column-actions,
+.vehicle-data-table td:nth-child(10) {
+    transform: translateX(-96px);
+}
+/* One balanced status width across Master Data lists. */
+.branch-data-table .branch-column-status,
+.branch-data-table .branch-cell-status,
+.driver-data-table .driver-column-status,
+.driver-data-table .driver-cell-status,
+.vehicle-data-table .vehicle-column-status,
+.vehicle-data-table .vehicle-cell-status {
+    text-align: center;
+    width: 140px;
+}
+/* Center the operational summary columns in Master Cabang. */
+.branch-data-table .branch-column-count,
+.branch-data-table .branch-cell-count {
+    text-align: center;
+    width: 104px;
+}
+.branch-data-table .branch-column-actions,
+.branch-data-table .branch-cell-actions {
+    text-align: center;
+    width: 140px;
+}
+.branch-data-table .branch-cell-actions .table-row-actions {
+    justify-content: center;
+}
+/* Structured column grid for Master Cabang. */
+.branch-data-table {
+    table-layout: fixed;
+}
+.branch-data-table .branch-col-code { width: 12%; }
+.branch-data-table .branch-col-name { width: 21%; }
+.branch-data-table .branch-col-contact { width: 24%; }
+.branch-data-table .branch-col-driver-count { width: 9%; }
+.branch-data-table .branch-col-vehicle-count { width: 9%; }
+.branch-data-table .branch-col-status { width: 10%; }
+.branch-data-table .branch-col-actions { width: 15%; }
+.branch-data-table .branch-column-count,
+.branch-data-table .branch-cell-count,
+.branch-data-table .branch-column-status,
+.branch-data-table .branch-cell-status,
+.branch-data-table .branch-column-actions,
+.branch-data-table .branch-cell-actions {
+    text-align: center;
+    width: auto;
+}
+.branch-data-table td:nth-child(2),
+.branch-data-table td:nth-child(3) {
+    overflow: hidden;
+}
+.branch-data-table td:nth-child(2) span,
+.branch-data-table td:nth-child(2) small,
+.branch-data-table td:nth-child(3) span,
+.branch-data-table td:nth-child(3) small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* Structured column grid for Master Kendaraan. */
+.vehicle-data-table {
+    table-layout: fixed;
+}
+.vehicle-data-table .vehicle-col-number { width: 3%; }
+.vehicle-data-table .vehicle-col-photo { width: 4%; }
+.vehicle-data-table .vehicle-col-police { width: 14%; }
+.vehicle-data-table .vehicle-col-brand { width: 10%; }
+.vehicle-data-table .vehicle-col-year { width: 10%; }
+.vehicle-data-table .vehicle-col-color { width: 11%; }
+.vehicle-data-table .vehicle-col-branch { width: 19%; }
+.vehicle-data-table .vehicle-col-status { width: 11%; }
+.vehicle-data-table .vehicle-col-qr { width: 6%; }
+.vehicle-data-table .vehicle-col-actions { width: 12%; }
+.vehicle-data-table .vehicle-column-status,
+.vehicle-data-table .vehicle-cell-status,
+.vehicle-data-table .vehicle-column-qr,
+.vehicle-data-table td:nth-child(9),
+.vehicle-data-table .vehicle-column-actions,
+.vehicle-data-table td:nth-child(10) {
+    transform: none;
+    width: auto;
+}
+.vehicle-data-table td:nth-child(3),
+.vehicle-data-table td:nth-child(4),
+.vehicle-data-table td:nth-child(7) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* Center QR controls within the Master Kendaraan table. */
+.vehicle-data-table .vehicle-column-qr,
+.vehicle-data-table td:nth-child(9) {
+    text-align: center;
+}
+.vehicle-data-table td:nth-child(9) .vehicle-qr-trigger {
+    margin-left: auto;
+    margin-right: auto;
+}
+/* Center numeric columns in Master Pertanyaan. */
+.question-data-table .question-column-center,
+.question-data-table .question-cell-center {
+    text-align: center;
+}
+/* Unified pagination controls. */
+.admin-pagination {
+    align-items: center;
+    display: flex;
+    gap: 5px;
+    justify-content: flex-end;
+}
+.admin-pagination-button {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d9e2ef;
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: #31415c;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 700;
+    height: 30px;
+    justify-content: center;
+    min-width: 30px;
+    padding: 0 7px;
+    text-decoration: none;
+    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+.admin-pagination-button:hover,
+.admin-pagination-button:focus-visible {
+    background: #eef4ff;
+    border-color: #a9c1f4;
+    color: #1d4ed8;
+    outline: 0;
+}
+.admin-pagination-button.is-current {
+    background: #2859df;
+    border-color: #2859df;
+    color: #fff;
+}
+.admin-pagination-button.is-disabled {
+    background: #f8fafc;
+    color: #b7c2d2;
+    cursor: not-allowed;
+}
+.admin-pagination-button svg {
+    height: 16px;
+    width: 16px;
+}
+.admin-pagination-ellipsis {
+    color: #71809a;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 700;
+    height: 30px;
+    justify-content: center;
+    min-width: 16px;
+    padding: 0 1px;
+}
+@media (max-width: 560px) {
+    .admin-pagination { gap: 4px; }
+    .admin-pagination-button { min-width: 29px; padding: 0 6px; }
+}
