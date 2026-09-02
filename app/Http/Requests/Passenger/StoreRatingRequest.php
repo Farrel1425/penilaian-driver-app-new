@@ -17,6 +17,7 @@ class StoreRatingRequest extends FormRequest
     {
         return [
             'passenger_name' => ['required', 'string', 'min:2', 'max:100'],
+            'passenger_unit' => ['required', 'string', 'min:2', 'max:100'],
             'answers' => ['nullable', 'array'],
             'answers.*' => ['nullable'],
         ];

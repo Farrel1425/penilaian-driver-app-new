@@ -1,62 +1,46 @@
 <x-passenger.layout title="Penilaian" variant="assessment">
-    <header class="passenger-mobile-header">
+    <header class="passenger-mobile-header passenger-scroll-header">
         <a href="{{ route('passenger.rating.assessor', [$vehicle->qr_token, $driver]) }}" aria-label="Kembali ke isi nama"><x-lucide-chevron-left aria-hidden="true" /></a>
         <h1>Penilaian</h1>
     </header>
 
-    <form class="passenger-assessment-page" method="POST" action="{{ route('passenger.rating.submit', [$vehicle->qr_token, $driver]) }}">
+    @php
+        $allQuestions = $questions->get(App\Models\Question::TARGET_DRIVER, collect())
+            ->concat($questions->get(App\Models\Question::TARGET_VEHICLE, collect()))
+            ->concat($questions->get(App\Models\Question::TARGET_FEEDBACK, collect()))
+            ->values();
+    @endphp
+
+    <form class="passenger-assessment-page passenger-assessment-scroll" method="POST" action="{{ route('passenger.rating.submit', [$vehicle->qr_token, $driver]) }}">
         @csrf
         <input type="hidden" name="passenger_name" value="{{ $passengerName }}">
+        <input type="hidden" name="passenger_unit" value="{{ $passengerUnit }}">
         <input type="hidden" name="submission_token" value="{{ $submissionToken }}">
-        <p class="passenger-assessment-intro">Berikan penilaian terbaik Anda</p>
-        @php($number = 0)
 
-        <section class="passenger-assessment-group">
-            <h2>Penilaian Driver</h2>
-            @forelse($questions->get(App\Models\Question::TARGET_DRIVER, collect()) as $question)
-                @include('passenger.partials.question', ['question' => $question, 'number' => ++$number])
+        <section class="passenger-assessment-scroll-list">
+            @forelse ($allQuestions as $question)
+                @include('passenger.partials.question', ['question' => $question, 'number' => $loop->iteration, 'scroll' => true])
             @empty
-                <div class="passenger-assessment-empty">Belum ada pertanyaan driver aktif.</div>
+                <div class="passenger-assessment-empty">Belum ada pertanyaan penilaian aktif.</div>
             @endforelse
         </section>
 
-        <section class="passenger-assessment-group">
-            <h2>Penilaian Kendaraan</h2>
-            @forelse($questions->get(App\Models\Question::TARGET_VEHICLE, collect()) as $question)
-                @include('passenger.partials.question', ['question' => $question, 'number' => ++$number])
-            @empty
-                <div class="passenger-assessment-empty">Belum ada pertanyaan kendaraan aktif.</div>
-            @endforelse
-        </section>
-
-        <section class="passenger-assessment-group passenger-feedback-group">
-            <h2>Feedback / Keluhan</h2>
-            <p class="passenger-feedback-intro">Sampaikan bila ada kondisi yang perlu kami tindak lanjuti.</p>
-            @forelse($questions->get(App\Models\Question::TARGET_FEEDBACK, collect()) as $question)
-                @include('passenger.partials.question', ['question' => $question, 'number' => ++$number])
-            @empty
-                <div class="passenger-assessment-empty">Tidak ada feedback tambahan.</div>
-            @endforelse
-        </section>
-
-        <footer class="passenger-assessment-footer">
-            <button type="submit" data-submitting-label="Mengirim Penilaian...">Kirim Penilaian</button>
+        <footer class="passenger-assessment-footer passenger-scroll-footer">
+            <button type="submit" data-submitting-label="Mengirim Penilaian...">Kirim Penilaian <x-lucide-send aria-hidden="true" /></button>
         </footer>
     </form>
 
     <script>
         const feedbackFollowUp = document.querySelector('[data-feedback-followup]');
-        const selectedFeedbackChoice = document.querySelector('[data-feedback-choice]:checked');
+        const syncFeedbackFollowUp = (input) => {
+            if (feedbackFollowUp && input) {
+                feedbackFollowUp.hidden = input.dataset.feedbackEmpty === 'true';
+            }
+        };
 
-        if (feedbackFollowUp && selectedFeedbackChoice) {
-            feedbackFollowUp.hidden = selectedFeedbackChoice.dataset.feedbackEmpty === 'true';
-        }
-
+        syncFeedbackFollowUp(document.querySelector('[data-feedback-choice]:checked'));
         document.querySelectorAll('[data-feedback-choice]').forEach((input) => {
-            input.addEventListener('change', (event) => {
-                if (!feedbackFollowUp) return;
-                feedbackFollowUp.hidden = event.target.dataset.feedbackEmpty === 'true';
-            });
+            input.addEventListener('change', () => syncFeedbackFollowUp(input));
         });
     </script>
 </x-passenger.layout>

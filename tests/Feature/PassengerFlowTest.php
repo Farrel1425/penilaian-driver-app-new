@@ -30,13 +30,14 @@ class PassengerFlowTest extends TestCase
             ->assertSee('Scan Ulang QR');
         $this->get(route('passenger.rating.drivers', $vehicle->qr_token))->assertOk()->assertSee($driver->full_name);
         $this->get(route('passenger.rating.driver', [$vehicle->qr_token, $driver]))->assertOk()->assertSee($driver->full_name);
-        $this->get(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]))->assertOk()->assertSee('Siapa nama Anda?');
-        $this->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => 'Made Penilai'])
+        $this->get(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]))->assertOk()->assertSee('Input Nama');
+        $this->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => 'Made Penilai', 'passenger_unit' => 'Kantor Pusat'])
             ->assertRedirect(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]));
         $this->get(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))->assertOk()->assertSee($driverRating->question)->assertSee($yesNo->question);
 
         $payload = [
             'passenger_name' => 'Made Penilai',
+            'passenger_unit' => 'Kantor Pusat',
             'submission_token' => $this->app['session.store']->get("passenger_submission_token_{$vehicle->id}_{$driver->id}"),
             'answers' => [
                 $driverRating->id => '5',
@@ -55,6 +56,7 @@ class PassengerFlowTest extends TestCase
         $this->assertSame($vehicle->id, $rating->vehicle_id);
         $this->assertSame($driver->id, $rating->driver_id);
         $this->assertSame('Made Penilai', $rating->passenger_name);
+        $this->assertSame('Kantor Pusat', $rating->passenger_unit);
         $this->assertCount(3, $rating->answers);
         $this->get(route('passenger.rating.success', [$vehicle->qr_token, $rating]))->assertOk()->assertSee('Terima Kasih');
     }
@@ -87,7 +89,7 @@ class PassengerFlowTest extends TestCase
         Question::factory()->create(['question' => 'Nonaktif', 'sort_order' => 2, 'status' => Question::STATUS_INACTIVE]);
         Question::factory()->create(['question' => 'Kedua', 'sort_order' => 2, 'status' => Question::STATUS_ACTIVE]);
 
-        $this->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => 'Penilai Uji']);
+        $this->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => 'Penilai Uji', 'passenger_unit' => 'Unit Operasional']);
 
         $this->get(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))
             ->assertOk()
@@ -111,6 +113,7 @@ class PassengerFlowTest extends TestCase
         $this->from(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))
             ->post(route('passenger.rating.submit', [$vehicle->qr_token, $driver]), [
                 'passenger_name' => 'Penilai Uji',
+                'passenger_unit' => 'Unit Operasional',
                 'answers' => [
                     $rating->id => '6',
                     $yesNo->id => '2',
@@ -129,7 +132,7 @@ class PassengerFlowTest extends TestCase
             ->assertRedirect(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]));
 
         $this->from(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]))
-            ->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => ' '])
+            ->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => ' ', 'passenger_unit' => 'Kantor Pusat'])
             ->assertSessionHasErrors('passenger_name');
     }
 

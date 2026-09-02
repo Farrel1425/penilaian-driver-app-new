@@ -959,11 +959,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const baseWidth = Number(canvas.dataset.chartBaseWidth) || 760;
         let zoom = 1;
-        let zoomAnchorX = null;
-        let zoomAnchorTimer;
+
+        const scaledWidth = (scale = zoom) => Math.round(baseWidth * scale);
 
         const renderZoom = () => {
-            canvas.style.width = `${Math.round(baseWidth * zoom)}px`;
+            const width = scaledWidth();
+            canvas.style.minWidth = `${width}px`;
+            canvas.style.width = `${width}px`;
             label.textContent = `${Math.round(zoom * 100)}%`;
         };
 
@@ -972,15 +974,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const currentWidth = canvas.getBoundingClientRect().width;
-            const pointInCanvas = scrollArea.scrollLeft + focalX;
-            const focalPoint = currentWidth > 0 ? pointInCanvas / currentWidth : 0;
+            const currentWidth = scaledWidth();
+            const focalPoint = Math.min(Math.max((scrollArea.scrollLeft + focalX) / currentWidth, 0), 1);
 
             zoom = nextZoom;
             renderZoom();
 
-            const nextWidth = canvas.getBoundingClientRect().width;
-            scrollArea.scrollLeft = Math.max(0, (focalPoint * nextWidth) - focalX);
+            const targetScrollLeft = (focalPoint * scaledWidth()) - focalX;
+            const maxScrollLeft = Math.max(0, scrollArea.scrollWidth - scrollArea.clientWidth);
+            scrollArea.scrollLeft = Math.min(Math.max(targetScrollLeft, 0), maxScrollLeft);
         };
 
         controls.querySelector('[data-chart-zoom-in]')?.addEventListener('click', () => {
@@ -995,18 +997,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.ctrlKey || event.metaKey) {
                 event.preventDefault();
 
-                if (zoomAnchorX === null) {
-                    const bounds = scrollArea.getBoundingClientRect();
-                    zoomAnchorX = Math.min(Math.max(event.clientX - bounds.left, 0), scrollArea.clientWidth);
-                }
-
-                clearTimeout(zoomAnchorTimer);
-                zoomAnchorTimer = window.setTimeout(() => {
-                    zoomAnchorX = null;
-                }, 220);
-
+                const bounds = scrollArea.getBoundingClientRect();
+                const focalX = Math.min(Math.max(event.clientX - bounds.left, 0), scrollArea.clientWidth);
                 const step = event.deltaY < 0 ? 0.1 : -0.1;
-                changeZoom(Math.min(1.8, Math.max(0.7, zoom + step)), zoomAnchorX);
+                changeZoom(Math.min(1.8, Math.max(0.7, zoom + step)), focalX);
                 return;
             }
 
@@ -1126,4 +1120,122 @@ document.addEventListener('DOMContentLoaded', () => {
             field.addEventListener('change', submit);
         });
     });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const wizard = document.querySelector('[data-assessment-wizard]');
+
+    if (!wizard) {
+        return;
+    }
+
+    const steps = Array.from(wizard.querySelectorAll('[data-assessment-step]'));
+    const previousButton = wizard.querySelector('[data-wizard-previous]');
+    const nextButton = wizard.querySelector('[data-wizard-next]');
+    const submitButton = wizard.querySelector('[data-wizard-submit]');
+    const currentPage = wizard.querySelector('[data-wizard-current-page]');
+    const progress = wizard.querySelector('[data-wizard-progress]');
+    const totalPages = Number(wizard.dataset.totalPages || steps.length);
+    let page = Math.max(0, steps.findIndex((step) => step.querySelector('[data-wizard-server-error]')));
+
+    const showPage = (nextPage, shouldFocus = false) => {
+        page = Math.min(Math.max(nextPage, 0), steps.length - 1);
+        steps.forEach((step, index) => {
+            step.hidden = index !== page;
+        });
+
+        if (currentPage) {
+            currentPage.textContent = String(page + 1);
+        }
+
+        if (progress) {
+            progress.style.width = `${((page + 1) / totalPages) * 100}%`;
+        }
+
+        if (previousButton instanceof HTMLButtonElement) {
+            previousButton.hidden = page === 0;
+        }
+
+        if (nextButton instanceof HTMLButtonElement) {
+            nextButton.hidden = page === steps.length - 1;
+        }
+
+        if (submitButton instanceof HTMLButtonElement) {
+            submitButton.hidden = page !== steps.length - 1;
+        }
+
+        if (shouldFocus) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    const hasAnswer = (question) => {
+        if (question.hidden || question.dataset.required !== 'true') {
+            return true;
+        }
+
+        const controls = Array.from(question.querySelectorAll('input, textarea'));
+
+        return controls.some((control) => {
+            if (control instanceof HTMLInputElement && (control.type === 'radio' || control.type === 'checkbox')) {
+                return control.checked;
+            }
+
+            return control.value.trim() !== '';
+        });
+    };
+
+    const validatePage = () => {
+        const activeStep = steps[page];
+        const questions = Array.from(activeStep.querySelectorAll('[data-wizard-question]'));
+        let firstInvalid;
+
+        questions.forEach((question) => {
+            const error = question.querySelector('[data-wizard-error]');
+            const isAnswered = hasAnswer(question);
+
+            if (error) {
+                error.hidden = isAnswered;
+            }
+
+            if (!isAnswered && !firstInvalid) {
+                firstInvalid = question;
+            }
+        });
+
+        firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        return !firstInvalid;
+    };
+
+    nextButton?.addEventListener('click', () => {
+        if (validatePage()) {
+            showPage(page + 1, true);
+        }
+    });
+
+    previousButton?.addEventListener('click', () => showPage(page - 1, true));
+
+    wizard.addEventListener('input', (event) => {
+        const question = event.target instanceof Element ? event.target.closest('[data-wizard-question]') : null;
+        const error = question?.querySelector('[data-wizard-error]');
+
+        if (error && hasAnswer(question)) {
+            error.hidden = true;
+        }
+    });
+
+    const syncFeedbackFollowUp = (feedbackChoice) => {
+        const followUp = wizard.querySelector('[data-feedback-followup]');
+        if (followUp && feedbackChoice) {
+            followUp.hidden = feedbackChoice.dataset.feedbackEmpty === 'true';
+        }
+    };
+
+    wizard.addEventListener('change', (event) => {
+        const feedbackChoice = event.target instanceof HTMLInputElement && event.target.matches('[data-feedback-choice]') ? event.target : null;
+        syncFeedbackFollowUp(feedbackChoice);
+    });
+
+    syncFeedbackFollowUp(wizard.querySelector('[data-feedback-choice]:checked'));
+    showPage(page);
 });

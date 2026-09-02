@@ -15,11 +15,12 @@ class StorePassengerNameRequest extends FormRequest
     {
         return [
             'passenger_name' => ['required', 'string', 'min:2', 'max:100'],
+            'passenger_unit' => ['required', 'string', 'min:2', 'max:100'],
         ];
     }
 
     public function attributes(): array
     {
-        return ['passenger_name' => 'nama Anda'];
+        return ['passenger_name' => 'nama Anda', 'passenger_unit' => 'unit kerja'];
     }
 }

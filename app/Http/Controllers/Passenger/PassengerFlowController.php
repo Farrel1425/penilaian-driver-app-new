@@ -68,20 +68,20 @@ class PassengerFlowController extends Controller
         $vehicle = $this->activeVehicle($vehicleToken);
         $this->ensureSelectableDriver($vehicle, $driver);
         $passengerName = session($this->passengerNameSessionKey($vehicle, $driver));
+        $passengerUnit = session($this->passengerUnitSessionKey($vehicle, $driver));
 
-        return view('passenger.assessor', compact('vehicle', 'driver', 'passengerName'));
+        return view('passenger.assessor', compact('vehicle', 'driver', 'passengerName', 'passengerUnit'));
     }
 
     public function storeAssessor(StorePassengerNameRequest $request, string $vehicleToken, Driver $driver): RedirectResponse
     {
         $vehicle = $this->activeVehicle($vehicleToken);
         $this->ensureSelectableDriver($vehicle, $driver);
+        $data = $request->validated();
 
         session()->forget($this->passengerSubmissionTokenSessionKey($vehicle, $driver));
-        session()->put(
-            $this->passengerNameSessionKey($vehicle, $driver),
-            trim($request->validated('passenger_name')),
-        );
+        session()->put($this->passengerNameSessionKey($vehicle, $driver), trim($data['passenger_name']));
+        session()->put($this->passengerUnitSessionKey($vehicle, $driver), trim($data['passenger_unit']));
 
         return redirect()->route('passenger.rating.assessment', [$vehicle->qr_token, $driver]);
     }
@@ -91,11 +91,12 @@ class PassengerFlowController extends Controller
         $vehicle = $this->activeVehicle($vehicleToken);
         $this->ensureSelectableDriver($vehicle, $driver);
         $passengerName = session($this->passengerNameSessionKey($vehicle, $driver));
+        $passengerUnit = session($this->passengerUnitSessionKey($vehicle, $driver));
 
-        if (! is_string($passengerName) || trim($passengerName) === '') {
+        if (! is_string($passengerName) || trim($passengerName) === '' || ! is_string($passengerUnit) || trim($passengerUnit) === '') {
             return redirect()
                 ->route('passenger.rating.assessor', [$vehicle->qr_token, $driver])
-                ->with('error', 'Silakan isi nama Anda sebelum memberikan penilaian.');
+                ->with('error', 'Silakan isi nama dan unit kerja sebelum memberikan penilaian.');
         }
 
         $submissionToken = session($this->passengerSubmissionTokenSessionKey($vehicle, $driver));
@@ -112,7 +113,7 @@ class PassengerFlowController extends Controller
             ->get()
             ->groupBy('target_type');
 
-        return view('passenger.assessment', compact('vehicle', 'driver', 'questions', 'passengerName', 'submissionToken'));
+        return view('passenger.assessment', compact('vehicle', 'driver', 'questions', 'passengerName', 'passengerUnit', 'submissionToken'));
     }
 
     public function submit(StoreRatingRequest $request, string $vehicleToken, Driver $driver): RedirectResponse
@@ -122,6 +123,7 @@ class PassengerFlowController extends Controller
         $questions = Question::query()->with('options')->active()->ordered()->get();
         $answers = $request->validatedAnswers($questions);
         $passengerName = trim($request->validated('passenger_name'));
+        $passengerUnit = trim($request->validated('passenger_unit'));
         $submissionToken = $request->string('submission_token')->toString();
         abort_unless(
             $submissionToken !== '' && hash_equals((string) session($this->passengerSubmissionTokenSessionKey($vehicle, $driver)), $submissionToken),
@@ -143,12 +145,13 @@ class PassengerFlowController extends Controller
         }
 
         try {
-            $rating = DB::transaction(function () use ($vehicle, $driver, $answers, $passengerName): Rating {
+            $rating = DB::transaction(function () use ($vehicle, $driver, $answers, $passengerName, $passengerUnit): Rating {
                 $rating = Rating::query()->create([
                     'branch_id' => $vehicle->branch_id,
                     'vehicle_id' => $vehicle->id,
                     'driver_id' => $driver->id,
                     'passenger_name' => $passengerName,
+                    'passenger_unit' => $passengerUnit,
                     'submitted_at' => now(),
                 ]);
 
@@ -166,6 +169,7 @@ class PassengerFlowController extends Controller
 
         Cache::put($submissionKey, $rating->id, now()->addDay());
         session()->forget($this->passengerNameSessionKey($vehicle, $driver));
+        session()->forget($this->passengerUnitSessionKey($vehicle, $driver));
 
         return redirect()->route('passenger.rating.success', [$vehicle->qr_token, $rating]);
     }
@@ -199,6 +203,11 @@ class PassengerFlowController extends Controller
     private function passengerNameSessionKey(Vehicle $vehicle, Driver $driver): string
     {
         return "passenger_name_{$vehicle->id}_{$driver->id}";
+    }
+
+    private function passengerUnitSessionKey(Vehicle $vehicle, Driver $driver): string
+    {
+        return "passenger_unit_{$vehicle->id}_{$driver->id}";
     }
 
     private function passengerSubmissionTokenSessionKey(Vehicle $vehicle, Driver $driver): string

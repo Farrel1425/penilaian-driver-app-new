@@ -8,16 +8,24 @@
         @csrf
         <section class="passenger-assessor-card">
             <span class="passenger-assessor-icon"><x-lucide-user-round aria-hidden="true" /></span>
-            <h2>Siapa nama Anda?</h2>
-            <p>Masukkan nama agar penilaian Anda dapat dicatat dengan baik.</p>
+            <h2>Input Nama</h2>
+            <p>Masukkan nama dan unit kerja agar penilaian Anda dapat dicatat dengan baik.</p>
 
             @if (session('error'))
                 <p class="passenger-assessor-error" role="alert">{{ session('error') }}</p>
             @endif
 
-            <label for="passenger_name">Nama Anda</label>
-            <input id="passenger_name" name="passenger_name" type="text" value="{{ old('passenger_name', $passengerName) }}" placeholder="Contoh: Made Putra" maxlength="100" autocomplete="name" autofocus required>
-            @error('passenger_name')<p class="passenger-assessor-error" role="alert">{{ $message }}</p>@enderror
+            <div class="passenger-assessor-field">
+                <label for="passenger_name">Nama Anda</label>
+                <input id="passenger_name" name="passenger_name" type="text" value="{{ old('passenger_name', $passengerName) }}" placeholder="Contoh: Made Putra" maxlength="100" autocomplete="name" autofocus required>
+                @error('passenger_name')<p class="passenger-assessor-error" role="alert">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="passenger-assessor-field">
+                <label for="passenger_unit">Unit Kerja</label>
+                <input id="passenger_unit" name="passenger_unit" type="text" value="{{ old('passenger_unit', $passengerUnit) }}" placeholder="Contoh: Kepala Bagian" maxlength="100" autocomplete="organization" required>
+                @error('passenger_unit')<p class="passenger-assessor-error" role="alert">{{ $message }}</p>@enderror
+            </div>
         </section>
 
         <footer class="passenger-assessor-footer">

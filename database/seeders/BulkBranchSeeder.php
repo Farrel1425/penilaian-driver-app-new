@@ -11,6 +11,22 @@ class BulkBranchSeeder extends Seeder
 {
     public function run(): void
     {
+        $driverPhotos = Driver::query()
+            ->whereHas('branch', fn ($query) => $query->where('code', 'not like', 'SIM-%'))
+            ->whereNotNull('photo')
+            ->where('photo', '<>', '')
+            ->orderBy('id')
+            ->pluck('photo')
+            ->values();
+
+        $vehiclePhotos = Vehicle::query()
+            ->whereHas('branch', fn ($query) => $query->where('code', 'not like', 'SIM-%'))
+            ->whereNotNull('photo')
+            ->where('photo', '<>', '')
+            ->orderBy('id')
+            ->get(['photo', 'interior_photo'])
+            ->values();
+
         foreach (range(1, 10) as $number) {
             $code = sprintf('SIM-%03d', $number);
             $branch = Branch::query()->updateOrCreate(
@@ -34,6 +50,24 @@ class BulkBranchSeeder extends Seeder
             $missingVehicles = max(0, 10 - $branch->vehicles()->count());
             if ($missingVehicles > 0) {
                 Vehicle::factory()->count($missingVehicles)->for($branch)->create();
+            }
+
+            if ($driverPhotos->isNotEmpty()) {
+                $branch->drivers()->whereNull('photo')->oldest('id')->get()
+                    ->each(fn (Driver $driver, int $index) => $driver->update([
+                        'photo' => $driverPhotos[$index % $driverPhotos->count()],
+                    ]));
+            }
+
+            if ($vehiclePhotos->isNotEmpty()) {
+                $branch->vehicles()->whereNull('photo')->oldest('id')->get()
+                    ->each(function (Vehicle $vehicle, int $index) use ($vehiclePhotos): void {
+                        $source = $vehiclePhotos[$index % $vehiclePhotos->count()];
+                        $vehicle->update([
+                            'photo' => $source->photo,
+                            'interior_photo' => $source->interior_photo,
+                        ]);
+                    });
             }
         }
     }

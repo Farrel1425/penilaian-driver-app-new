@@ -4585,8 +4585,8 @@ button {
     background: #2457e6;
     border-radius: 3px;
     box-shadow: none;
-    height: 24px;
-    width: 24px;
+    height: 22px;
+    width: 22px;
 }
 .brand-mark svg {
     height: 14px;
@@ -6042,9 +6042,13 @@ button {
 .passenger-driver-detail-footer {
     background: #fff;
     border-top: 1px solid rgba(198, 198, 207, 0.25);
+    bottom: 0;
+    box-shadow: 0 -6px 16px rgba(15, 23, 42, 0.06);
     display: grid;
     gap: 8px;
     padding: 16px 24px max(20px, env(safe-area-inset-bottom));
+    position: sticky;
+    z-index: 10;
 }
 .passenger-driver-select,
 .passenger-driver-other {
@@ -6105,6 +6109,7 @@ button {
 .passenger-assessor-icon svg { height: 25px; width: 25px; }
 .passenger-assessor-card h2 { color: #10284d; font-family: "Trebuchet MS", Inter, sans-serif; font-size: 21px; margin: 0; }
 .passenger-assessor-card > p { color: #64748b; font-size: 13px; line-height: 1.55; margin: 9px auto 24px; max-width: 280px; }
+.passenger-assessor-field + .passenger-assessor-field { margin-top: 16px; }
 .passenger-assessor-card label { color: #203c67; display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; text-align: left; }
 .passenger-assessor-card input {
     background: #ffffff;
@@ -6121,7 +6126,15 @@ button {
 .passenger-assessor-card input:focus { border-color: #2463eb; box-shadow: 0 0 0 3px rgba(36, 99, 235, 0.14); }
 .passenger-assessor-card input::placeholder { color: #94a3b8; }
 .passenger-assessor-error { color: #d92d20 !important; font-size: 12px !important; margin: 0 0 12px !important; max-width: none !important; text-align: left; }
-.passenger-assessor-footer { margin-top: auto; padding: 20px 0 max(20px, env(safe-area-inset-bottom)); }
+.passenger-assessor-footer {
+    background: #f8fafc;
+    bottom: 0;
+    box-shadow: 0 -6px 16px rgba(15, 23, 42, 0.06);
+    margin: auto -24px 0;
+    padding: 16px 24px max(20px, env(safe-area-inset-bottom));
+    position: sticky;
+    z-index: 10;
+}
 .passenger-assessor-footer button {
     align-items: center;
     background: #1d4ed8;
@@ -6259,7 +6272,9 @@ button {
 .passenger-star-rating {
     align-items: center;
     display: flex;
-    gap: 4px;
+    justify-content: space-between;
+    margin-inline: 18px;
+    width: calc(100% - 36px);
 }
 .passenger-star-rating label {
     cursor: pointer;
@@ -6272,30 +6287,36 @@ button {
     width: 1px;
 }
 .passenger-star-rating svg {
-    color: #d1d5db;
-    height: 26px;
-    stroke-width: 1.7;
+    color: #7a8497;
+    fill: #ffffff;
+    height: 22px;
+    stroke-width: 2;
     transition:
         color 0.15s ease,
         fill 0.15s ease;
-    width: 26px;
+    width: 22px;
 }
 .passenger-star-rating label.is-selected svg {
-    color: #ffb500;
+    color: #f6a700;
     fill: currentColor;
 }
-.passenger-star-rating label:focus-within svg {
-    outline: 2px solid #1d4ed8;
-    outline-offset: 2px;
+.passenger-star-rating label:hover svg {
+    color: #f6a700;
 }
-.passenger-rating-labels {
-    color: #71809a;
-    display: flex;
-    font-family: Inter, "Segoe UI", sans-serif;
-    font-size: 10px;
-    justify-content: space-between;
-    max-width: 146px;
-    margin-top: -4px;
+.passenger-star-rating label:focus-within svg {
+    border-radius: 3px;
+    outline: 2px solid #1d4ed8;
+    outline-offset: 3px;
+}
+.passenger-assessment-ratings {
+    gap: 18px;
+    padding-bottom: 20px;
+}
+.passenger-assessment-ratings .passenger-assessment-question {
+    gap: 7px;
+}
+.passenger-assessment-ratings .passenger-star-rating {
+    margin-top: 12px;
 }
 .passenger-answer-options {
     display: grid;
@@ -11131,4 +11152,486 @@ form[aria-busy="true"] input[type="submit"].is-submitting {
 @media (max-width: 560px) {
     .admin-pagination { gap: 4px; }
     .admin-pagination-button { min-width: 29px; padding: 0 6px; }
+}
+/* Passenger assessment wizard: three questions per page with a focused mobile rating experience. */
+.passenger-flow-assessment .passenger-wizard-header {
+    background: #0b1a3f;
+    border-bottom: 0;
+    color: #ffffff;
+}
+.passenger-flow-assessment .passenger-wizard-header a,
+.passenger-flow-assessment .passenger-wizard-header h1 {
+    color: #ffffff;
+}
+.passenger-assessment-wizard {
+    min-height: calc(100vh - 65px);
+}
+.passenger-wizard-progress {
+    padding: 22px 24px 18px;
+}
+.passenger-wizard-progress p {
+    color: #191c1e;
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 14px;
+}
+.passenger-wizard-progress p strong {
+    color: #1d4ed8;
+    font-size: 25px;
+}
+.passenger-wizard-progress-track {
+    background: #e7eaf0;
+    border-radius: 999px;
+    height: 7px;
+    overflow: hidden;
+}
+.passenger-wizard-progress-track i {
+    background: #1d4ed8;
+    border-radius: inherit;
+    display: block;
+    height: 100%;
+    transition: width 0.22s ease;
+    width: 0;
+}
+.passenger-wizard-steps {
+    flex: 1;
+}
+.passenger-assessment-step {
+    display: grid;
+    gap: 18px;
+    padding: 20px 24px 132px;
+}
+.passenger-assessment-step[hidden] {
+    display: none;
+}
+.passenger-wizard-question {
+    background: #ffffff;
+    border: 1px solid rgba(198, 198, 207, 0.52);
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07);
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 24px 18px 22px;
+}
+.passenger-wizard-question .passenger-question-icon {
+    display: none;
+}
+.passenger-wizard-question legend {
+    color: #141821;
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.45;
+    padding: 0;
+    text-align: center;
+}
+.passenger-wizard-question legend span {
+    align-items: center;
+    background: #1d4ed8;
+    border-radius: 50%;
+    color: #ffffff;
+    display: flex;
+    font-size: 17px;
+    height: 40px;
+    justify-content: center;
+    margin: 0 auto 16px;
+    width: 40px;
+}
+.passenger-wizard-question legend b {
+    color: #d92d20;
+}
+.passenger-wizard-question .passenger-question-instruction {
+    margin: -5px 0 0;
+    text-align: center;
+}
+.passenger-wizard-rating {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    justify-content: initial;
+    margin: 8px 0 0;
+    width: 100%;
+}
+.passenger-wizard-rating label {
+    align-content: center;
+    aspect-ratio: 1 / 1.12;
+    background: #ffffff;
+    border: 1.5px solid #172033;
+    border-radius: 12px;
+    color: #172033;
+    display: grid;
+    gap: 5px;
+    justify-items: center;
+    min-height: 64px;
+    padding: 7px 2px;
+}
+.passenger-wizard-rating label span {
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+.passenger-wizard-rating svg {
+    color: currentColor;
+    fill: #ffffff;
+    height: 28px;
+    stroke-width: 2.15;
+    width: 28px;
+}
+.passenger-wizard-rating label.is-selected {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #ffffff;
+}
+.passenger-wizard-rating label.is-selected svg {
+    color: #ffffff;
+    fill: currentColor;
+}
+.passenger-wizard-rating label:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+}
+.passenger-wizard-rating label.is-selected:hover {
+    color: #ffffff;
+}
+.passenger-wizard-rating label:focus-within svg {
+    outline: 0;
+}
+.passenger-wizard-question .passenger-answer-options {
+    margin-top: 6px;
+}
+.passenger-wizard-question .passenger-assessment-error {
+    margin: 0;
+    text-align: center;
+}
+.passenger-wizard-footer {
+    align-items: stretch;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;
+    z-index: 20;
+}
+.passenger-wizard-footer:has(.passenger-wizard-previous:not([hidden])) {
+    grid-template-columns: minmax(105px, 0.45fr) 1fr;
+}
+.passenger-wizard-footer button {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+    justify-content: center;
+    text-transform: none;
+}
+.passenger-wizard-previous {
+    background: #ffffff !important;
+    border-color: #c6c6cf !important;
+    box-shadow: none !important;
+    color: #1d4ed8 !important;
+}
+@media (max-width: 380px) {
+    .passenger-wizard-question {
+        padding: 21px 14px 20px;
+    }
+    .passenger-wizard-question legend {
+        font-size: 16px;
+    }
+    .passenger-wizard-rating {
+        gap: 6px;
+    }
+    .passenger-wizard-rating label span {
+        font-size: 16px;
+    }
+    .passenger-wizard-rating svg {
+        height: 25px;
+        width: 25px;
+    }
+}
+.passenger-wizard-footer {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+.passenger-wizard-footer:has(.passenger-wizard-previous:not([hidden])) {
+    grid-template-columns: none;
+}
+.passenger-wizard-footer .passenger-wizard-previous,
+.passenger-wizard-footer .passenger-wizard-next {
+    border-radius: 50%;
+    flex: 0 0 48px;
+    height: 48px;
+    padding: 0;
+    width: 48px;
+}
+.passenger-wizard-footer .passenger-wizard-next {
+    margin-left: auto;
+}
+.passenger-wizard-footer .passenger-wizard-previous svg,
+.passenger-wizard-footer .passenger-wizard-next svg {
+    height: 22px;
+    width: 22px;
+}
+.passenger-wizard-footer [data-wizard-submit] {
+    width: 100%;
+}
+/* Refined red theme for the passenger assessment wizard. */
+.passenger-flow-assessment .passenger-wizard-header {
+    background: #15161a;
+}
+.passenger-wizard-progress p strong {
+    color: #c81632;
+}
+.passenger-wizard-progress-track i,
+.passenger-wizard-question legend span {
+    background: #c81632;
+}
+.passenger-wizard-rating label.is-selected {
+    background: #c81632;
+    border-color: #c81632;
+}
+.passenger-wizard-rating label:hover {
+    border-color: #c81632;
+    color: #c81632;
+}
+.passenger-wizard-footer button[hidden] {
+    display: none;
+}
+.passenger-wizard-footer .passenger-wizard-next,
+.passenger-wizard-footer [data-wizard-submit] {
+    background: #c81632;
+    border-color: #c81632;
+    box-shadow: 0 4px 12px rgba(200, 22, 50, 0.24);
+}
+.passenger-wizard-footer .passenger-wizard-next:hover,
+.passenger-wizard-footer [data-wizard-submit]:hover {
+    background: #a80f27;
+    border-color: #a80f27;
+}
+.passenger-wizard-footer .passenger-wizard-previous {
+    border-color: #e3b4bd !important;
+    color: #c81632 !important;
+}
+/* Final blue assessment theme, aligned with the passenger identity flow. */
+.passenger-flow-assessment .passenger-wizard-header {
+    background: #ffffff;
+    border-bottom: 1px solid rgba(198, 198, 207, 0.55);
+}
+.passenger-flow-assessment .passenger-wizard-header a,
+.passenger-flow-assessment .passenger-wizard-header h1 {
+    color: #10284d;
+}
+.passenger-wizard-progress p strong {
+    color: #1d4ed8;
+}
+.passenger-wizard-progress-track i,
+.passenger-wizard-question legend span {
+    background: #1d4ed8;
+}
+.passenger-wizard-rating label.is-selected {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+.passenger-wizard-rating label:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+}
+.passenger-wizard-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+.passenger-wizard-footer:has(.passenger-wizard-previous:not([hidden])) {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+.passenger-wizard-footer .passenger-wizard-previous,
+.passenger-wizard-footer .passenger-wizard-next {
+    border-radius: 10px;
+    flex: initial;
+    height: 50px;
+    margin: 0;
+    padding: 0 14px;
+    width: 100%;
+}
+.passenger-wizard-footer .passenger-wizard-next,
+.passenger-wizard-footer [data-wizard-submit] {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.22);
+}
+.passenger-wizard-footer .passenger-wizard-next:hover,
+.passenger-wizard-footer [data-wizard-submit]:hover {
+    background: #1641bd;
+    border-color: #1641bd;
+}
+.passenger-wizard-footer .passenger-wizard-previous {
+    background: #ffffff !important;
+    border-color: #1d4ed8 !important;
+    color: #1d4ed8 !important;
+}
+/* Keep the score selection distinct with a soft rose-red accent. */
+.passenger-wizard-rating label.is-selected {
+    background: #c85a6a;
+    border-color: #c85a6a;
+}
+.passenger-wizard-rating label:hover {
+    border-color: #c85a6a;
+    color: #c85a6a;
+}
+/* Keep chart zoom anchored: no width transition or fixed minimum width during scaling. */
+.dashboard-chart-canvas {
+    min-width: 0;
+    transition: none;
+}
+/* Scrollable assessment form with compact rating cards. */
+.passenger-flow-assessment {
+    background: #f6f8fb;
+}
+.passenger-flow-assessment .passenger-scroll-header {
+    background: #ffffff;
+    border-bottom: 1px solid rgba(198, 198, 207, 0.55);
+}
+.passenger-flow-assessment .passenger-scroll-header a,
+.passenger-flow-assessment .passenger-scroll-header h1 {
+    color: #10284d;
+}
+.passenger-assessment-scroll {
+    background: #f6f8fb;
+}
+.passenger-assessment-scroll-list {
+    display: grid;
+    gap: 16px;
+    padding: 18px 16px 104px;
+}
+.passenger-scroll-question {
+    background: #ffffff;
+    border: 1px solid #e1e7ef;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(15, 35, 68, 0.05);
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 16px 14px 15px;
+}
+.passenger-scroll-question .passenger-question-icon {
+    display: none;
+}
+.passenger-scroll-question .passenger-scroll-indicator {
+    color: #273e62;
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0;
+}
+.passenger-scroll-question legend {
+    color: #586a83;
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.38;
+    padding: 0;
+}
+.passenger-scroll-question legend span {
+    display: none;
+}
+.passenger-scroll-question legend b {
+    color: #d92d20;
+}
+.passenger-scroll-question .passenger-question-instruction {
+    margin: 0;
+}
+.passenger-scroll-question .passenger-star-rating {
+    gap: 17px;
+    justify-content: initial;
+    margin: 8px 0 0;
+    width: auto;
+}
+.passenger-scroll-question .passenger-star-rating svg {
+    color: #e3ad17;
+    fill: #ffffff;
+    height: 31px;
+    stroke-width: 1.9;
+    width: 31px;
+}
+.passenger-scroll-question .passenger-star-rating label.is-selected svg {
+    color: #e3ad17;
+    fill: currentColor;
+}
+.passenger-scroll-question .passenger-star-rating label:hover svg {
+    color: #e3ad17;
+}
+.passenger-scroll-question .passenger-answer-options {
+    margin-top: 7px;
+}
+.passenger-scroll-footer {
+    background: #ffffff;
+    border-top: 1px solid #e1e7ef;
+    box-shadow: 0 -5px 16px rgba(15, 35, 68, 0.08);
+    display: block;
+    padding: 14px 16px max(16px, env(safe-area-inset-bottom));
+    z-index: 20;
+}
+.passenger-scroll-footer button {
+    align-items: center;
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    border-radius: 8px;
+    display: flex;
+    font-size: 13px;
+    gap: 8px;
+    justify-content: center;
+    letter-spacing: 0;
+    text-transform: none;
+}
+.passenger-scroll-footer button svg {
+    height: 17px;
+    width: 17px;
+}
+.passenger-scroll-footer button:hover {
+    background: #1641bd;
+    border-color: #1641bd;
+}
+/* Compact card rhythm for the scrollable assessment. */
+.passenger-assessment-scroll-list {
+    gap: 14px;
+    padding-top: 16px;
+}
+.passenger-scroll-question {
+    gap: 0;
+    padding: 15px 14px 16px;
+}
+.passenger-scroll-question .passenger-scroll-legend {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+.passenger-scroll-question .passenger-scroll-indicator {
+    line-height: 1.3;
+    margin: 0 0 5px;
+}
+.passenger-scroll-question .passenger-scroll-question-text {
+    color: #586a83;
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.38;
+    margin: 0;
+}
+.passenger-scroll-question .passenger-scroll-question-text b {
+    color: #d92d20;
+}
+.passenger-scroll-question .passenger-star-rating {
+    gap: 14px;
+    margin-top: 13px;
+}
+.passenger-scroll-question .passenger-star-rating svg {
+    height: 28px;
+    width: 28px;
+}
+.passenger-scroll-question .passenger-star-rating {
+    gap: 0;
+    justify-content: space-between;
+    width: 100%;
 }
