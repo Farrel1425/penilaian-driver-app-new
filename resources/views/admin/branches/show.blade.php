@@ -1,10 +1,10 @@
-<x-layouts.admin title="Detail Cabang">
-    <div class="resource-page-navigation">
+<x-layouts.admin title="Detail Unit Kerja">
+    <x-slot:pageActions><div class="resource-page-navigation">
         <a class="primary-button" href="{{ route('admin.branches.index') }}">
             <x-lucide-arrow-left aria-hidden="true" />
             <span>Kembali</span>
         </a>
-    </div>
+    </div></x-slot>
     <div class="detail-layout branch-detail-layout">
         <x-admin.panel title="Informasi Cabang">
             <div class="detail-grid">

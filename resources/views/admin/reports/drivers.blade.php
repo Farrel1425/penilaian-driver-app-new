@@ -1,5 +1,5 @@
 <x-layouts.admin title="Report Driver">
-    @include('admin.reports._toolbar', ['type' => 'driver'])
+    <x-slot:pageActions>@include('admin.reports._toolbar', ['type' => 'driver'])</x-slot>
 
     <div class="stat-grid report-stat-grid">
         <x-admin.stat-card label="Total Driver" :value="$data['stats']['total_driver']" note="Sesuai unit kerja terpilih" />

@@ -17,6 +17,8 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
-        "cropperjs": "^1.6.2"
+        "cropperjs": "^1.6.2",
+        "lottie-web": "^5.13.0"
     }
 }
+  

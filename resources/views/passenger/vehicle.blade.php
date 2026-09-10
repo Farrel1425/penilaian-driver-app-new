@@ -1,43 +1,38 @@
 <x-passenger.layout title="Informasi Kendaraan" variant="vehicle">
     <header class="passenger-mobile-header">
-        {{-- <button type="button" aria-label="Kembali" onclick="window.history.back()"><x-lucide-chevron-left aria-hidden="true" /></button> --}}
-        <h1>Informasi Kendaraan</h1>
+        <h1>Verifikasi Kendaraan</h1>
+        <p>Pastikan kendaraan yang Anda tumpangi sesuai data di bawah.</p>
     </header>
 
     <section class="passenger-vehicle-page">
         <article class="passenger-vehicle-card">
-            <div class="passenger-vehicle-heading">
-                <h2>{{ $vehicle->police_number }}</h2>
-                <p>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: '-' }}</p>
-            </div>
-
             <div class="passenger-vehicle-photo">
+                <span class="passenger-vehicle-photo-label">Kendaraan terdeteksi</span>
+                <x-lucide-circle-check class="passenger-vehicle-verified" aria-hidden="true" />
                 @if ($vehicle->photo)
                     <img src="{{ Str::startsWith($vehicle->photo, ['http://', 'https://', '/']) ? $vehicle->photo : asset('storage/' . $vehicle->photo) }}" alt="{{ $vehicle->police_number }}">
                 @else
                     <x-lucide-car-front aria-hidden="true" />
                 @endif
+                <div class="passenger-vehicle-photo-caption"><span>Model terdeteksi</span><strong>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: '-' }}</strong></div>
             </div>
 
+            <div class="passenger-vehicle-heading"><span>Identitas Kendaraan</span><h2>{{ $vehicle->police_number }}</h2></div>
             <dl class="passenger-vehicle-details">
                 <div>
                     <x-lucide-building-2 aria-hidden="true" />
-                    <div><dt>Unit Kerja / Cabang</dt><dd>{{ $vehicle->branch?->name ?: '-' }}</dd></div>
+                    <div><dt>Unit Kerja</dt><dd>{{ $vehicle->branch?->name ?: '-' }}</dd></div>
                 </div>
                 <div>
-                    <x-lucide-panel-top-dashed aria-hidden="true" />
-                    <div><dt>No. Polisi</dt><dd>{{ $vehicle->police_number }}</dd></div>
-                </div>
-                <div>
-                    <x-lucide-car-front aria-hidden="true" />
-                    <div><dt>Merk / Tipe</dt><dd>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: '-' }}</dd></div>
+                    <x-lucide-circle-check aria-hidden="true" />
+                    <div><dt>Status Sistem</dt><dd class="is-success">Terverifikasi Aktif</dd></div>
                 </div>
             </dl>
         </article>
     </section>
 
     <footer class="passenger-vehicle-footer">
-        <a class="passenger-vehicle-continue" href="{{ route('passenger.rating.drivers', $vehicle->qr_token) }}">Lanjutkan</a>
+        <a class="passenger-vehicle-continue" href="{{ route('passenger.rating.drivers', $vehicle->qr_token) }}"><x-lucide-circle-check aria-hidden="true" /> Lanjutkan</a>
         <button class="passenger-vehicle-rescan" type="button" data-passenger-qr-scanner-open>
             <x-lucide-scan-line aria-hidden="true" />
             <span>Scan Ulang QR</span>

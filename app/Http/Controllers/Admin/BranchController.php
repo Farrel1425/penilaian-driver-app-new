@@ -83,12 +83,12 @@ class BranchController extends Controller
         if ($branch->status === Branch::STATUS_ACTIVE) {
             $this->deactivateWithDependents($branch);
 
-            return back()->with('status', 'Unit kerja, driver, dan kendaraan terkait berhasil dinonaktifkan.');
+            return back()->with('status', 'Unit kerja, pegawai, dan kendaraan terkait berhasil dinonaktifkan.');
         }
 
         $branch->update(['status' => Branch::STATUS_ACTIVE]);
 
-        return back()->with('status', 'Status unit kerja berhasil diaktifkan. Driver dan kendaraan tetap perlu diaktifkan secara terpisah.');
+        return back()->with('status', 'Status unit kerja berhasil diaktifkan. Pegawai dan kendaraan tetap perlu diaktifkan secara terpisah.');
     }
 
     public function destroy(Branch $branch): RedirectResponse
@@ -96,7 +96,7 @@ class BranchController extends Controller
         if ($branch->drivers()->exists() || $branch->vehicles()->exists() || $branch->ratings()->exists()) {
             $this->deactivateWithDependents($branch);
 
-            return back()->with('status', 'Unit kerja sudah punya data terkait, jadi unit kerja beserta driver dan kendaraannya dinonaktifkan.');
+            return back()->with('status', 'Unit kerja sudah punya data terkait, jadi unit kerja beserta pegawai dan kendaraannya dinonaktifkan.');
         }
 
         $branch->delete();

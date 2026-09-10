@@ -5,7 +5,7 @@
         $qrDataUri = app(App\Services\VehicleQrCodeService::class)->dataUri($vehicle);
     @endphp
 
-    <div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.vehicles.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div>
+    <x-slot:pageActions><div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.vehicles.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div></x-slot>
 
     <div class="detail-layout branch-detail-layout">
         <x-admin.panel title="Data Kendaraan">

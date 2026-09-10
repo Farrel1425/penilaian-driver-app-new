@@ -10,9 +10,8 @@
     }
 @endphp
 
-<x-admin.panel class="performance-report-toolbar">
-    <div class="performance-report-toolbar-inner">
-        @include('admin.assessments._filter', $filterData)
+<div class="performance-report-toolbar-inner">
+        @include('admin.assessments._filter', [...$filterData, 'searchPlaceholder' => $type === 'branch' ? 'Cari unit kerja' : 'Cari driver, kendaraan, atau unit kerja'])
 
         <div class="page-inline-actions performance-report-actions">
             <a class="secondary-button" data-no-loading href="{{ route('admin.reports.export', ['type' => $type, ...$filters->queryString()]) }}">
@@ -24,5 +23,4 @@
                 <span>Simpan PDF</span>
             </a>
         </div>
-    </div>
-</x-admin.panel>
+</div>

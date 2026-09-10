@@ -1,23 +1,19 @@
 <x-layouts.admin title="Log Aktivitas">
-    <x-admin.panel class="activity-log-toolbar">
-        <form class="activity-log-filter" method="GET" action="{{ route('admin.activity-logs.index') }}">
-            <label class="activity-log-search-field">
-                <x-lucide-search aria-hidden="true" />
-                <input name="search" value="{{ request('search') }}" placeholder="Cari aktivitas, modul, atau admin">
-            </label>
-            <input type="date" name="start_date" value="{{ request('start_date') }}" aria-label="Tanggal mulai">
-            <input type="date" name="end_date" value="{{ request('end_date') }}" aria-label="Tanggal akhir">
-            <select name="user_id" aria-label="Filter admin">
+    <x-slot:pageActions>
+        <form class="activity-log-filter admin-dashboard-filters" method="GET" action="{{ route('admin.activity-logs.index') }}" data-auto-filter-form>
+            <input type="hidden" name="search" value="{{ request('search') }}">
+            <label><span>Mulai</span><input type="date" name="start_date" value="{{ request('start_date') }}" aria-label="Tanggal mulai"></label>
+            <label><span>Sampai</span><input type="date" name="end_date" value="{{ request('end_date') }}" aria-label="Tanggal akhir"></label>
+            <label><span>Admin</span><select name="user_id" aria-label="Filter admin">
                 <option value="">Semua Admin</option>
                 @foreach ($admins as $admin)
                     <option value="{{ $admin->id }}" @selected((string) request('user_id') === (string) $admin->id)>{{ $admin->name }}</option>
                 @endforeach
-            </select>
-            <button class="secondary-button" type="submit"><x-lucide-filter aria-hidden="true" /><span>Terapkan</span></button>
+            </select></label>
             <a class="secondary-button" href="{{ route('admin.activity-logs.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
             <a class="primary-button activity-log-export" data-no-loading href="{{ route('admin.activity-logs.export', request()->query()) }}"><x-lucide-download aria-hidden="true" /><span>Export Excel</span></a>
         </form>
-    </x-admin.panel>
+    </x-slot>
 
     <x-admin.panel class="activity-log-table-panel">
         <div class="table-wrap">

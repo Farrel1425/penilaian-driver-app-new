@@ -1,4 +1,5 @@
 <x-layouts.admin title="Profil Sistem">
+    @php($logoUrl = App\Models\SystemSetting::logoUrl())
     <div class="settings-page-grid">
         <x-admin.panel>
             <div class="settings-panel-heading">
@@ -14,11 +15,7 @@
 
                 <div class="settings-logo-field">
                     <div class="settings-logo-preview">
-                        @if (! empty($settings['logo']))
-                            <img src="{{ str_starts_with($settings['logo'], ['http://', 'https://', '/']) ? $settings['logo'] : asset('storage/'.$settings['logo']) }}" alt="Logo sistem">
-                        @else
-                            <img src="{{ asset('images/lais-logo-white.png') }}" alt="Logo sistem">
-                        @endif
+                        <img src="{{ $logoUrl }}" alt="Logo sistem">
                     </div>
                     <div>
                         <label for="logo">Logo Sistem</label>
@@ -46,7 +43,10 @@
                     </div>
                 </div>
 
-                <div class="form-actions"><button class="primary-button" type="submit"><x-lucide-save aria-hidden="true" /><span>Simpan Perubahan</span></button></div>
+                <div class="form-actions">
+                    <a class="secondary-button" href="{{ route('admin.dashboard') }}">Batal</a>
+                    <button class="primary-button" type="submit">Simpan</button>
+                </div>
             </form>
         </x-admin.panel>
 

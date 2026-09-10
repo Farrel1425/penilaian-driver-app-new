@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'branch_id',
+    'employee_category_id',
     'full_name',
     'nickname',
     'birth_place',
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'sim_expired_at',
     'sim_photo',
     'join_date',
+    'end_date',
     'status',
 ])]
 class Driver extends Model
@@ -65,6 +67,11 @@ class Driver extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function employeeCategory(): BelongsTo
+    {
+        return $this->belongsTo(EmployeeCategory::class);
+    }
+
     public function ratings(): HasMany
     {
         return $this->hasMany(Rating::class);
@@ -75,12 +82,20 @@ class Driver extends Model
         return $query->where('status', self::STATUS_ACTIVE);
     }
 
+    public function scopeEligibleForAssessment(Builder $query): Builder
+    {
+        return $query->whereHas('employeeCategory', fn (Builder $category) => $category
+            ->active()
+            ->where('requires_sim', true));
+    }
+
     protected function casts(): array
     {
         return [
             'birth_date' => 'date',
             'sim_expired_at' => 'date',
             'join_date' => 'date',
+            'end_date' => 'date',
         ];
     }
 }

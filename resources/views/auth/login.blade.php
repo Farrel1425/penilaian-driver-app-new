@@ -1,65 +1,70 @@
 <x-layouts.guest title="Login Admin">
-    <main class="lais-auth-page">
-        <div class="lais-auth-frame">
-            <section class="lais-auth-shell">
-                <aside class="lais-auth-brand" aria-label="Sistem Penilaian Driver">
-                <div class="lais-auth-brand-top">
-                    <img class="lais-auth-logo" src="{{ asset('images/lais-logo-white.png') }}" alt="Sistem Penilaian Driver">
-                </div>
+    @php($systemName = App\Models\SystemSetting::value('system_name', 'Aplikasi Penilaian Driver'))
+    @php($systemLogoUrl = App\Models\SystemSetting::logoUrl())
+    <main class="bpd-login-page">
+        <header class="bpd-login-topbar">
+            <a class="bpd-login-brand" href="{{ route('login') }}" aria-label="{{ $systemName }}">
+                <img src="{{ $systemLogoUrl }}" alt="Logo {{ $systemName }}">
+                <span class="bpd-login-brand-copy"><strong>{{ $systemName }}</strong><span class="bpd-login-support"><i>Supported by</i><b>Bank BPD Bali</b></span></span>
+            </a>
+            <div class="bpd-login-help">
+                <button type="button" aria-label="Bantuan" title="Bantuan"><x-lucide-circle-help aria-hidden="true" /></button>
+                <button type="button" aria-label="Informasi" title="Informasi"><x-lucide-info aria-hidden="true" /></button>
+            </div>
+        </header>
 
-                <div class="lais-auth-brand-content">
-                    <h2>Sistem<br>Penilaian Driver</h2>
-                    <p>Pantau, nilai, dan tingkatkan performa driver Anda dengan lebih mudah.</p>
-                </div>
-                <img class="lais-auth-vehicle-art" src="{{ asset('images/lais-login-car.png') }}" alt="">
-                <small>&copy; {{ now()->year }} Sistem Penilaian Driver. Semua hak dilindungi.</small>
-                </aside>
+        <section class="bpd-login-hero bpd-login-hero-copy" aria-label="Aplikasi Penilaian Driver">
+                <h1>Aplikasi <em>Penilaian</em><br>Driver.</h1>
+                <p>Aplikasi Penilaian Driver adalah platform digital untuk memantau, mengukur, dan meningkatkan kinerja serta keselamatan berkendara para pengemudi secara transparan. Integrasi langsung dengan Bank BPD Bali mempermudah pencairan gaji, bonus, dan insentif secara real-time ke rekening driver.</p>
+                <div class="bpd-login-metrics" aria-label="Keunggulan sistem">
+                    <span><strong>24/7</strong><small>REAL-TIME TRACKING</small></span>
+                    <span><strong>99.9%</strong><small>SYSTEM UPTIME</small></span>
+                </div>        </section>
 
-                <section class="lais-auth-form-area" aria-labelledby="login-title">
-                    <div class="lais-auth-card">
-                    <header>
-                        <h1 id="login-title">Masuk ke Sistem</h1>
-                        <p>Gunakan akun Anda untuk melanjutkan.</p>
-                    </header>
+        <section class="bpd-login-card" aria-labelledby="login-title">
+            <header>
+                <h1 id="login-title">Selamat Datang</h1>
+                <p>Aplikasi Penilaian Driver Supported by <strong>Bank BPD Bali</strong></p>
+            </header>
 
-                    <form class="lais-auth-form" method="POST" action="{{ route('login.store') }}">
-                        @csrf
-
-                        <label>
-                            <span>Email</span>
-                            <div class="lais-auth-input-wrap">
-                                <input @class(['is-invalid' => $errors->any()]) name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="contoh@email.com" required autofocus>
-                                <x-lucide-mail aria-hidden="true" />
-                            </div>
-                            @if ($errors->any())
-                                <small class="lais-auth-error">{{ $errors->first('email') ?: $errors->first('password') }}</small>
-                            @endif
-                        </label>
-
-                        <label>
-                            <span>Kata sandi</span>
-                            <div class="lais-auth-password-wrap">
-                                <input name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required data-password-input>
-                                <button class="lais-auth-password-toggle" type="button" aria-label="Tampilkan kata sandi" aria-pressed="false" data-password-toggle>
-                                    <x-lucide-eye-off data-password-icon="hidden" aria-hidden="true" />
-                                    <x-lucide-eye data-password-icon="visible" aria-hidden="true" />
-                                </button>
-                            </div>
-                        </label>
-
-                        <div class="lais-auth-options">
-                            <label class="lais-auth-remember">
-                                <input name="remember" type="checkbox" value="1" @checked(old('remember'))>
-                                <span>Ingatkan saya</span>
-                            </label>
-                            <a href="{{ route('password.request') }}">Lupa kata sandi?</a>
-                        </div>
-
-                        <button type="submit"><span>Login</span></button>
-                    </form>
+            <form class="bpd-login-form" method="POST" action="{{ route('login.store') }}">
+                @csrf
+                <label>
+                    <span>Identitas Pengguna</span>
+                    <div class="bpd-login-input">
+                        <x-lucide-user-round aria-hidden="true" />
+                        <input @class(['is-invalid' => $errors->any()]) name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="Username atau Email" required autofocus>
                     </div>
-                </section>
-            </section>
-        </div>
+                    @if ($errors->any())
+                        <small class="bpd-login-error">{{ $errors->first('email') ?: $errors->first('password') }}</small>
+                    @endif
+                </label>
+
+                <label>
+                    <span>Kunci Akses</span>
+                    <div class="bpd-login-input bpd-login-password">
+                        <x-lucide-key-round aria-hidden="true" />
+                        <input name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required data-password-input>
+                        <button type="button" aria-label="Tampilkan kata sandi" aria-pressed="false" data-password-toggle>
+                            <x-lucide-eye-off data-password-icon="hidden" aria-hidden="true" />
+                            <x-lucide-eye data-password-icon="visible" aria-hidden="true" />
+                        </button>
+                    </div>
+                </label>
+
+                <div class="bpd-login-options">
+                    <label>
+                        <input name="remember" type="checkbox" value="1" @checked(old('remember'))>
+                        <span>Tetap Masuk</span>
+                    </label>
+                </div>
+
+                <button class="bpd-login-submit" type="submit"><span>Masuk Sistem</span><x-lucide-zap aria-hidden="true" /></button>
+            </form>
+
+            <footer>Lupa Kata Sandi? <a href="{{ route('password.request') }}">Reset Kata Sandi</a></footer>
+        </section>
+
+        <footer class="bpd-login-footer"><span>&copy; {{ now()->year }} Aplikasi Penilaian Driver by Bank BPD Bali</span><span>Privasi &nbsp;&nbsp; Syarat &amp; Ketentuan &nbsp;&nbsp; Arsitektur Keamanan</span></footer>
     </main>
 </x-layouts.guest>

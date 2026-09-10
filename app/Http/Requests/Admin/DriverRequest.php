@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use App\Models\Branch;
 use App\Models\Driver;
+use App\Models\EmployeeCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,6 +19,7 @@ class DriverRequest extends FormRequest
     {
         return [
             'branch_id' => ['required', Rule::exists(Branch::class, 'id')],
+            'employee_category_id' => ['nullable', Rule::exists(EmployeeCategory::class, 'id')],
             'full_name' => ['required', 'string', 'max:255'],
             'nickname' => ['nullable', 'string', 'max:255'],
             'birth_place' => ['required', 'string', 'max:255'],
@@ -33,6 +35,7 @@ class DriverRequest extends FormRequest
             'sim_expired_at' => ['nullable', 'date'],
             'sim_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'join_date' => ['required', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:join_date'],
             'status' => ['required', Rule::in([Driver::STATUS_ACTIVE, Driver::STATUS_INACTIVE])],
         ];
     }

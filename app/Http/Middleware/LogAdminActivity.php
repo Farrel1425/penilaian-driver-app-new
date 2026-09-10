@@ -36,7 +36,8 @@ class LogAdminActivity
         $route = (string) $request->route()?->getName();
         $module = match (true) {
             str_starts_with($route, 'admin.branches.') => 'Unit Kerja',
-            str_starts_with($route, 'admin.drivers.') => 'Driver',
+            str_starts_with($route, 'admin.employees.') => 'Pegawai',
+            str_starts_with($route, 'admin.employee-categories.') => 'Kategori Pegawai',
             str_starts_with($route, 'admin.vehicles.') => 'Kendaraan',
             str_starts_with($route, 'admin.questions.') => 'Pertanyaan',
             str_starts_with($route, 'admin.users.') => 'Pengguna',

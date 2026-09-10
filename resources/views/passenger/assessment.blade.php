@@ -1,8 +1,8 @@
 <x-passenger.layout title="Penilaian" variant="assessment">
-    <header class="passenger-mobile-header passenger-scroll-header">
-        <a href="{{ route('passenger.rating.assessor', [$vehicle->qr_token, $driver]) }}" aria-label="Kembali ke isi nama"><x-lucide-chevron-left aria-hidden="true" /></a>
-        <h1>Penilaian</h1>
-    </header>
+    <section class="passenger-assessment-hero" aria-labelledby="assessment-page-title">
+        <a class="passenger-assessment-back" href="{{ route('passenger.rating.assessor', [$vehicle->qr_token, $driver]) }}" aria-label="Kembali ke data penumpang"><x-lucide-chevron-left aria-hidden="true" /></a>
+        <div><h1 id="assessment-page-title">Penilaian Driver</h1><p>Berikan penilaian sesuai pengalaman Anda.</p></div>
+    </section>
 
     @php
         $allQuestions = $questions->get(App\Models\Question::TARGET_DRIVER, collect())
@@ -17,6 +17,16 @@
         <input type="hidden" name="passenger_unit" value="{{ $passengerUnit }}">
         <input type="hidden" name="submission_token" value="{{ $submissionToken }}">
 
+        <aside class="passenger-assessment-summary">
+            <div class="passenger-assessment-summary-photo">
+                @if ($driver->photo)
+                    <img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/' . $driver->photo) }}" alt="{{ $driver->full_name }}">
+                @else
+                    <span>{{ strtoupper(substr($driver->full_name, 0, 1)) }}</span>
+                @endif
+            </div>
+            <div><strong>{{ $driver->full_name }}</strong><small>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: 'Kendaraan' }} · {{ $vehicle->police_number }}</small></div>
+        </aside>
         <section class="passenger-assessment-scroll-list">
             @forelse ($allQuestions as $question)
                 @include('passenger.partials.question', ['question' => $question, 'number' => $loop->iteration, 'scroll' => true])

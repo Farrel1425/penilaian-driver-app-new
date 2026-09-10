@@ -1,16 +1,67 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
+import lottie from 'lottie-web/build/player/lottie_light';
+import '../css/passenger.css';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const categorySelect = document.querySelector('[data-employee-category]');
+    const simSection = document.querySelector('[data-employee-sim-section]');
+
+    if (categorySelect instanceof HTMLSelectElement && simSection instanceof HTMLElement) {
+        const syncSimSection = () => {
+            const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            simSection.hidden = selectedOption?.dataset.requiresSim !== 'true';
+        };
+
+        categorySelect.addEventListener('change', syncSimSection);
+        syncSimSection();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-app-loading-animation]').forEach((container) => {
+        lottie.loadAnimation({
+            autoplay: true,
+            container,
+            loop: true,
+            path: container.dataset.appLoadingAnimation,
+            renderer: 'svg',
+            rendererSettings: {
+                preserveAspectRatio: 'xMidYMid meet',
+            },
+        });
+    });
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.querySelector('[data-sidebar-toggle]');
     const sidebar = document.querySelector('[data-admin-sidebar]');
+    const sidebarCollapse = document.querySelector('[data-sidebar-collapse]');
+    const adminFrame = document.querySelector('.admin-frame');
     const passwordToggle = document.querySelector('[data-password-toggle]');
     const passwordInput = document.querySelector('[data-password-input]');
     const profileMenu = document.querySelector('[data-profile-menu]');
     const profileTrigger = document.querySelector('[data-profile-trigger]');
+    const notificationMenu = document.querySelector('[data-notification-menu]');
 
     toggle?.addEventListener('click', () => {
         sidebar?.classList.toggle('is-open');
+    });
+
+    const setSidebarCollapsed = (isCollapsed) => {
+        adminFrame?.classList.toggle('is-sidebar-collapsed', isCollapsed);
+        sidebarCollapse?.setAttribute('aria-expanded', String(!isCollapsed));
+        sidebarCollapse?.setAttribute('aria-label', isCollapsed ? 'Buka navigasi samping' : 'Tutup navigasi samping');
+        sidebarCollapse?.setAttribute('title', isCollapsed ? 'Buka navigasi samping' : 'Tutup navigasi samping');
+        window.localStorage.setItem('admin-sidebar-collapsed', String(isCollapsed));
+    };
+
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+        setSidebarCollapsed(window.localStorage.getItem('admin-sidebar-collapsed') === 'true');
+    }
+
+    sidebarCollapse?.addEventListener('click', () => {
+        setSidebarCollapsed(!adminFrame?.classList.contains('is-sidebar-collapsed'));
     });
 
     passwordToggle?.addEventListener('click', () => {
@@ -32,6 +83,67 @@ document.addEventListener('DOMContentLoaded', () => {
         profileTrigger?.setAttribute('aria-expanded', String(isOpen));
     });
 
+    notificationMenu?.addEventListener('toggle', () => {
+        if (!notificationMenu.open || !notificationMenu.querySelector('[data-notification-indicator]')) {
+            return;
+        }
+
+        fetch(notificationMenu.dataset.notificationReadUrl, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
+            },
+        }).then((response) => {
+            if (!response.ok) {
+                return;
+            }
+
+            notificationMenu.querySelector('[data-notification-indicator]')?.remove();
+            const count = notificationMenu.querySelector('[data-notification-count]');
+            if (count) {
+                count.textContent = 'Sudah dibaca';
+            }
+        });
+    });
+
+    const dashboardFilterForm = document.querySelector('[data-dashboard-filter-form]');
+    dashboardFilterForm?.querySelectorAll('[data-dashboard-filter]').forEach((control) => {
+        control.addEventListener('change', () => dashboardFilterForm.requestSubmit());
+    });
+
+    const dashboardSearchForm = document.querySelector('[data-dashboard-search-form]');
+    const dashboardSearch = dashboardSearchForm?.querySelector('[data-dashboard-search]');
+    let dashboardSearchTimeout;
+
+    dashboardSearch?.addEventListener('input', () => {
+        window.clearTimeout(dashboardSearchTimeout);
+        dashboardSearchTimeout = window.setTimeout(() => dashboardSearchForm.requestSubmit(), 500);
+    });
+
+    const driverFilterForm = document.querySelector('[data-driver-filter-form]');
+    driverFilterForm?.querySelectorAll('[data-driver-filter]').forEach((control) => {
+        control.addEventListener('change', () => driverFilterForm.requestSubmit());
+    });
+
+    const driverSearchForm = document.querySelector('[data-driver-search-form]');
+    const driverSearch = driverSearchForm?.querySelector('[data-driver-search]');
+    let driverSearchTimeout;
+
+    driverSearch?.addEventListener('input', () => {
+        window.clearTimeout(driverSearchTimeout);
+        driverSearchTimeout = window.setTimeout(() => driverSearchForm.requestSubmit(), 500);
+    });
+
+    const masterSearchForm = document.querySelector('[data-master-search-form]');
+    const masterSearch = masterSearchForm?.querySelector('[data-master-search]');
+    let masterSearchTimeout;
+
+    masterSearch?.addEventListener('input', () => {
+        window.clearTimeout(masterSearchTimeout);
+        masterSearchTimeout = window.setTimeout(() => masterSearchForm.requestSubmit(), 500);
+    });
+
     document.addEventListener('click', (event) => {
         if (profileMenu && !profileMenu.contains(event.target)) {
             profileMenu.open = false;
@@ -39,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
+        if (event.key === 'Escape' && profileMenu) {
             profileMenu.open = false;
             profileTrigger?.focus();
         }
@@ -54,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!loadingOverlay) {
         return;
     }
-
     const showLoading = () => {
         window.clearTimeout(loadingTimer);
         window.clearTimeout(loadingSafetyTimer);
@@ -168,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = () => {
         modal.hidden = true;
         modal.classList.remove('is-status-confirmation');
+        modal.classList.remove('is-deactivation-confirmation');
         form = undefined;
         trigger?.focus();
         trigger = undefined;
@@ -177,14 +289,17 @@ document.addEventListener('DOMContentLoaded', () => {
         form = submittedForm;
         trigger = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
         const name = form.dataset.deleteName || 'data ini';
-        title.textContent = form.dataset.confirmTitle || `Hapus ${name}?`;
-        description.textContent = form.dataset.confirmDescription || form.dataset.deleteDescription || `${name} akan dihapus secara permanen.`;
-        const label = form.dataset.confirmLabel || 'Hapus';
+        const isDelete = form.matches('[data-delete-confirm]');
+        title.textContent = isDelete ? 'Delete Data' : (form.dataset.confirmTitle || `Hapus ${name}?`);
+        description.textContent = isDelete ? 'Apakah anda yakin ingin menghapus data?' : (form.dataset.confirmDescription || form.dataset.deleteDescription || `${name} akan dihapus secara permanen.`);
+        const label = isDelete ? 'Hapus Data' : (form.dataset.confirmLabel || 'Hapus');
         confirm.querySelector('[data-delete-modal-confirm-label]').textContent = label;
         const isPrimary = form.dataset.confirmTone === 'primary';
+        const isDeactivation = !isDelete && form.dataset.confirmIcon === 'power' && label.toLowerCase().startsWith('nonaktifkan');
         confirm.classList.toggle('primary-button', isPrimary);
         confirm.classList.toggle('danger-button', !isPrimary);
         modal.classList.toggle('is-status-confirmation', form.dataset.confirmIcon === 'power');
+        modal.classList.toggle('is-deactivation-confirmation', isDeactivation);
         modal.querySelector('[data-delete-modal-icon]')?.toggleAttribute('hidden', form.dataset.confirmIcon === 'power');
         modal.querySelector('[data-confirm-modal-power-icon]')?.toggleAttribute('hidden', form.dataset.confirmIcon !== 'power');
         confirm.querySelector('[data-delete-modal-confirm-trash]')?.toggleAttribute('hidden', form.dataset.confirmIcon === 'power');
@@ -212,6 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const submittedForm = form;
         modal.hidden = true;
         modal.classList.remove('is-status-confirmation');
+        modal.classList.remove('is-deactivation-confirmation');
         form = undefined;
         submittedForm.dataset.deleteConfirmed = 'true';
         submittedForm.removeAttribute('data-no-loading');
@@ -247,37 +363,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key === 'Escape') {
             document.querySelectorAll('.vehicle-qr-menu[open]').forEach((menu) => menu.removeAttribute('open'));
         }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-debounced-search-form]').forEach((form) => {
-        const input = form.querySelector('[data-debounced-search]');
-        if (!input) return;
-
-        const focusKey = `${window.location.pathname}:debounced-search-focus`;
-        let searchTimeout;
-
-        const restoreFocus = () => {
-            const focusState = window.sessionStorage.getItem(focusKey);
-            if (!focusState) return;
-
-            window.sessionStorage.removeItem(focusKey);
-            input.focus();
-            const cursorPosition = Math.min(Number(focusState) || input.value.length, input.value.length);
-            input.setSelectionRange(cursorPosition, cursorPosition);
-        };
-
-        input.addEventListener('input', () => {
-            window.clearTimeout(searchTimeout);
-            searchTimeout = window.setTimeout(() => {
-                window.sessionStorage.setItem(focusKey, String(input.selectionStart ?? input.value.length));
-                form.requestSubmit();
-            }, 1000);
-        });
-
-        form.addEventListener('submit', () => window.clearTimeout(searchTimeout));
-        restoreFocus();
     });
 });
 
@@ -947,74 +1032,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-chart-controls]').forEach((controls) => {
-        const card = controls.closest('.dashboard-trend-card');
-        const canvas = card?.querySelector('[data-chart-canvas]');
-        const scrollArea = card?.querySelector('[data-chart-scroll]');
-        const label = controls.querySelector('[data-chart-zoom-label]');
-
-        if (!(canvas instanceof HTMLElement) || !(scrollArea instanceof HTMLElement) || !label) {
-            return;
-        }
-
-        const baseWidth = Number(canvas.dataset.chartBaseWidth) || 760;
-        let zoom = 1;
-
-        const scaledWidth = (scale = zoom) => Math.round(baseWidth * scale);
-
-        const renderZoom = () => {
-            const width = scaledWidth();
-            canvas.style.minWidth = `${width}px`;
-            canvas.style.width = `${width}px`;
-            label.textContent = `${Math.round(zoom * 100)}%`;
-        };
-
-        const changeZoom = (nextZoom, focalX = scrollArea.clientWidth / 2) => {
-            if (nextZoom === zoom) {
-                return;
-            }
-
-            const currentWidth = scaledWidth();
-            const focalPoint = Math.min(Math.max((scrollArea.scrollLeft + focalX) / currentWidth, 0), 1);
-
-            zoom = nextZoom;
-            renderZoom();
-
-            const targetScrollLeft = (focalPoint * scaledWidth()) - focalX;
-            const maxScrollLeft = Math.max(0, scrollArea.scrollWidth - scrollArea.clientWidth);
-            scrollArea.scrollLeft = Math.min(Math.max(targetScrollLeft, 0), maxScrollLeft);
-        };
-
-        controls.querySelector('[data-chart-zoom-in]')?.addEventListener('click', () => {
-            changeZoom(Math.min(1.8, zoom + 0.2));
-        });
-
-        controls.querySelector('[data-chart-zoom-out]')?.addEventListener('click', () => {
-            changeZoom(Math.max(0.7, zoom - 0.2));
-        });
-
-        scrollArea.addEventListener('wheel', (event) => {
-            if (event.ctrlKey || event.metaKey) {
-                event.preventDefault();
-
-                const bounds = scrollArea.getBoundingClientRect();
-                const focalX = Math.min(Math.max(event.clientX - bounds.left, 0), scrollArea.clientWidth);
-                const step = event.deltaY < 0 ? 0.1 : -0.1;
-                changeZoom(Math.min(1.8, Math.max(0.7, zoom + step)), focalX);
-                return;
-            }
-
-            if (event.shiftKey) {
-                event.preventDefault();
-                scrollArea.scrollLeft += event.deltaY;
-            }
-        }, { passive: false });
-
-        renderZoom();
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
     const timeout = Number(body.dataset.adminSessionTimeout);
     const pingUrl = body.dataset.adminSessionPing;
@@ -1077,19 +1094,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     schedule();
 });
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-dashboard-auto-filter]').forEach((form) => {
-        let filterTimer;
-        const submit = () => {
-            window.clearTimeout(filterTimer);
-            filterTimer = window.setTimeout(() => form.requestSubmit(), 500);
-        };
-
-        form.querySelectorAll('input[type="date"], select').forEach((field) => {
-            field.addEventListener('change', submit);
-        });
-    });
-});
 // Open native date pickers from the whole input area, not only the calendar icon.
 document.addEventListener('click', (event) => {
     const input = event.target instanceof Element ? event.target.closest('input[type="date"]') : null;
@@ -1121,121 +1125,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-document.addEventListener('DOMContentLoaded', () => {
-    const wizard = document.querySelector('[data-assessment-wizard]');
 
-    if (!wizard) {
+// Keep each sidebar group open or closed across page changes.
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-sidebar-group]').forEach((group) => {
+        const storageKey = `sidebar-group-${group.dataset.sidebarGroup}-open`;
+        const savedState = window.localStorage.getItem(storageKey);
+        const hasActivePage = group.querySelector('.sidebar-nav-submenu .is-active') !== null;
+
+        if (hasActivePage) {
+            group.open = true;
+            window.localStorage.setItem(storageKey, 'true');
+        } else if (savedState !== null) {
+            group.open = savedState === 'true';
+        } else {
+            window.localStorage.setItem(storageKey, String(group.open));
+        }
+    });
+});
+
+document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-sidebar-group-toggle]');
+    if (!toggle) return;
+
+    const group = toggle.closest('[data-sidebar-group]');
+    if (!group) return;
+
+    const adminFrame = document.querySelector('.admin-frame');
+    if (adminFrame?.classList.contains('is-sidebar-collapsed')) {
+        event.preventDefault();
+        adminFrame.classList.remove('is-sidebar-collapsed');
+        window.localStorage.setItem('admin-sidebar-collapsed', 'false');
+        document.querySelector('[data-sidebar-collapse]')?.setAttribute('aria-expanded', 'true');
+        document.querySelector('[data-sidebar-collapse]')?.setAttribute('aria-label', 'Tutup navigasi samping');
+        document.querySelector('[data-sidebar-collapse]')?.setAttribute('title', 'Tutup navigasi samping');
         return;
     }
 
-    const steps = Array.from(wizard.querySelectorAll('[data-assessment-step]'));
-    const previousButton = wizard.querySelector('[data-wizard-previous]');
-    const nextButton = wizard.querySelector('[data-wizard-next]');
-    const submitButton = wizard.querySelector('[data-wizard-submit]');
-    const currentPage = wizard.querySelector('[data-wizard-current-page]');
-    const progress = wizard.querySelector('[data-wizard-progress]');
-    const totalPages = Number(wizard.dataset.totalPages || steps.length);
-    let page = Math.max(0, steps.findIndex((step) => step.querySelector('[data-wizard-server-error]')));
-
-    const showPage = (nextPage, shouldFocus = false) => {
-        page = Math.min(Math.max(nextPage, 0), steps.length - 1);
-        steps.forEach((step, index) => {
-            step.hidden = index !== page;
-        });
-
-        if (currentPage) {
-            currentPage.textContent = String(page + 1);
-        }
-
-        if (progress) {
-            progress.style.width = `${((page + 1) / totalPages) * 100}%`;
-        }
-
-        if (previousButton instanceof HTMLButtonElement) {
-            previousButton.hidden = page === 0;
-        }
-
-        if (nextButton instanceof HTMLButtonElement) {
-            nextButton.hidden = page === steps.length - 1;
-        }
-
-        if (submitButton instanceof HTMLButtonElement) {
-            submitButton.hidden = page !== steps.length - 1;
-        }
-
-        if (shouldFocus) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    };
-
-    const hasAnswer = (question) => {
-        if (question.hidden || question.dataset.required !== 'true') {
-            return true;
-        }
-
-        const controls = Array.from(question.querySelectorAll('input, textarea'));
-
-        return controls.some((control) => {
-            if (control instanceof HTMLInputElement && (control.type === 'radio' || control.type === 'checkbox')) {
-                return control.checked;
-            }
-
-            return control.value.trim() !== '';
-        });
-    };
-
-    const validatePage = () => {
-        const activeStep = steps[page];
-        const questions = Array.from(activeStep.querySelectorAll('[data-wizard-question]'));
-        let firstInvalid;
-
-        questions.forEach((question) => {
-            const error = question.querySelector('[data-wizard-error]');
-            const isAnswered = hasAnswer(question);
-
-            if (error) {
-                error.hidden = isAnswered;
-            }
-
-            if (!isAnswered && !firstInvalid) {
-                firstInvalid = question;
-            }
-        });
-
-        firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        return !firstInvalid;
-    };
-
-    nextButton?.addEventListener('click', () => {
-        if (validatePage()) {
-            showPage(page + 1, true);
-        }
-    });
-
-    previousButton?.addEventListener('click', () => showPage(page - 1, true));
-
-    wizard.addEventListener('input', (event) => {
-        const question = event.target instanceof Element ? event.target.closest('[data-wizard-question]') : null;
-        const error = question?.querySelector('[data-wizard-error]');
-
-        if (error && hasAnswer(question)) {
-            error.hidden = true;
-        }
-    });
-
-    const syncFeedbackFollowUp = (feedbackChoice) => {
-        const followUp = wizard.querySelector('[data-feedback-followup]');
-        if (followUp && feedbackChoice) {
-            followUp.hidden = feedbackChoice.dataset.feedbackEmpty === 'true';
-        }
-    };
-
-    wizard.addEventListener('change', (event) => {
-        const feedbackChoice = event.target instanceof HTMLInputElement && event.target.matches('[data-feedback-choice]') ? event.target : null;
-        syncFeedbackFollowUp(feedbackChoice);
-    });
-
-    syncFeedbackFollowUp(wizard.querySelector('[data-feedback-choice]:checked'));
-    showPage(page);
+    event.preventDefault();
+    group.open = !group.open;
+    window.localStorage.setItem(`sidebar-group-${group.dataset.sidebarGroup}-open`, String(group.open));
 });

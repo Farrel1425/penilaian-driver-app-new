@@ -1,5 +1,5 @@
 <x-layouts.admin title="Report Kendaraan">
-    @include('admin.reports._toolbar', ['type' => 'vehicle'])
+    <x-slot:pageActions>@include('admin.reports._toolbar', ['type' => 'vehicle'])</x-slot>
 
     <div class="stat-grid report-stat-grid">
         <x-admin.stat-card label="Total Kendaraan" :value="$data['stats']['total_vehicle']" note="Sesuai unit kerja terpilih" />

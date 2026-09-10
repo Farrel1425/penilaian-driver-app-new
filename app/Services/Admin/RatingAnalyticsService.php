@@ -333,11 +333,11 @@ class RatingAnalyticsService
 
     private function latestActivities(Collection $ratings, bool $includeAdminActivities): Collection
     {
-        $ratingActivities = $ratings->take(6)->map(fn (Rating $rating) => [
+        $ratingActivities = collect($ratings->take(6)->map(fn (Rating $rating) => [
             'type' => 'rating',
             'description' => sprintf('Penilaian baru untuk %s dan %s.', $rating->driver?->full_name ?? 'driver', $rating->vehicle?->police_number ?? 'kendaraan'),
             'created_at' => $rating->submitted_at,
-        ]);
+        ])->all());
 
         $adminActivities = $includeAdminActivities ? ActivityLog::query()->latest('created_at')->take(6)->get()->map(fn (ActivityLog $log) => [
             'type' => 'admin',

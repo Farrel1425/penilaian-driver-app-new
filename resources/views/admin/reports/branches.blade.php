@@ -1,5 +1,5 @@
 <x-layouts.admin title="Report Unit Kerja">
-    @include('admin.reports._toolbar', ['type' => 'branch'])
+    <x-slot:pageActions>@include('admin.reports._toolbar', ['type' => 'branch'])</x-slot>
 
     <div class="stat-grid report-stat-grid">
         <x-admin.stat-card label="Total Unit Kerja" :value="$data['stats']['total_branches']" note="Memiliki penilaian sesuai filter" />

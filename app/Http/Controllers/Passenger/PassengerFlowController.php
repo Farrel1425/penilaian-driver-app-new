@@ -30,6 +30,7 @@ class PassengerFlowController extends Controller
         $drivers = Driver::query()
             ->where('branch_id', $vehicle->branch_id)
             ->active()
+            ->eligibleForAssessment()
             ->orderBy('full_name')
             ->get();
 
@@ -198,6 +199,8 @@ class PassengerFlowController extends Controller
     {
         abort_unless($driver->status === Driver::STATUS_ACTIVE, 404);
         abort_unless($driver->branch_id === $vehicle->branch_id, 404);
+        $driver->loadMissing('employeeCategory');
+        abort_unless($driver->employeeCategory?->status === 'active' && $driver->employeeCategory->requires_sim, 404);
     }
 
     private function passengerNameSessionKey(Vehicle $vehicle, Driver $driver): string

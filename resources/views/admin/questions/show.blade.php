@@ -1,5 +1,5 @@
 <x-layouts.admin title="Detail Pertanyaan">
-    <div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.questions.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div>
+    <x-slot:pageActions><div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.questions.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div></x-slot>
     <div class="detail-layout branch-detail-layout">
         <x-admin.panel title="Informasi Pertanyaan">
             <div class="detail-grid">

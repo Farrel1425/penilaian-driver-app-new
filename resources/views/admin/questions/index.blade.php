@@ -1,4 +1,16 @@
 <x-layouts.admin title="Master Pertanyaan">
+    @if (! $isReordering)
+        <x-slot:pageActions>
+            <form class="master-filter-panel" method="GET" action="{{ route('admin.questions.index') }}">
+                <input type="hidden" name="search" value="{{ request('search') }}">
+                <label><span>KATEGORI</span><select name="target_type" onchange="this.form.requestSubmit()" aria-label="Filter kategori"><option value="">Semua Kategori</option><option value="driver" @selected(request('target_type') === 'driver')>Driver</option><option value="vehicle" @selected(request('target_type') === 'vehicle')>Kendaraan</option><option value="feedback" @selected(request('target_type') === 'feedback')>Feedback/Keluhan</option></select></label>
+                <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
+                @if (request()->filled('search') || request()->filled('target_type') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.questions.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
+                <a class="secondary-button master-secondary-action" href="{{ route('admin.questions.index', ['reorder' => 1]) }}"><x-lucide-grip-vertical aria-hidden="true" /><span>Ubah Urutan</span></a>
+                <a class="primary-button master-create-button" href="{{ route('admin.questions.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Pertanyaan</span></a>
+            </form>
+        </x-slot:pageActions>
+    @endif
     <section class="question-list-card">
         @if ($isReordering)
             <div class="question-list-toolbar question-reorder-toolbar">
@@ -15,33 +27,6 @@
                     </form>
                 </div>
             </div>
-        @else
-            <form class="question-list-toolbar" method="GET" action="{{ route('admin.questions.index') }}" data-debounced-search-form>
-                <div class="question-list-filters">
-                    <label class="question-search-field">
-                        <x-lucide-search aria-hidden="true" />
-                        <input name="search" value="{{ request('search') }}" placeholder="Cari pertanyaan..." aria-label="Cari pertanyaan" data-debounced-search>
-                    </label>
-
-                    <select name="target_type" onchange="this.form.requestSubmit()" aria-label="Filter kategori">
-                        <option value="">Semua Kategori</option>
-                        <option value="driver" @selected(request('target_type') === 'driver')>Driver</option>
-                        <option value="vehicle" @selected(request('target_type') === 'vehicle')>Kendaraan</option>
-                        <option value="feedback" @selected(request('target_type') === 'feedback')>Feedback/Keluhan</option>
-                    </select>
-
-                    <select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status">
-                        <option value="">Semua Status</option>
-                        <option value="active" @selected(request('status') === 'active')>Aktif</option>
-                        <option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option>
-                    </select>
-                </div>
-
-                <div class="question-list-actions">
-                    <a class="secondary-button question-reorder-button" href="{{ route('admin.questions.index', ['reorder' => 1]) }}"><x-lucide-grip-vertical aria-hidden="true" /><span>Ubah Urutan</span></a>
-                    <a class="primary-button question-create-button" href="{{ route('admin.questions.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Pertanyaan</span></a>
-                </div>
-            </form>
         @endif
 
         <div class="table-wrap question-table-wrap">

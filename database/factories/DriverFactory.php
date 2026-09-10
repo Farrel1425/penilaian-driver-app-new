@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Branch;
 use App\Models\Driver;
+use App\Models\EmployeeCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<Driver> */
@@ -15,6 +16,10 @@ class DriverFactory extends Factory
     {
         return [
             'branch_id' => Branch::factory(),
+            'employee_category_id' => EmployeeCategory::query()->firstOrCreate(
+                ['name' => 'Driver'],
+                ['requires_sim' => true, 'status' => EmployeeCategory::STATUS_ACTIVE],
+            )->id,
             'full_name' => $this->faker->name(),
             'nickname' => $this->faker->firstName(),
             'birth_place' => $this->faker->city(),

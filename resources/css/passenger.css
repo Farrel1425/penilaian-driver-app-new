@@ -1,0 +1,862 @@
+/* Mobile-first passenger rating flow. */
+.passenger-shell {
+    background: #eef3ee;
+}
+
+.passenger-app {
+    --passenger-green: #007b35;
+    --passenger-green-dark: #00652c;
+    --passenger-ink: #1b201e;
+    --passenger-copy: #61695f;
+    --passenger-canvas: #f8faf7;
+    --passenger-line: #c4c9ac;
+    --passenger-card-line: #e2e7df;
+    background: #eef3ee;
+    color: var(--passenger-ink);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+}
+
+.passenger-app-brand {
+    align-items: center;
+    background: #f8faf7;
+    border-bottom: 1px solid var(--passenger-line);
+    display: flex;
+    gap: 9px;
+    height: 64px;
+    margin: 0 auto;
+    max-width: 440px;
+    padding: 0 16px;
+}
+
+.passenger-app-brand img {
+    height: 38px;
+    object-fit: contain;
+    width: 38px;
+}
+
+.passenger-app-brand strong,
+.passenger-app-brand span {
+    display: block;
+}
+
+.passenger-app-brand strong {
+    color: var(--passenger-ink);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.passenger-app-brand span {
+    color: var(--passenger-copy);
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.passenger-app-brand-actions {
+    color: var(--passenger-green);
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.passenger-app-brand-actions svg {
+    height: 18px;
+    width: 18px;
+}
+
+.passenger-flow {
+    background: var(--passenger-canvas);
+    margin: 0 auto;
+    max-width: 440px;
+    min-height: calc(100vh - 64px);
+}
+
+.passenger-mobile-header {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    padding: 24px 20px 16px;
+}
+
+.passenger-mobile-header a,
+.passenger-assessment-back {
+    align-items: center;
+    border: 1px solid var(--passenger-line);
+    border-radius: 50%;
+    color: var(--passenger-ink);
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    text-decoration: none;
+    width: 40px;
+}
+
+.passenger-mobile-header a {
+    grid-row: 1 / span 2;
+    margin-top: 3px;
+}
+
+.passenger-mobile-header a svg,
+.passenger-assessment-back svg {
+    height: 21px;
+    stroke-width: 2.25;
+    width: 21px;
+}
+
+.passenger-mobile-header h1 {
+    color: var(--passenger-ink);
+    font-size: 28px;
+    font-weight: 750;
+    grid-column: 2;
+    line-height: 1.05;
+    margin: 0;
+    padding-left: 14px;
+}
+
+.passenger-mobile-header p {
+    color: #555d51;
+    font-size: 11px;
+    font-weight: 600;
+    grid-column: 2;
+    letter-spacing: 0.04em;
+    line-height: 1.45;
+    margin: 7px 0 0;
+    padding-left: 14px;
+    text-transform: uppercase;
+}
+
+.passenger-flow-vehicle .passenger-mobile-header {
+    display: block;
+}
+
+.passenger-flow-vehicle .passenger-mobile-header h1,
+.passenger-flow-vehicle .passenger-mobile-header p {
+    padding-left: 0;
+}
+
+.passenger-vehicle-page,
+.passenger-driver-page,
+.passenger-driver-detail-page,
+.passenger-assessor-page {
+    padding: 0 20px 112px;
+}
+
+.passenger-vehicle-card,
+.passenger-driver-option,
+.passenger-driver-profile,
+.passenger-driver-detail-card,
+.passenger-assessor-card,
+.passenger-selected-trip,
+.passenger-assessment-summary,
+.passenger-scroll-question,
+.passenger-success-reference {
+    background: #fff;
+    border: 1px solid var(--passenger-card-line);
+    border-radius: 8px;
+    box-shadow: 0 5px 16px rgb(39 55 35 / 5%);
+}
+
+.passenger-vehicle-card {
+    overflow: hidden;
+}
+
+.passenger-vehicle-photo {
+    align-items: center;
+    background: #e9eee7;
+    display: flex;
+    height: 210px;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.passenger-vehicle-photo img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.passenger-vehicle-photo > svg {
+    color: var(--passenger-green);
+    height: 76px;
+    width: 76px;
+}
+
+.passenger-vehicle-photo::after {
+    background: linear-gradient(transparent 42%, rgb(15 24 17 / 78%));
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.passenger-vehicle-photo-label,
+.passenger-vehicle-verified,
+.passenger-vehicle-photo-caption {
+    position: absolute;
+    z-index: 1;
+}
+
+.passenger-vehicle-photo-label {
+    background: rgb(255 255 255 / 91%);
+    border-radius: 4px;
+    color: #4f574b;
+    font-size: 10px;
+    font-weight: 700;
+    left: 12px;
+    letter-spacing: 0.04em;
+    padding: 6px 8px;
+    text-transform: uppercase;
+    top: 12px;
+}
+
+.passenger-vehicle-verified {
+    color: var(--passenger-green);
+    height: 20px;
+    right: 12px;
+    top: 14px;
+    width: 20px;
+}
+
+.passenger-vehicle-photo-caption {
+    bottom: 15px;
+    color: #fff;
+    left: 16px;
+}
+
+.passenger-vehicle-photo-caption span,
+.passenger-vehicle-heading > span,
+.passenger-vehicle-details dt,
+.passenger-driver-detail-card dt {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.passenger-vehicle-photo-caption strong {
+    display: block;
+    font-size: 22px;
+    line-height: 1.15;
+    margin-top: 5px;
+}
+
+.passenger-vehicle-heading {
+    border-bottom: 1px solid var(--passenger-card-line);
+    padding: 17px 16px 14px;
+}
+
+.passenger-vehicle-heading > span,
+.passenger-vehicle-details dt,
+.passenger-driver-detail-card dt {
+    color: #697066;
+}
+
+.passenger-vehicle-heading h2 {
+    border: 1px solid var(--passenger-line);
+    border-radius: 6px;
+    color: var(--passenger-ink);
+    font-size: 26px;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    margin: 10px 0 0;
+    padding: 14px 12px;
+    text-align: center;
+}
+
+.passenger-vehicle-details,
+.passenger-driver-detail-card {
+    margin: 0;
+    padding: 0 16px;
+}
+
+.passenger-vehicle-details > div,
+.passenger-driver-detail-card > div {
+    align-items: flex-start;
+    border-top: 1px solid var(--passenger-card-line);
+    display: flex;
+    gap: 11px;
+    padding: 15px 0;
+}
+
+.passenger-vehicle-details > div:first-child,
+.passenger-driver-detail-card > div:first-child {
+    border-top: 0;
+}
+
+.passenger-vehicle-details svg {
+    color: var(--passenger-green);
+    flex: 0 0 18px;
+    height: 18px;
+    margin-top: 3px;
+    width: 18px;
+}
+
+.passenger-vehicle-details dd,
+.passenger-driver-detail-card dd {
+    color: var(--passenger-ink);
+    font-size: 16px;
+    font-weight: 650;
+    line-height: 1.25;
+    margin: 5px 0 0;
+}
+
+.passenger-vehicle-details dd.is-success {
+    color: var(--passenger-green);
+}
+
+.passenger-vehicle-footer,
+.passenger-driver-detail-footer,
+.passenger-assessor-footer,
+.passenger-scroll-footer {
+    background: rgb(248 250 247 / 96%);
+    border-top: 1px solid var(--passenger-card-line);
+    bottom: 0;
+    display: grid;
+    gap: 10px;
+    left: 50%;
+    max-width: 440px;
+    padding: 12px 20px max(18px, env(safe-area-inset-bottom));
+    position: fixed;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 10;
+}
+
+.passenger-vehicle-continue,
+.passenger-driver-select,
+.passenger-assessor-footer button,
+.passenger-scroll-footer button,
+.passenger-success-finish {
+    align-items: center;
+    background: var(--passenger-green);
+    border: 1px solid var(--passenger-green);
+    border-radius: 8px;
+    color: #fff;
+    display: flex;
+    font-size: 15px;
+    font-weight: 750;
+    gap: 8px;
+    justify-content: center;
+    min-height: 50px;
+    width: 100%;
+}
+
+.passenger-vehicle-rescan,
+.passenger-driver-other {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--passenger-line);
+    border-radius: 8px;
+    color: #4e554a;
+    display: flex;
+    font-size: 14px;
+    font-weight: 650;
+    gap: 8px;
+    justify-content: center;
+    min-height: 46px;
+    width: 100%;
+}
+
+.passenger-driver-list {
+    display: grid;
+    gap: 12px;
+}
+
+.passenger-driver-option {
+    align-items: center;
+    color: inherit;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+    padding: 12px;
+    position: relative;
+}
+
+.passenger-driver-option.is-recommended {
+    margin-top: 28px;
+    padding-top: 28px;
+}
+
+.passenger-driver-recommendation {
+    align-items: center;
+    color: var(--passenger-green);
+    display: flex;
+    font-size: 11px;
+    font-weight: 750;
+    gap: 5px;
+    left: 12px;
+    position: absolute;
+    top: 8px;
+}
+
+.passenger-driver-photo,
+.passenger-selected-trip-photo,
+.passenger-assessment-summary-photo {
+    align-items: center;
+    background: #e9eee7;
+    border-radius: 50%;
+    color: var(--passenger-green);
+    display: flex;
+    font-size: 20px;
+    font-weight: 750;
+    height: 58px;
+    justify-content: center;
+    overflow: hidden;
+    width: 58px;
+}
+
+.passenger-driver-photo img,
+.passenger-selected-trip-photo img,
+.passenger-assessment-summary-photo img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.passenger-driver-summary h2,
+.passenger-driver-profile h2 {
+    color: var(--passenger-ink);
+    font-size: 16px;
+    margin: 0;
+}
+
+.passenger-driver-summary > small,
+.passenger-driver-summary p span,
+.passenger-selected-trip span,
+.passenger-selected-trip small,
+.passenger-driver-profile > p,
+.passenger-driver-detail-card small {
+    color: var(--passenger-copy);
+    display: block;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.passenger-driver-summary p {
+    align-items: center;
+    color: var(--passenger-green);
+    display: flex;
+    font-size: 12px;
+    font-weight: 750;
+    gap: 4px;
+    margin: 5px 0 0;
+}
+
+.passenger-driver-summary p svg {
+    fill: currentColor;
+    height: 14px;
+    width: 14px;
+}
+
+.passenger-driver-select-label {
+    align-items: center;
+    color: var(--passenger-green);
+    display: flex;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.passenger-driver-help {
+    align-items: flex-start;
+    background: #f0f5ef;
+    border: 1px solid var(--passenger-line);
+    border-radius: 8px;
+    display: flex;
+    font-size: 12px;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 13px;
+}
+
+.passenger-driver-help svg,
+.passenger-driver-detail-icon {
+    color: var(--passenger-green);
+}
+
+.passenger-driver-help p {
+    margin: 0;
+}
+
+.passenger-driver-profile {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 22px 16px;
+}
+
+.passenger-driver-detail-photo {
+    background: #e9eee7;
+    border: 2px solid var(--passenger-line);
+    border-radius: 50%;
+    height: 116px;
+    overflow: hidden;
+    width: 116px;
+}
+
+.passenger-driver-detail-photo img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.passenger-driver-profile h2 {
+    font-size: 20px;
+    margin-top: 13px;
+}
+
+.passenger-driver-active {
+    background: #e8f3e9;
+    border-radius: 999px;
+    color: #3f5041;
+    font-size: 13px;
+    margin-top: 12px;
+    padding: 7px 11px;
+}
+
+.passenger-driver-active i {
+    background: var(--passenger-green);
+    border-radius: 50%;
+    display: inline-block;
+    height: 7px;
+    margin-right: 6px;
+    width: 7px;
+}
+
+.passenger-driver-detail-icon {
+    align-items: center;
+    background: #edf5ed;
+    border-radius: 50%;
+    display: flex;
+    flex: 0 0 32px;
+    height: 32px;
+    justify-content: center;
+}
+
+.passenger-driver-detail-icon svg {
+    height: 17px;
+    width: 17px;
+}
+
+.passenger-assessor-card {
+    min-width: 0;
+    padding: 18px;
+}
+
+.passenger-assessor-icon {
+    align-items: center;
+    background: var(--passenger-green);
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    height: 38px;
+    justify-content: center;
+    width: 38px;
+}
+
+.passenger-assessor-card h2 {
+    font-size: 19px;
+    margin: 11px 0 4px;
+}
+
+.passenger-assessor-card > p {
+    color: var(--passenger-copy);
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0 0 18px;
+}
+
+.passenger-assessor-field + .passenger-assessor-field {
+    margin-top: 14px;
+}
+
+.passenger-assessor-field {
+    min-width: 0;
+}
+
+.passenger-assessor-card label {
+    color: #4e554a;
+    display: block;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+}
+
+.passenger-assessor-card label b,
+.passenger-scroll-question b {
+    color: #c92a2a;
+}
+
+.passenger-assessor-card input,
+.passenger-scroll-question input[type="text"],
+.passenger-scroll-question textarea {
+    background: #fff;
+    border: 1px solid var(--passenger-line);
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: var(--passenger-ink);
+    font: inherit;
+    max-width: 100%;
+    min-height: 48px;
+    min-width: 0;
+    padding: 0 12px;
+    width: 100%;
+}
+
+.passenger-selected-trip,
+.passenger-assessment-summary {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px;
+}
+
+.passenger-selected-trip strong {
+    display: block;
+    font-size: 16px;
+    margin: 3px 0;
+}
+
+.passenger-flow-assessment {
+    padding-bottom: 86px;
+}
+
+.passenger-assessment-hero {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 42px minmax(0, 1fr);
+    margin: 0 20px 14px;
+    min-height: 88px;
+    padding: 14px 0;
+}
+
+.passenger-mobile-header a:hover,
+.passenger-assessment-back:hover {
+    background: #edf5ed;
+    border-color: var(--passenger-green);
+    color: var(--passenger-green);
+}
+
+.passenger-assessment-hero h1 {
+    color: var(--passenger-ink);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.08;
+    margin: 0;
+}
+
+.passenger-assessment-hero p {
+    color: #535a52;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.32;
+    margin: 4px 0 0;
+    text-transform: uppercase;
+}
+
+.passenger-assessment-summary {
+    margin: 0 20px 14px;
+}
+
+.passenger-assessment-summary strong,
+.passenger-assessment-summary small {
+    display: block;
+}
+
+.passenger-assessment-summary strong {
+    font-size: 15px;
+}
+
+.passenger-assessment-summary small {
+    color: var(--passenger-copy);
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.passenger-assessment-scroll-list {
+    display: grid;
+    gap: 13px;
+    padding: 0 20px 20px;
+}
+
+.passenger-scroll-question {
+    display: grid;
+    gap: 11px;
+    margin: 0;
+    padding: 16px;
+}
+
+.passenger-scroll-question .passenger-question-icon,
+.passenger-scroll-question .passenger-scroll-legend {
+    display: none;
+}
+
+.passenger-scroll-question .passenger-scroll-indicator {
+    color: var(--passenger-green);
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.passenger-scroll-question .passenger-scroll-question-text {
+    color: var(--passenger-ink);
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.passenger-question-instruction {
+    color: var(--passenger-copy);
+    font-size: 12px;
+    margin: -4px 0 0;
+}
+
+.passenger-star-rating {
+    display: flex;
+    justify-content: space-between;
+}
+
+.passenger-star-rating input {
+    position: absolute;
+    opacity: 0;
+}
+
+.passenger-star-rating svg {
+    color: var(--passenger-green);
+    fill: #fff;
+    height: 35px;
+    stroke-width: 1.7;
+    width: 35px;
+}
+
+.passenger-star-rating label.is-selected svg {
+    fill: currentColor;
+}
+
+.passenger-answer-options {
+    display: grid;
+    gap: 8px;
+}
+
+.passenger-answer-options label {
+    align-items: center;
+    border: 1px solid var(--passenger-line);
+    border-radius: 6px;
+    display: flex;
+    font-size: 13px;
+    gap: 9px;
+    min-height: 42px;
+    padding: 9px 11px;
+}
+
+.passenger-answer-options input {
+    accent-color: var(--passenger-green);
+}
+
+.passenger-scroll-question textarea {
+    min-height: 100px;
+    padding: 11px;
+    resize: vertical;
+}
+
+.passenger-success-page {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 64px);
+    padding: 64px 28px 42px;
+    text-align: center;
+}
+
+.passenger-success-icon {
+    align-items: center;
+    background: #fff;
+    border: 2px solid var(--passenger-green);
+    border-radius: 50%;
+    box-shadow: 0 10px 22px rgb(0 123 53 / 15%);
+    color: var(--passenger-green);
+    display: flex;
+    height: 104px;
+    justify-content: center;
+    width: 104px;
+}
+
+.passenger-success-icon svg {
+    height: 52px;
+    stroke-width: 2.5;
+    width: 52px;
+}
+
+.passenger-success-page h1 {
+    color: var(--passenger-green);
+    font-size: 34px;
+    line-height: 1.1;
+    margin: 28px 0 10px;
+}
+
+.passenger-success-page > p {
+    color: #4f574e;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.passenger-success-reference {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    margin: 28px 0;
+    padding: 13px;
+    text-align: left;
+    width: 100%;
+}
+
+.passenger-success-reference > svg {
+    background: #edf5ed;
+    border-radius: 6px;
+    color: var(--passenger-green);
+    height: 38px;
+    padding: 9px;
+    width: 38px;
+}
+
+.passenger-success-reference span,
+.passenger-success-reference strong {
+    display: block;
+}
+
+.passenger-success-reference span {
+    color: var(--passenger-copy);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.passenger-success-reference strong {
+    color: var(--passenger-ink);
+    font-size: 20px;
+    margin-top: 4px;
+}
+
+.passenger-success-finish {
+    text-decoration: none;
+}
+
+@media (min-width: 441px) {
+    .passenger-app-brand,
+    .passenger-flow {
+        box-shadow: 0 0 0 1px rgb(196 201 172 / 45%);
+    }
+}

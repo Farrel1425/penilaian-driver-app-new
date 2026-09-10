@@ -16,7 +16,7 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', [
             'filters' => $filters,
-            'branches' => $analytics->branches($filters->branchId),
+            'branches' => $analytics->branches($request->user()->isBranchAdmin() ? $filters->branchId : null),
             'data' => $analytics->dashboard($filters, ! $request->user()->isBranchAdmin()),
             'analytics' => $analytics,
         ]);
