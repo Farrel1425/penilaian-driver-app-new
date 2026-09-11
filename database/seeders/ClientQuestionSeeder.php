@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\IndicatorCategory;
 use App\Models\Question;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class ClientQuestionSeeder extends Seeder
 {
@@ -40,7 +42,7 @@ class ClientQuestionSeeder extends Seeder
                 'placeholder' => null,
                 'rating_min_label' => null,
                 'rating_max_label' => null,
-                'indicator' => Question::FEEDBACK_INDICATOR,
+                'indicator_category_id' => $this->indicatorCategory(Question::TARGET_FEEDBACK, Question::FEEDBACK_INDICATOR),
                 'answer_type' => Question::TYPE_MULTIPLE_CHOICE,
                 'is_required' => false,
                 'weight' => 0,
@@ -72,7 +74,7 @@ class ClientQuestionSeeder extends Seeder
                 'placeholder' => 'Tuliskan kondisi atau keluhan Anda...',
                 'rating_min_label' => null,
                 'rating_max_label' => null,
-                'indicator' => Question::FEEDBACK_INDICATOR,
+                'indicator_category_id' => $this->indicatorCategory(Question::TARGET_FEEDBACK, Question::FEEDBACK_INDICATOR),
                 'answer_type' => Question::TYPE_PARAGRAPH,
                 'is_required' => false,
                 'weight' => 0,
@@ -97,7 +99,7 @@ class ClientQuestionSeeder extends Seeder
                 'placeholder' => null,
                 'rating_min_label' => 'Sangat Buruk',
                 'rating_max_label' => 'Sangat Baik',
-                'indicator' => $indicator,
+                'indicator_category_id' => $this->indicatorCategory($targetType, $indicator),
                 'answer_type' => Question::TYPE_RATING,
                 'is_required' => true,
                 'weight' => $weight,
@@ -105,5 +107,19 @@ class ClientQuestionSeeder extends Seeder
             ]);
             $rating->options()->delete();
         }
+    }
+
+    private function indicatorCategory(string $targetType, string $name): int
+    {
+        $categoryId = IndicatorCategory::query()
+            ->where('target_type', $targetType)
+            ->where('name', $name)
+            ->value('id');
+
+        if (! $categoryId) {
+            throw new RuntimeException("Kategori indikator {$name} untuk target {$targetType} belum tersedia.");
+        }
+
+        return (int) $categoryId;
     }
 }

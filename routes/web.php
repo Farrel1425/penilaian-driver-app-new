@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DriverController;
 use App\Http\Controllers\Admin\EmployeeCategoryController;
+use App\Http\Controllers\Admin\IndicatorCategoryController;
 use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PartnershipInquiryController as AdminPartnershipInquiryController;
@@ -83,6 +84,8 @@ Route::middleware(['auth', 'active.admin', 'admin.inactivity', LogAdminActivity:
             Route::patch('drivers/{driver}/toggle-status', [DriverController::class, 'toggleStatus'])->name('drivers.toggle-status');
             Route::resource('employee-categories', EmployeeCategoryController::class)->except('show');
             Route::patch('employee-categories/{employee_category}/toggle-status', [EmployeeCategoryController::class, 'toggleStatus'])->name('employee-categories.toggle-status');
+            Route::resource('indicator-categories', IndicatorCategoryController::class)->except('show');
+            Route::patch('indicator-categories/{indicator_category}/toggle-status', [IndicatorCategoryController::class, 'toggleStatus'])->name('indicator-categories.toggle-status');
             Route::resource('vehicles', VehicleController::class);
             Route::get('vehicles/{vehicle}/qr', [VehicleQrController::class, 'preview'])->name('vehicles.qr.preview');
             Route::get('vehicles/{vehicle}/qr/download', [VehicleQrController::class, 'download'])->name('vehicles.qr.download');

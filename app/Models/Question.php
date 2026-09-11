@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['question', 'instruction', 'placeholder', 'rating_min_label', 'rating_max_label', 'icon_path', 'indicator', 'target_type', 'answer_type', 'is_required', 'weight', 'sort_order', 'status'])]
+#[Fillable(['question', 'instruction', 'placeholder', 'rating_min_label', 'rating_max_label', 'icon_path', 'indicator_category_id', 'target_type', 'answer_type', 'is_required', 'weight', 'sort_order', 'status'])]
 class Question extends Model
 {
     /** @use HasFactory<QuestionFactory> */
@@ -50,6 +51,18 @@ class Question extends Model
     public const STATUS_ACTIVE = 'active';
 
     public const STATUS_INACTIVE = 'inactive';
+
+    protected $with = ['indicatorCategory'];
+
+    public function indicatorCategory(): BelongsTo
+    {
+        return $this->belongsTo(IndicatorCategory::class);
+    }
+
+    public function getIndicatorAttribute(): ?string
+    {
+        return $this->indicatorCategory?->name;
+    }
 
     public function options(): HasMany
     {

@@ -139,7 +139,7 @@ class RatingAnalyticsService
 
     public function questionScores(RatingReportFilters $filters, string $targetType): Collection
     {
-        return $this->ratingAnswers($filters, $targetType)->with('question')->get()
+        return $this->ratingAnswers($filters, $targetType)->with('question.indicatorCategory')->get()
             ->groupBy('question_id')
             ->map(function (Collection $answers) {
                 $question = $answers->first()->question;

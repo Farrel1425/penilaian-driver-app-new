@@ -24,7 +24,12 @@
                 <option value="{{ App\Models\Question::TARGET_VEHICLE }}" @selected(old('target_type', $question->target_type) === App\Models\Question::TARGET_VEHICLE)>Kendaraan</option>
                 <option value="{{ App\Models\Question::TARGET_FEEDBACK }}" @selected(old('target_type', $question->target_type) === App\Models\Question::TARGET_FEEDBACK)>Feedback/Keluhan</option>
             </x-admin.select>
-            <x-admin.field label="Indikator" name="indicator" :value="$question->indicator" required data-indicator-input />
+            <x-admin.select label="Kategori Indikator" name="indicator_category_id" required data-indicator-category>
+                <option value="">Pilih kategori indikator</option>
+                @foreach ($indicatorCategories as $category)
+                    <option value="{{ $category->id }}" data-indicator-target="{{ $category->target_type }}" @selected((string) old('indicator_category_id', $question->indicator_category_id) === (string) $category->id)>{{ $category->name }}{{ $category->status === App\Models\IndicatorCategory::STATUS_INACTIVE ? ' (Nonaktif)' : '' }}</option>
+                @endforeach
+            </x-admin.select>
             <x-admin.select label="Tipe Jawaban" name="answer_type" required data-answer-type>
                 @foreach ([
                     App\Models\Question::TYPE_RATING => 'Rating 1-5',

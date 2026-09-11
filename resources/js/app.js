@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileMenu = document.querySelector('[data-profile-menu]');
     const profileTrigger = document.querySelector('[data-profile-trigger]');
     const notificationMenu = document.querySelector('[data-notification-menu]');
+    const notificationTrigger = notificationMenu?.querySelector('summary');
 
     toggle?.addEventListener('click', () => {
         sidebar?.classList.toggle('is-open');
@@ -149,10 +150,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (profileMenu && !profileMenu.contains(event.target)) {
             profileMenu.open = false;
         }
+
+        if (notificationMenu && !notificationMenu.contains(event.target)) {
+            notificationMenu.open = false;
+        }
     });
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && profileMenu) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        if (notificationMenu?.open) {
+            notificationMenu.open = false;
+            notificationTrigger?.focus();
+            return;
+        }
+
+        if (profileMenu?.open) {
             profileMenu.open = false;
             profileTrigger?.focus();
         }
@@ -534,10 +549,36 @@ const renderQuestionPreview = () => {
 document.addEventListener('DOMContentLoaded', () => {
     const optionList = document.querySelector('[data-option-list]');
     const addOption = document.querySelector('[data-add-option]');
+    const targetSelect = document.querySelector('[data-weight-target]');
+    const indicatorCategorySelect = document.querySelector('[data-indicator-category]');
+
+    const syncIndicatorCategories = () => {
+        if (!(targetSelect instanceof HTMLSelectElement) || !(indicatorCategorySelect instanceof HTMLSelectElement)) {
+            return;
+        }
+
+        const selectedOption = indicatorCategorySelect.selectedOptions[0];
+        if (selectedOption?.value && selectedOption.dataset.indicatorTarget !== targetSelect.value) {
+            indicatorCategorySelect.value = '';
+        }
+
+        Array.from(indicatorCategorySelect.options).forEach((option) => {
+            if (!option.value) {
+                return;
+            }
+
+            const isMatchingTarget = option.dataset.indicatorTarget === targetSelect.value;
+            option.hidden = !isMatchingTarget;
+            option.disabled = !isMatchingTarget;
+        });
+    };
 
     document.querySelector('[data-question-input]')?.addEventListener('input', renderQuestionPreview);
     document.querySelector('[data-answer-type]')?.addEventListener('change', renderQuestionPreview);
-    document.querySelector('[data-weight-target]')?.addEventListener('change', renderQuestionPreview);
+    targetSelect?.addEventListener('change', () => {
+        syncIndicatorCategories();
+        renderQuestionPreview();
+    });
     document.querySelector('[data-question-instruction]')?.addEventListener('input', renderQuestionPreview);
     document.querySelector('[data-question-placeholder]')?.addEventListener('input', renderQuestionPreview);
     document.querySelector('[data-question-rating-min]')?.addEventListener('input', renderQuestionPreview);
@@ -560,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuestionPreview();
     });
 
+    syncIndicatorCategories();
     renderQuestionPreview();
 });
 

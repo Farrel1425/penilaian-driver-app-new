@@ -12856,28 +12856,34 @@ body.auth-app:has(.bpd-login-page) {
 .admin-app .admin-notification-list {
     display: grid;
 }
-.admin-app .admin-notification-list article {
+.admin-app .admin-notification-item {
     align-items: start;
     border-bottom: 1px solid #e6e9e6;
+    color: inherit;
     display: grid;
     gap: 11px;
     grid-template-columns: 9px minmax(0, 1fr);
     padding: 14px 16px;
+    text-decoration: none;
 }
-.admin-app .admin-notification-list article i {
+.admin-app a.admin-notification-item:hover,
+.admin-app a.admin-notification-item:focus-visible {
+    background: #f4f8ef;
+}
+.admin-app .admin-notification-item i {
     background: #c6f300;
     border-radius: 50%;
     height: 8px;
     margin-top: 5px;
     width: 8px;
 }
-.admin-app .admin-notification-list article strong {
+.admin-app .admin-notification-item strong {
     color: #262b27;
     display: block;
     font-size: 13px;
     line-height: 1.3;
 }
-.admin-app .admin-notification-list article small {
+.admin-app .admin-notification-item small {
     color: #596057;
     display: block;
     font-size: 10px;
@@ -13914,6 +13920,7 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .admin-page-heading--master-cabang,
     .admin-app .admin-page-heading--master-pegawai,
     .admin-app .admin-page-heading--kategori-pegawai,
+    .admin-app .admin-page-heading--kategori-indikator,
     .admin-app .admin-page-heading--master-kendaraan,
     .admin-app .admin-page-heading--master-pertanyaan,
     .admin-app .admin-page-heading--permintaan-kerjasama {
@@ -13925,6 +13932,7 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .admin-page-heading--master-cabang .admin-page-heading-actions,
     .admin-app .admin-page-heading--master-pegawai .admin-page-heading-actions,
     .admin-app .admin-page-heading--kategori-pegawai .admin-page-heading-actions,
+    .admin-app .admin-page-heading--kategori-indikator .admin-page-heading-actions,
     .admin-app .admin-page-heading--permintaan-kerjasama .admin-page-heading-actions,
     .admin-app
         .admin-page-heading--master-kendaraan
@@ -14055,6 +14063,7 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .admin-page-heading--master-cabang,
     .admin-app .admin-page-heading--master-pegawai,
     .admin-app .admin-page-heading--kategori-pegawai,
+    .admin-app .admin-page-heading--kategori-indikator,
     .admin-app .admin-page-heading--master-kendaraan,
     .admin-app .admin-page-heading--master-pertanyaan {
         display: grid;

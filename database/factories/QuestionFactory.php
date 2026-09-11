@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\IndicatorCategory;
 use App\Models\Question;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,8 +15,10 @@ class QuestionFactory extends Factory
     {
         return [
             'question' => $this->faker->sentence(),
-            'indicator' => 'Indikator Uji',
             'target_type' => $this->faker->randomElement([Question::TARGET_DRIVER, Question::TARGET_VEHICLE]),
+            'indicator_category_id' => fn (array $attributes) => IndicatorCategory::factory()->create([
+                'target_type' => $attributes['target_type'],
+            ])->id,
             'answer_type' => $this->faker->randomElement([
                 Question::TYPE_RATING,
                 Question::TYPE_YES_NO,

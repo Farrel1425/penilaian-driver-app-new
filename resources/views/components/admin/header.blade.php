@@ -1,5 +1,5 @@
 @props(['title' => 'Dashboard'])
-@php($subtitles = ['Dashboard' => 'Ringkasan aktivitas penilaian driver dan kendaraan.', 'Master Cabang' => 'Kelola data cabang atau unit kerja.', 'Tambah Unit Kerja' => 'Buat data unit kerja baru.', 'Edit Unit Kerja' => 'Perbarui data unit kerja.', 'Detail Unit Kerja' => 'Informasi unit kerja dan data terkait.', 'Master Pegawai' => 'Kelola data pegawai secara lengkap, akurat, dan terstruktur.', 'Tambah Pegawai' => 'Buat data pegawai baru.', 'Edit Pegawai' => 'Perbarui data pegawai.', 'Detail Pegawai' => 'Informasi pegawai dan data terkait.', 'Kategori Pegawai' => 'Kelola kategori dan kebutuhan data SIM pegawai.', 'Tambah Kategori Pegawai' => 'Buat kategori pegawai baru.', 'Edit Kategori Pegawai' => 'Perbarui kategori pegawai.', 'Master Kendaraan' => 'Kelola data kendaraan dan QR Code.', 'Tambah Kendaraan' => 'Buat data kendaraan baru.', 'Edit Kendaraan' => 'Perbarui data kendaraan.', 'Detail Kendaraan' => 'Informasi kendaraan dan data terkait.', 'Master Pertanyaan' => 'Kelola pertanyaan penilaian.', 'Tambah Pertanyaan' => 'Buat konfigurasi pertanyaan baru.', 'Edit Pertanyaan' => 'Perbarui konfigurasi pertanyaan.', 'Detail Pertanyaan' => 'Informasi konfigurasi pertanyaan.', 'Pengguna' => 'Kelola akun administrator dan akses aplikasi.', 'Edit Admin' => 'Perbarui data dan akses akun administrator.', 'Detail Admin' => 'Informasi akun administrator.', 'Monitoring' => 'Pantau aktivitas penilaian yang masuk.', 'Report Driver' => 'Analisis kinerja penilaian driver.', 'Report Kendaraan' => 'Analisis kinerja penilaian kendaraan.', 'Profil Sistem' => 'Kelola identitas dan informasi bantuan sistem.', 'Log Aktivitas' => 'Riwayat aktivitas administrator untuk audit aplikasi.', 'Permintaan Kerjasama' => 'Kelola permintaan penawaran yang dikirim melalui landing page.', 'Detail Permintaan Kerjasama' => 'Informasi lengkap calon mitra dan kebutuhan layanan.'])
+@php($subtitles = ['Dashboard' => 'Ringkasan aktivitas penilaian driver dan kendaraan.', 'Master Cabang' => 'Kelola data cabang atau unit kerja.', 'Tambah Unit Kerja' => 'Buat data unit kerja baru.', 'Edit Unit Kerja' => 'Perbarui data unit kerja.', 'Detail Unit Kerja' => 'Informasi unit kerja dan data terkait.', 'Master Pegawai' => 'Kelola data pegawai secara lengkap, akurat, dan terstruktur.', 'Tambah Pegawai' => 'Buat data pegawai baru.', 'Edit Pegawai' => 'Perbarui data pegawai.', 'Detail Pegawai' => 'Informasi pegawai dan data terkait.', 'Kategori Pegawai' => 'Kelola kategori dan kebutuhan data SIM pegawai.', 'Tambah Kategori Pegawai' => 'Buat kategori pegawai baru.', 'Edit Kategori Pegawai' => 'Perbarui kategori pegawai.', 'Master Kendaraan' => 'Kelola data kendaraan dan QR Code.', 'Tambah Kendaraan' => 'Buat data kendaraan baru.', 'Edit Kendaraan' => 'Perbarui data kendaraan.', 'Detail Kendaraan' => 'Informasi kendaraan dan data terkait.', 'Kategori Indikator' => 'Kelola kategori indikator untuk master pertanyaan.', 'Tambah Kategori Indikator' => 'Buat kategori indikator baru.', 'Edit Kategori Indikator' => 'Perbarui kategori indikator.', 'Master Pertanyaan' => 'Kelola pertanyaan penilaian.', 'Tambah Pertanyaan' => 'Buat konfigurasi pertanyaan baru.', 'Edit Pertanyaan' => 'Perbarui konfigurasi pertanyaan.', 'Detail Pertanyaan' => 'Informasi konfigurasi pertanyaan.', 'Pengguna' => 'Kelola akun administrator dan akses aplikasi.', 'Edit Admin' => 'Perbarui data dan akses akun administrator.', 'Detail Admin' => 'Informasi akun administrator.', 'Monitoring' => 'Pantau aktivitas penilaian yang masuk.', 'Report Driver' => 'Analisis kinerja penilaian driver.', 'Report Kendaraan' => 'Analisis kinerja penilaian kendaraan.', 'Profil Sistem' => 'Kelola identitas dan informasi bantuan sistem.', 'Log Aktivitas' => 'Riwayat aktivitas administrator untuk audit aplikasi.', 'Permintaan Kerjasama' => 'Kelola permintaan penawaran yang dikirim melalui landing page.', 'Detail Permintaan Kerjasama' => 'Informasi lengkap calon mitra dan kebutuhan layanan.'])
 <?php
     $isDashboard = $title === 'Dashboard';
     $isDriverIndex = $title === 'Master Pegawai';
@@ -9,6 +9,7 @@
         'Master Cabang' => ['route' => 'admin.branches.index', 'placeholder' => 'Cari kode, unit kerja, PIC, atau kontak...', 'filters' => ['status']],
         'Master Kendaraan' => ['route' => 'admin.vehicles.index', 'placeholder' => 'Cari nomor polisi, merk, atau Unit Kerja...', 'filters' => ['branch_id', 'status']],
         'Master Pertanyaan' => ['route' => 'admin.questions.index', 'placeholder' => 'Cari pertanyaan atau indikator...', 'filters' => ['target_type', 'status']],
+        'Kategori Indikator' => ['route' => 'admin.indicator-categories.index', 'placeholder' => 'Cari kategori indikator...', 'filters' => ['target_type', 'status']],
         'Permintaan Kerjasama' => ['route' => 'admin.partnership-inquiries.index', 'placeholder' => 'Cari perusahaan, PIC, kontak, atau layanan...', 'filters' => ['start_date', 'end_date', 'status']],
         default => null,
     };
@@ -74,10 +75,17 @@
             <header><strong>Notifikasi</strong><span data-notification-count>{{ $unreadNotifications > 0 ? $unreadNotifications.' Baru' : 'Sudah dibaca' }}</span></header>
             <div class="admin-notification-list">
                 @forelse ($recentNotifications as $notification)
-                    <article>
-                        <i aria-hidden="true"></i>
-                        <div><strong>{{ $notification->description ?: $notification->action }}</strong><small>{{ $notification->module }}{{ $notification->created_at ? ' · '.$notification->created_at->diffForHumans() : '' }}</small></div>
-                    </article>
+                    @if (auth()->user()?->role === \App\Models\User::ROLE_ADMIN)
+                        <a class="admin-notification-item" href="{{ route('admin.activity-logs.index') }}" role="menuitem">
+                            <i aria-hidden="true"></i>
+                            <div><strong>{{ $notification->description ?: $notification->action }}</strong><small>{{ $notification->module }}{{ $notification->created_at ? ' · '.$notification->created_at->diffForHumans() : '' }}</small></div>
+                        </a>
+                    @else
+                        <article class="admin-notification-item">
+                            <i aria-hidden="true"></i>
+                            <div><strong>{{ $notification->description ?: $notification->action }}</strong><small>{{ $notification->module }}{{ $notification->created_at ? ' · '.$notification->created_at->diffForHumans() : '' }}</small></div>
+                        </article>
+                    @endif
                 @empty
                     <p class="admin-notification-empty">Belum ada notifikasi baru.</p>
                 @endforelse

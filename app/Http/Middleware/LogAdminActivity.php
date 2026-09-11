@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Branch;
 use App\Models\Driver;
+use App\Models\IndicatorCategory;
 use App\Models\Question;
 use App\Models\User;
 use App\Models\Vehicle;
@@ -38,6 +39,7 @@ class LogAdminActivity
             str_starts_with($route, 'admin.branches.') => 'Unit Kerja',
             str_starts_with($route, 'admin.employees.') => 'Pegawai',
             str_starts_with($route, 'admin.employee-categories.') => 'Kategori Pegawai',
+            str_starts_with($route, 'admin.indicator-categories.') => 'Kategori Indikator',
             str_starts_with($route, 'admin.vehicles.') => 'Kendaraan',
             str_starts_with($route, 'admin.questions.') => 'Pertanyaan',
             str_starts_with($route, 'admin.users.') => 'Pengguna',
@@ -79,6 +81,7 @@ class LogAdminActivity
             $label = match (true) {
                 $parameter instanceof Branch => $parameter->name,
                 $parameter instanceof Driver => $parameter->full_name,
+                $parameter instanceof IndicatorCategory => $parameter->name,
                 $parameter instanceof Vehicle => $parameter->police_number,
                 $parameter instanceof Question => $parameter->question,
                 $parameter instanceof User => $parameter->name,

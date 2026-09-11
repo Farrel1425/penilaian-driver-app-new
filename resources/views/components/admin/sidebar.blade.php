@@ -15,7 +15,7 @@
         <a class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}" href="{{ route('admin.dashboard') }}"><x-lucide-layout-dashboard class="nav-icon" aria-hidden="true" /><span>Dashboard</span></a>
 
         @if ($isSuperAdmin)
-            @php($masterActive = request()->routeIs('admin.branches.*', 'admin.employees.*', 'admin.employee-categories.*', 'admin.vehicles.*', 'admin.questions.*'))
+            @php($masterActive = request()->routeIs('admin.branches.*', 'admin.employees.*', 'admin.employee-categories.*', 'admin.vehicles.*', 'admin.indicator-categories.*', 'admin.questions.*'))
             <details class="sidebar-nav-group" data-sidebar-group="master-data" @if($masterActive) open @endif>
                 <summary class="sidebar-link sidebar-nav-group-toggle {{ $masterActive ? 'is-active' : '' }}" data-sidebar-group-toggle><x-lucide-database class="nav-icon" aria-hidden="true" /><span>Master Data</span><x-lucide-chevron-down class="sidebar-nav-chevron" aria-hidden="true" /></summary>
                 <div class="sidebar-nav-submenu" aria-label="Master Data">
@@ -23,6 +23,7 @@
                     <a class="{{ request()->routeIs('admin.employee-categories.*') ? 'is-active' : '' }}" href="{{ route('admin.employee-categories.index') }}">Kategori Pegawai</a>
                     <a class="{{ request()->routeIs('admin.employees.*') ? 'is-active' : '' }}" href="{{ route('admin.employees.index') }}">Pegawai</a>
                     <a class="{{ request()->routeIs('admin.vehicles.*') ? 'is-active' : '' }}" href="{{ route('admin.vehicles.index') }}">Kendaraan</a>
+                    <a class="{{ request()->routeIs('admin.indicator-categories.*') ? 'is-active' : '' }}" href="{{ route('admin.indicator-categories.index') }}">Kategori Indikator</a>
                     <a class="{{ request()->routeIs('admin.questions.*') ? 'is-active' : '' }}" href="{{ route('admin.questions.index') }}">Pertanyaan</a>
                 </div>
             </details>

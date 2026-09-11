@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\QuestionRequest;
+use App\Models\IndicatorCategory;
 use App\Models\Question;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,9 @@ class QuestionController extends Controller
             $questions = $query->get();
         } else {
             $questions = $query
-                ->when($request->string('search')->toString(), fn ($query, string $search) => $query->where('question', 'like', "%{$search}%"))
+                ->when($request->string('search')->toString(), fn ($query, string $search) => $query->where(fn ($query) => $query
+                    ->where('question', 'like', "%{$search}%")
+                    ->orWhereHas('indicatorCategory', fn ($query) => $query->where('name', 'like', "%{$search}%"))))
                 ->when($request->string('target_type')->toString(), fn ($query, string $target) => $query->where('target_type', $target))
                 ->when($request->string('answer_type')->toString(), fn ($query, string $type) => $query->where('answer_type', $type))
                 ->when($request->string('status')->toString(), fn ($query, string $status) => $query->where('status', $status))
@@ -38,6 +41,7 @@ class QuestionController extends Controller
     {
         return view('admin.questions.create', [
             'question' => new Question(['status' => Question::STATUS_INACTIVE]),
+            'indicatorCategories' => IndicatorCategory::query()->active()->ordered()->get(),
             'weightSummary' => $this->weightSummary(),
         ]);
     }
@@ -70,6 +74,10 @@ class QuestionController extends Controller
 
         return view('admin.questions.edit', [
             'question' => $question,
+            'indicatorCategories' => IndicatorCategory::query()
+                ->where(fn ($query) => $query->active()->orWhere('id', $question->indicator_category_id))
+                ->ordered()
+                ->get(),
             'weightSummary' => $this->weightSummary($question),
             'returnTo' => $request->string('return_to')->toString() === 'detail' ? 'detail' : 'index',
         ]);

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\IndicatorCategory;
 use App\Models\Question;
 use App\Models\RatingAnswer;
 use App\Models\User;
@@ -20,7 +21,7 @@ class QuestionManagementTest extends TestCase
 
         $this->post(route('admin.questions.store'), [
             'question' => 'Bagaimana keramahan driver?',
-            'indicator' => 'Sikap & Etika',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_DRIVER, 'Sikap & Etika'),
             'target_type' => Question::TARGET_DRIVER,
             'answer_type' => Question::TYPE_RATING,
             'is_required' => '1',
@@ -45,7 +46,7 @@ class QuestionManagementTest extends TestCase
 
         $this->post(route('admin.questions.store'), [
             'question' => 'Bagaimana keramahan driver?',
-            'indicator' => 'Sikap & Etika',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_DRIVER, 'Sikap & Etika'),
             'instruction' => 'Berikan penilaian berdasarkan pengalaman perjalanan Anda.',
             'placeholder' => 'Pilih rating dari 1 sampai 5',
             'rating_min_label' => 'Sangat Buruk',
@@ -75,7 +76,7 @@ class QuestionManagementTest extends TestCase
 
         $this->post(route('admin.questions.store'), [
             'question' => 'Bagian kendaraan mana yang perlu diperbaiki?',
-            'indicator' => 'Tidak dipakai',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_VEHICLE),
             'target_type' => Question::TARGET_VEHICLE,
             'answer_type' => Question::TYPE_MULTIPLE_CHOICE,
             'is_required' => '0',
@@ -93,7 +94,7 @@ class QuestionManagementTest extends TestCase
 
         $this->put(route('admin.questions.update', $question), [
             'question' => 'Bagian kendaraan yang perlu diperbaiki?',
-            'indicator' => 'Tidak dipakai',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_VEHICLE),
             'target_type' => Question::TARGET_VEHICLE,
             'answer_type' => Question::TYPE_CHECKBOX,
             'is_required' => '1',
@@ -116,7 +117,7 @@ class QuestionManagementTest extends TestCase
 
         $this->post(route('admin.questions.store'), [
             'question' => 'Pilih kondisi kendaraan',
-            'indicator' => 'Tidak dipakai',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_VEHICLE),
             'target_type' => Question::TARGET_VEHICLE,
             'answer_type' => Question::TYPE_CHECKBOX,
             'is_required' => '1',
@@ -144,14 +145,14 @@ class QuestionManagementTest extends TestCase
         $this->actingAs(User::factory()->create());
         Question::factory()->create([
             'target_type' => Question::TARGET_DRIVER,
-            'indicator' => 'Sikap & Etika',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_DRIVER, 'Sikap & Etika'),
             'weight' => 85,
             'status' => Question::STATUS_INACTIVE,
         ]);
 
         $this->post(route('admin.questions.store'), [
             'question' => 'Apakah driver tepat waktu?',
-            'indicator' => 'Ketepatan Waktu',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_DRIVER, 'Ketepatan Waktu'),
             'target_type' => Question::TARGET_DRIVER,
             'answer_type' => Question::TYPE_RATING,
             'is_required' => '1',
@@ -176,13 +177,13 @@ class QuestionManagementTest extends TestCase
         $this->assertSame(Question::STATUS_INACTIVE, $question->fresh()->status);
     }
 
-    public function test_vehicle_indicator_is_set_automatically(): void
+    public function test_question_uses_selected_indicator_category(): void
     {
         $this->actingAs(User::factory()->create());
 
         $this->post(route('admin.questions.store'), [
             'question' => 'Apakah kendaraan bersih?',
-            'indicator' => 'Tidak dipakai',
+            'indicator_category_id' => $categoryId = $this->categoryId(Question::TARGET_VEHICLE, Question::VEHICLE_INDICATOR),
             'target_type' => Question::TARGET_VEHICLE,
             'answer_type' => Question::TYPE_RATING,
             'is_required' => '1',
@@ -193,7 +194,7 @@ class QuestionManagementTest extends TestCase
 
         $this->assertDatabaseHas('questions', [
             'question' => 'Apakah kendaraan bersih?',
-            'indicator' => Question::VEHICLE_INDICATOR,
+            'indicator_category_id' => $categoryId,
         ]);
     }
 
@@ -280,5 +281,28 @@ class QuestionManagementTest extends TestCase
 
         $this->assertSame(Question::STATUS_INACTIVE, $question->fresh()->status);
         $this->assertNotNull($question->fresh());
+    }
+
+    public function test_indicator_category_must_match_question_target(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->post(route('admin.questions.store'), [
+            'question' => 'Apakah driver ramah?',
+            'indicator_category_id' => $this->categoryId(Question::TARGET_VEHICLE),
+            'target_type' => Question::TARGET_DRIVER,
+            'answer_type' => Question::TYPE_RATING,
+            'is_required' => '1',
+            'weight' => 100,
+            'status' => Question::STATUS_ACTIVE,
+        ])->assertSessionHasErrors('indicator_category_id');
+    }
+
+    private function categoryId(string $targetType, string $name = 'Indikator Uji'): int
+    {
+        return IndicatorCategory::query()->firstOrCreate(
+            ['name' => $name, 'target_type' => $targetType],
+            ['status' => IndicatorCategory::STATUS_ACTIVE, 'sort_order' => 1],
+        )->id;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\IndicatorCategory;
 use App\Models\Question;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -10,15 +11,8 @@ class QuestionRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
-        if ($this->input('target_type') === Question::TARGET_VEHICLE) {
-            $this->merge(['indicator' => Question::VEHICLE_INDICATOR]);
-        }
-
         if ($this->input('target_type') === Question::TARGET_FEEDBACK) {
-            $this->merge([
-                'indicator' => Question::FEEDBACK_INDICATOR,
-                'weight' => 0,
-            ]);
+            $this->merge(['weight' => 0]);
         }
     }
 
@@ -36,7 +30,7 @@ class QuestionRequest extends FormRequest
             'rating_min_label' => ['nullable', 'string', 'max:100'],
             'rating_max_label' => ['nullable', 'string', 'max:100'],
             'icon' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-            'indicator' => ['required', 'string', 'max:255'],
+            'indicator_category_id' => ['required', 'integer', Rule::exists(IndicatorCategory::class, 'id')],
             'target_type' => ['required', Rule::in([Question::TARGET_DRIVER, Question::TARGET_VEHICLE, Question::TARGET_FEEDBACK])],
             'answer_type' => ['required', Rule::in([
                 Question::TYPE_RATING,
@@ -61,6 +55,19 @@ class QuestionRequest extends FormRequest
             if (in_array($this->input('answer_type'), [Question::TYPE_MULTIPLE_CHOICE, Question::TYPE_CHECKBOX], true)
                 && count($this->normalizedOptions()) < 1) {
                 $validator->errors()->add('options', 'Opsi jawaban wajib diisi untuk tipe pilihan.');
+            }
+
+            if (! $validator->errors()->hasAny(['indicator_category_id', 'target_type'])) {
+                $category = IndicatorCategory::query()->find($this->integer('indicator_category_id'));
+                $currentQuestion = $this->route('question');
+                $isCurrentCategory = $currentQuestion instanceof Question
+                    && $currentQuestion->indicator_category_id === $category?->id;
+
+                if ($category?->target_type !== $this->string('target_type')->toString()) {
+                    $validator->errors()->add('indicator_category_id', 'Kategori indikator tidak sesuai dengan target pertanyaan.');
+                } elseif ($category->status !== IndicatorCategory::STATUS_ACTIVE && ! $isCurrentCategory) {
+                    $validator->errors()->add('indicator_category_id', 'Kategori indikator yang dipilih sudah tidak aktif.');
+                }
             }
 
             if ($validator->errors()->hasAny(['target_type', 'weight'])) {
@@ -100,7 +107,7 @@ class QuestionRequest extends FormRequest
             'placeholder',
             'rating_min_label',
             'rating_max_label',
-            'indicator',
+            'indicator_category_id',
             'target_type',
             'answer_type',
             'is_required',
