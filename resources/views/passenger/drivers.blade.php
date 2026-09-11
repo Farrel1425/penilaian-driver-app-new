@@ -8,8 +8,7 @@
     <section class="passenger-driver-page">
         <div class="passenger-driver-list">
             @forelse($drivers as $driver)
-                <a @class(['passenger-driver-option', 'is-recommended' => $loop->first]) href="{{ route('passenger.rating.driver', [$vehicle->qr_token, $driver]) }}">
-                    @if($loop->first)<span class="passenger-driver-recommendation"><x-lucide-badge-check aria-hidden="true" /> Rekomendasi Driver</span>@endif
+                <a class="passenger-driver-option" href="{{ route('passenger.rating.driver', [$vehicle->qr_token, $driver]) }}">
                     <div class="passenger-driver-photo">
                         @if ($driver->photo)
                             <img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/' . $driver->photo) }}" alt="{{ $driver->full_name }}">

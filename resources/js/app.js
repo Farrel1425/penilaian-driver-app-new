@@ -1,6 +1,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import lottie from 'lottie-web/build/player/lottie_light';
+import QrScanner from 'qr-scanner';
 import '../css/passenger.css';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -824,20 +825,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    let stream;
-    let detector;
-    let scanTimer;
+    let qrScanner;
 
     const stopCamera = () => {
-        window.clearTimeout(scanTimer);
-        stream?.getTracks().forEach((track) => track.stop());
-        stream = undefined;
-        video.srcObject = null;
+        qrScanner?.stop();
     };
 
     const closeScanner = () => {
         stopCamera();
         scanner.hidden = true;
+        document.body.classList.remove('is-passenger-scanner-open');
         retryButton.hidden = true;
         openButton.focus();
     };
@@ -851,64 +848,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const openRating = (rawValue) => {
         try {
             const url = new URL(rawValue, window.location.origin);
-            const routePrefix = '/rating/';
+            const routeMatch = url.pathname.match(/^\/rating\/([a-zA-Z0-9]{40})(?:\/|$)/);
 
-            if (url.origin !== window.location.origin || !url.pathname.startsWith(routePrefix) || url.pathname.slice(routePrefix.length).split('/')[0] === '') {
+            if (!routeMatch) {
                 setFailure('QR ini bukan QR kendaraan yang valid. Arahkan kamera ke QR kendaraan yang benar.');
 
                 return;
             }
 
             stopCamera();
-            window.location.assign(`${url.origin}${url.pathname}`);
+            window.location.assign(`${window.location.origin}/rating/${routeMatch[1]}`);
         } catch {
             setFailure('QR ini tidak dapat dibaca. Coba arahkan kamera kembali ke QR kendaraan.');
         }
-    };
-
-    const detect = async () => {
-        if (!stream || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
-            scanTimer = window.setTimeout(detect, 200);
-
-            return;
-        }
-
-        try {
-            const codes = await detector.detect(video);
-            const code = codes.find((item) => item.rawValue);
-
-            if (code?.rawValue) {
-                openRating(code.rawValue);
-
-                return;
-            }
-        } catch {
-            // The next frame can still be decoded normally.
-        }
-
-        scanTimer = window.setTimeout(detect, 200);
     };
 
     const startScanner = async () => {
         retryButton.hidden = true;
         status.textContent = 'Meminta akses kamera...';
 
-        if (!('BarcodeDetector' in window) || !navigator.mediaDevices?.getUserMedia) {
-            setFailure('Browser ini belum mendukung pemindai QR. Gunakan Chrome versi terbaru atau buka QR melalui kamera perangkat Anda.');
+        if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+            setFailure('Kamera memerlukan koneksi HTTPS. Buka halaman ini melalui domain HTTPS lalu coba kembali.');
 
             return;
         }
 
         try {
-            detector = new window.BarcodeDetector({ formats: ['qr_code'] });
-            stream = await navigator.mediaDevices.getUserMedia({
-                audio: false,
-                video: { facingMode: { ideal: 'environment' } },
-            });
-            video.srcObject = stream;
-            await video.play();
+            qrScanner ??= new QrScanner(
+                video,
+                (result) => openRating(result.data),
+                {
+                    highlightCodeOutline: true,
+                    highlightScanRegion: true,
+                    preferredCamera: 'environment',
+                    returnDetailedScanResult: true,
+                },
+            );
+
+            await qrScanner.start();
             status.textContent = 'Arahkan QR kendaraan ke dalam kotak pemindai.';
-            detect();
         } catch {
             setFailure('Kamera tidak dapat digunakan. Izinkan akses kamera lalu coba kembali.');
         }
@@ -916,6 +894,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     openButton.addEventListener('click', () => {
         scanner.hidden = false;
+        document.body.classList.add('is-passenger-scanner-open');
         startScanner();
     });
     scanner.querySelectorAll('[data-passenger-qr-scanner-close]').forEach((button) => button.addEventListener('click', closeScanner));
@@ -925,6 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeScanner();
         }
     });
+    window.addEventListener('pagehide', () => qrScanner?.destroy(), { once: true });
 });
 
 document.addEventListener('DOMContentLoaded', () => {

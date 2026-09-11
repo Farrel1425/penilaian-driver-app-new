@@ -1,6 +1,7 @@
 /* Mobile-first passenger rating flow. */
 .passenger-shell {
     background: #eef3ee;
+    color-scheme: light only;
 }
 
 .passenger-app {
@@ -344,6 +345,16 @@
     width: 100%;
 }
 
+.passenger-vehicle-continue svg,
+.passenger-driver-select svg,
+.passenger-assessor-footer button svg,
+.passenger-scroll-footer button svg,
+.passenger-success-finish svg {
+    flex: 0 0 18px;
+    height: 18px;
+    width: 18px;
+}
+
 .passenger-vehicle-rescan,
 .passenger-driver-other {
     align-items: center;
@@ -360,6 +371,12 @@
     width: 100%;
 }
 
+.passenger-vehicle-rescan svg {
+    flex: 0 0 18px;
+    height: 18px;
+    width: 18px;
+}
+
 .passenger-driver-list {
     display: grid;
     gap: 12px;
@@ -373,23 +390,6 @@
     grid-template-columns: 58px minmax(0, 1fr) auto;
     padding: 12px;
     position: relative;
-}
-
-.passenger-driver-option.is-recommended {
-    margin-top: 28px;
-    padding-top: 28px;
-}
-
-.passenger-driver-recommendation {
-    align-items: center;
-    color: var(--passenger-green);
-    display: flex;
-    font-size: 11px;
-    font-weight: 750;
-    gap: 5px;
-    left: 12px;
-    position: absolute;
-    top: 8px;
 }
 
 .passenger-driver-photo,
@@ -460,7 +460,7 @@
 }
 
 .passenger-driver-help {
-    align-items: flex-start;
+    align-items: center;
     background: #f0f5ef;
     border: 1px solid var(--passenger-line);
     border-radius: 8px;
@@ -468,10 +468,16 @@
     font-size: 12px;
     gap: 8px;
     margin-top: 14px;
-    padding: 13px;
+    padding: 11px 12px;
 }
 
-.passenger-driver-help svg,
+.passenger-driver-help svg {
+    color: var(--passenger-green);
+    flex: 0 0 18px;
+    height: 18px;
+    width: 18px;
+}
+
 .passenger-driver-detail-icon {
     color: var(--passenger-green);
 }
@@ -852,6 +858,131 @@
 
 .passenger-success-finish {
     text-decoration: none;
+}
+
+.is-passenger-scanner-open {
+    overflow: hidden;
+}
+
+.passenger-qr-scanner[hidden] {
+    display: none;
+}
+
+.passenger-qr-scanner {
+    display: grid;
+    inset: 0;
+    padding: 16px;
+    place-items: center;
+    position: fixed;
+    z-index: 100;
+}
+
+.passenger-qr-scanner-backdrop {
+    background: rgb(14 22 17 / 72%);
+    border: 0;
+    inset: 0;
+    padding: 0;
+    position: absolute;
+}
+
+.passenger-qr-scanner-dialog {
+    background: #fff;
+    border: 1px solid var(--passenger-card-line);
+    border-radius: 8px;
+    box-shadow: 0 20px 50px rgb(0 0 0 / 25%);
+    max-height: calc(100svh - 32px);
+    overflow: auto;
+    padding: 16px;
+    position: relative;
+    width: min(100%, 400px);
+}
+
+.passenger-qr-scanner-dialog > header {
+    align-items: flex-start;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.passenger-qr-scanner-dialog > header span {
+    color: var(--passenger-green);
+    display: block;
+    font-size: 10px;
+    font-weight: 750;
+    margin-bottom: 3px;
+}
+
+.passenger-qr-scanner-dialog > header h2 {
+    font-size: 17px;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.passenger-qr-scanner-dialog > header button {
+    align-items: center;
+    background: #f0f5ef;
+    border: 1px solid var(--passenger-card-line);
+    border-radius: 50%;
+    color: var(--passenger-ink);
+    display: flex;
+    flex: 0 0 36px;
+    height: 36px;
+    justify-content: center;
+    padding: 0;
+    width: 36px;
+}
+
+.passenger-qr-scanner-dialog > header button svg,
+.passenger-qr-scanner-retry svg {
+    height: 17px;
+    width: 17px;
+}
+
+.passenger-qr-scanner-viewport {
+    aspect-ratio: 1;
+    background: #172019;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.passenger-qr-scanner-viewport video,
+.passenger-qr-scanner-viewport canvas {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.passenger-qr-scanner-frame {
+    border: 2px solid #fff;
+    border-radius: 8px;
+    inset: 14%;
+    pointer-events: none;
+    position: absolute;
+}
+
+.passenger-qr-scanner-dialog > p {
+    color: var(--passenger-copy);
+    font-size: 12px;
+    line-height: 1.45;
+    margin: 12px 0 0;
+    text-align: center;
+}
+
+.passenger-qr-scanner-retry {
+    align-items: center;
+    background: var(--passenger-green);
+    border: 1px solid var(--passenger-green);
+    border-radius: 8px;
+    color: #fff;
+    display: flex;
+    font-weight: 700;
+    gap: 7px;
+    justify-content: center;
+    margin-top: 12px;
+    min-height: 44px;
+    width: 100%;
 }
 
 @media (min-width: 441px) {
