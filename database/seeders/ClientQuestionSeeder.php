@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Question;
-use App\Models\RatingAnswer;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -12,9 +11,6 @@ class ClientQuestionSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function (): void {
-            RatingAnswer::query()->delete();
-            Question::query()->delete();
-
             $this->createRatings(Question::TARGET_DRIVER, [
                 ['Sikap & Etika', 'Apakah driver bersikap ramah, sopan, dan menghormati penumpang selama memberikan pelayanan?', 15],
                 ['Keselamatan Mengemudi', 'Apakah driver mengemudi dengan aman, hati-hati, dan tidak membahayakan penumpang selama perjalanan?', 20],
@@ -35,43 +31,51 @@ class ClientQuestionSeeder extends Seeder
                 [Question::VEHICLE_INDICATOR, 'Secara keseluruhan, apakah kendaraan memenuhi standar pelayanan yang diharapkan?', 15],
             ], 8);
 
-            $feedback = Question::query()->create([
+            $feedback = Question::query()->updateOrCreate([
+                'target_type' => Question::TARGET_FEEDBACK,
+                'sort_order' => 15,
+            ], [
                 'question' => 'Apakah terdapat kondisi kendaraan atau pelayanan driver yang menurut Anda perlu segera ditindaklanjuti?',
                 'instruction' => 'Pilih kondisi yang paling sesuai dengan pengalaman Anda.',
                 'placeholder' => null,
                 'rating_min_label' => null,
                 'rating_max_label' => null,
                 'indicator' => Question::FEEDBACK_INDICATOR,
-                'target_type' => Question::TARGET_FEEDBACK,
                 'answer_type' => Question::TYPE_MULTIPLE_CHOICE,
                 'is_required' => false,
                 'weight' => 0,
-                'sort_order' => 15,
                 'status' => Question::STATUS_ACTIVE,
             ]);
 
-            foreach ([
+            $feedbackOptions = [
                 'Tidak ada',
                 'Ada - masalah driver',
                 'Ada - masalah kendaraan',
                 'Ada - masalah keselamatan',
                 'Ada - lainnya',
-            ] as $index => $option) {
-                $feedback->options()->create(['option_text' => $option, 'sort_order' => $index + 1]);
-            }
+            ];
 
-            Question::query()->create([
+            foreach ($feedbackOptions as $index => $option) {
+                $feedback->options()->updateOrCreate(
+                    ['sort_order' => $index + 1],
+                    ['option_text' => $option],
+                );
+            }
+            $feedback->options()->whereNotIn('sort_order', range(1, count($feedbackOptions)))->delete();
+
+            Question::query()->updateOrCreate([
+                'target_type' => Question::TARGET_FEEDBACK,
+                'sort_order' => 16,
+            ], [
                 'question' => 'Mohon jelaskan kondisi yang perlu ditindaklanjuti.',
                 'instruction' => 'Kolom ini akan muncul bila Anda melaporkan adanya masalah.',
                 'placeholder' => 'Tuliskan kondisi atau keluhan Anda...',
                 'rating_min_label' => null,
                 'rating_max_label' => null,
                 'indicator' => Question::FEEDBACK_INDICATOR,
-                'target_type' => Question::TARGET_FEEDBACK,
                 'answer_type' => Question::TYPE_PARAGRAPH,
                 'is_required' => false,
                 'weight' => 0,
-                'sort_order' => 16,
                 'status' => Question::STATUS_ACTIVE,
             ]);
         });
@@ -83,20 +87,23 @@ class ClientQuestionSeeder extends Seeder
     private function createRatings(string $targetType, array $questions, int $startOrder): void
     {
         foreach ($questions as $offset => [$indicator, $question, $weight]) {
-            Question::query()->create([
+            $sortOrder = $startOrder + $offset;
+            $rating = Question::query()->updateOrCreate([
+                'target_type' => $targetType,
+                'sort_order' => $sortOrder,
+            ], [
                 'question' => $question,
                 'instruction' => null,
                 'placeholder' => null,
                 'rating_min_label' => 'Sangat Buruk',
                 'rating_max_label' => 'Sangat Baik',
                 'indicator' => $indicator,
-                'target_type' => $targetType,
                 'answer_type' => Question::TYPE_RATING,
                 'is_required' => true,
                 'weight' => $weight,
-                'sort_order' => $startOrder + $offset,
                 'status' => Question::STATUS_ACTIVE,
             ]);
+            $rating->options()->delete();
         }
     }
 }
