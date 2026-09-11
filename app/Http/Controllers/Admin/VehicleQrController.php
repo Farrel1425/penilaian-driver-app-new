@@ -29,7 +29,7 @@ class VehicleQrController extends Controller
 
         return Pdf::loadView('admin.vehicles.qr-download', [
             'vehicle' => $vehicle,
-            'qrDataUri' => $qrCode->dataUri($vehicle, size: 420),
+            'qrDataUri' => $qrCode->pngDataUri($vehicle, size: 720),
         ])->setPaper('a4')->download($filename);
     }
 

@@ -55,7 +55,8 @@ class VehicleQrCodeTest extends TestCase
         $this->get(route('admin.vehicles.qr.download', $vehicle))
             ->assertOk()
             ->assertHeader('Content-Type', 'application/pdf')
-            ->assertHeader('Content-Disposition', 'attachment; filename=qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.pdf');
+            ->assertHeader('Content-Disposition', 'attachment; filename=qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.pdf')
+            ->assertSee('%PDF', false);
     }
 
     public function test_admin_can_open_vehicle_qr_print_page(): void
