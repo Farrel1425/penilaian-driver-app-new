@@ -40,6 +40,11 @@ class User extends Authenticatable
         return $this->hasMany(ActivityLog::class);
     }
 
+    public function enteredDriverAttendances(): HasMany
+    {
+        return $this->hasMany(DriverAttendance::class, 'entered_by');
+    }
+
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);

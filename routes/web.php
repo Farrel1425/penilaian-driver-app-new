@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\EmployeeCategoryController;
 use App\Http\Controllers\Admin\IndicatorCategoryController;
 use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\OperationalMonitoringController;
 use App\Http\Controllers\Admin\PartnershipInquiryController as AdminPartnershipInquiryController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ReportBranchController;
@@ -63,6 +64,14 @@ Route::middleware(['auth', 'active.admin', 'admin.inactivity', LogAdminActivity:
             Route::get('penilaian/riwayat/export', [MonitoringController::class, 'export'])->name('assessments.export');
             Route::get('penilaian/riwayat/{rating}', [MonitoringController::class, 'show'])->name('assessments.show');
             Route::get('penilaian/rekap', [MonitoringController::class, 'recap'])->name('assessments.recap');
+            Route::get('penilaian/monitoring', [OperationalMonitoringController::class, 'index'])->name('monitoring.index');
+            Route::get('penilaian/monitoring/report', [OperationalMonitoringController::class, 'report'])->name('monitoring.report');
+            Route::get('penilaian/monitoring/export', [OperationalMonitoringController::class, 'export'])->name('monitoring.export');
+            Route::get('penilaian/monitoring/{branch}', [OperationalMonitoringController::class, 'show'])->name('monitoring.show');
+            Route::get('penilaian/monitoring/{branch}/report', [OperationalMonitoringController::class, 'report'])->name('monitoring.branch.report');
+            Route::get('penilaian/monitoring/{branch}/export', [OperationalMonitoringController::class, 'export'])->name('monitoring.branch.export');
+            Route::get('penilaian/monitoring/{branch}/drivers/{driver}', [OperationalMonitoringController::class, 'driver'])->name('monitoring.driver');
+            Route::post('penilaian/monitoring/{branch}/drivers/{driver}/attendance', [OperationalMonitoringController::class, 'storeAttendance'])->name('monitoring.attendance.store');
             Route::get('reports/drivers', ReportDriverController::class)->name('reports.drivers');
             Route::get('reports/vehicles', ReportVehicleController::class)->name('reports.vehicles');
             Route::get('reports/branches', ReportBranchController::class)->name('reports.branches');
@@ -72,7 +81,6 @@ Route::middleware(['auth', 'active.admin', 'admin.inactivity', LogAdminActivity:
         });
 
         Route::middleware('super.admin')->group(function (): void {
-            Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
             Route::get('partnership-inquiries', [AdminPartnershipInquiryController::class, 'index'])->name('partnership-inquiries.index');
             Route::get('partnership-inquiries/{partnershipInquiry}', [AdminPartnershipInquiryController::class, 'show'])->name('partnership-inquiries.show');
             Route::patch('partnership-inquiries/{partnershipInquiry}/status', [AdminPartnershipInquiryController::class, 'updateStatus'])->name('partnership-inquiries.status');

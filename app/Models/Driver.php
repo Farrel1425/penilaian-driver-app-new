@@ -77,6 +77,11 @@ class Driver extends Model
         return $this->hasMany(Rating::class);
     }
 
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(DriverAttendance::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_ACTIVE);

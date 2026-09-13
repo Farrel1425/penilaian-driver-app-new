@@ -20,7 +20,7 @@ class AdminReportTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $this->get(route('admin.dashboard'))->assertOk()->assertSee('Total Penilaian')->assertSee('Belum ada');
-        $this->get(route('admin.monitoring.index'))->assertOk()->assertSee('Belum ada penilaian');
+        $this->get(route('admin.monitoring.index'))->assertOk()->assertSee('Belum ada unit kerja');
         $this->get(route('admin.reports.drivers'))->assertOk()->assertSee('Report Driver');
         $this->get(route('admin.reports.vehicles'))->assertOk()->assertSee('Report Kendaraan');
     }
@@ -60,7 +60,7 @@ class AdminReportTest extends TestCase
             ->assertDontSee($driverB->full_name);
     }
 
-    public function test_date_range_filter_limits_monitoring_data(): void
+    public function test_date_range_filter_limits_assessment_history(): void
     {
         $this->actingAs(User::factory()->create());
         [$branch, $driver, $vehicle] = $this->makeEntities();
@@ -68,7 +68,7 @@ class AdminReportTest extends TestCase
         $old = $this->makeRating($branch, $driver, $vehicle, $question, 2, '2026-08-01 10:00:00');
         $new = $this->makeRating($branch, $driver, $vehicle, $question, 4, '2026-08-12 10:00:00');
 
-        $this->get(route('admin.monitoring.index', ['start_date' => '2026-08-10', 'end_date' => '2026-08-13']))
+        $this->get(route('admin.assessments.index', ['start_date' => '2026-08-10', 'end_date' => '2026-08-13']))
             ->assertOk()
             ->assertSee($new->submitted_at->format('d M Y'))
             ->assertDontSee($old->submitted_at->format('d M Y'));

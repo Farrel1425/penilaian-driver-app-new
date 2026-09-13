@@ -1188,3 +1188,71 @@ document.addEventListener('click', (event) => {
     group.open = !group.open;
     window.localStorage.setItem(`sidebar-group-${group.dataset.sidebarGroup}-open`, String(group.open));
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.querySelector('[data-attendance-modal]');
+    const form = modal?.querySelector('[data-attendance-form]');
+    const driverName = modal?.querySelector('[data-attendance-driver]');
+    const identity = modal?.querySelector('[data-attendance-identity]');
+    const driverId = form?.elements.namedItem('attendance_driver_id');
+    const scoreOutput = modal?.querySelector('[data-attendance-score]');
+    const totalOutput = modal?.querySelector('[data-attendance-total]');
+
+    if (!modal || !form || !driverId || !driverName || !identity || !scoreOutput || !totalOutput) {
+        return;
+    }
+
+    const fields = {
+        present: form.elements.namedItem('present_days'),
+        sick: form.elements.namedItem('sick_days'),
+        permitted: form.elements.namedItem('permitted_days'),
+        absent: form.elements.namedItem('absent_days'),
+    };
+
+    const value = (field) => Math.max(0, Number.parseInt(field?.value || '0', 10) || 0);
+    const refreshScore = () => {
+        const present = value(fields.present);
+        const sick = value(fields.sick);
+        const permitted = value(fields.permitted);
+        const absent = value(fields.absent);
+        const total = present + sick + permitted + absent;
+        const points = (present * 100) + (sick * 75) + (permitted * 50);
+        totalOutput.textContent = String(total);
+        scoreOutput.textContent = total > 0 ? (points / total).toFixed(1) : '0.0';
+        scoreOutput.classList.toggle('is-invalid', total > 31);
+    };
+
+    const openModal = (trigger) => {
+        form.action = trigger.dataset.action || '';
+        driverId.value = trigger.dataset.driverId || '';
+        driverName.textContent = trigger.dataset.driver || 'Driver';
+        identity.textContent = trigger.dataset.identity || '';
+        fields.present.value = trigger.dataset.present || '0';
+        fields.sick.value = trigger.dataset.sick || '0';
+        fields.permitted.value = trigger.dataset.permitted || '0';
+        fields.absent.value = trigger.dataset.absent || '0';
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        refreshScore();
+        fields.present.focus();
+    };
+
+    const closeModal = () => {
+        modal.hidden = true;
+        document.body.style.removeProperty('overflow');
+    };
+
+    document.querySelectorAll('[data-attendance-open]').forEach((trigger) => {
+        trigger.addEventListener('click', () => openModal(trigger));
+    });
+    Object.values(fields).forEach((field) => field?.addEventListener('input', refreshScore));
+    modal.querySelectorAll('[data-attendance-close]').forEach((button) => button.addEventListener('click', closeModal));
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) closeModal();
+    });
+
+    if (modal.dataset.errorDriverId) {
+        const trigger = document.querySelector(`[data-attendance-open][data-driver-id="${CSS.escape(modal.dataset.errorDriverId)}"]`);
+        if (trigger) openModal(trigger);
+    }
+});

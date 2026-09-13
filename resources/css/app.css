@@ -1254,6 +1254,1014 @@ button {
     }
 }
 
+/* Operational monitoring */
+.admin-app .admin-page-heading--monitoring,
+.admin-app .admin-page-heading--detail-monitoring,
+.admin-app .admin-page-heading--preview-penilaian,
+.admin-app .admin-page-heading--laporan-monitoring {
+    align-items: end;
+}
+.monitoring-period-panel,
+.monitoring-detail-actions,
+.monitoring-detail-actions form,
+.monitoring-report-actions {
+    align-items: end;
+    display: flex;
+    gap: 8px;
+}
+.monitoring-period-panel label,
+.monitoring-detail-actions label {
+    display: grid;
+    gap: 5px;
+}
+.monitoring-period-panel label span,
+.monitoring-detail-actions label span {
+    color: #444933;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.monitoring-period-panel input,
+.monitoring-detail-actions input {
+    background: #fff;
+    border: 1px solid #c4c9ac;
+    border-radius: 8px;
+    color: #191c1b;
+    height: 38px;
+    padding: 0 10px;
+}
+.monitoring-period-panel .secondary-button svg,
+.monitoring-detail-actions .secondary-button svg {
+    flex: 0 0 16px;
+    height: 16px;
+    width: 16px;
+}
+.monitoring-print-button,
+.monitoring-view-button,
+.monitoring-update-button {
+    align-items: center;
+    background: #007f36;
+    border: 1px solid #007f36;
+    border-radius: 8px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 700;
+    gap: 7px;
+    justify-content: center;
+    line-height: 1.2;
+    min-height: 38px;
+    padding: 7px 12px;
+    text-align: center;
+}
+.monitoring-print-button:hover,
+.monitoring-view-button:hover,
+.monitoring-update-button:hover {
+    background: #00652b;
+    border-color: #00652b;
+}
+.monitoring-print-button svg,
+.monitoring-view-button svg {
+    height: 15px;
+    width: 15px;
+}
+.monitoring-intro {
+    margin: -4px 0 18px;
+}
+.monitoring-intro h2 {
+    color: #191c1b;
+    font-size: 46px;
+    letter-spacing: 0;
+    line-height: 1.04;
+    margin: 0 0 8px;
+}
+.monitoring-intro p {
+    color: #444933;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+}
+.monitoring-detail-intro h2,
+.monitoring-preview-intro h2 {
+    font-size: 42px;
+}
+.monitoring-panel {
+    background: #fff;
+    border: 1px solid rgba(196, 201, 172, .45);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .025);
+    overflow: hidden;
+}
+.monitoring-panel-header {
+    align-items: center;
+    border-bottom: 1px solid #e7eae7;
+    display: flex;
+    justify-content: space-between;
+    min-height: 72px;
+    padding: 15px 18px;
+}
+.monitoring-panel-header h3,
+.monitoring-profile-card h3,
+.monitoring-evaluation-section h3,
+.monitoring-comparison-card h3,
+.monitoring-comments-card h3,
+.monitoring-grade-card h3,
+.monitoring-attendance-card h3 {
+    color: #191c1b;
+    font-size: 17px;
+    margin: 0;
+}
+.monitoring-panel-header p,
+.monitoring-evaluation-section header p,
+.monitoring-attendance-card header p {
+    color: #5f5e5e;
+    font-size: 11px;
+    margin: 3px 0 0;
+}
+.monitoring-status-tabs {
+    align-items: stretch;
+    background: #f2f4f2;
+    border: 1px solid #dfe3d7;
+    border-radius: 8px;
+    display: flex;
+    padding: 3px;
+}
+.monitoring-status-tabs a {
+    align-items: center;
+    border-radius: 6px;
+    color: #444933;
+    display: flex;
+    font-size: 11px;
+    gap: 4px;
+    justify-content: center;
+    min-height: 31px;
+    padding: 4px 12px;
+}
+.monitoring-status-tabs a.is-active {
+    background: #fff;
+    color: #191c1b;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+.monitoring-table {
+    min-width: 1040px;
+}
+.monitoring-table th {
+    background: #f2f4f2;
+    color: #444933;
+    font-size: 9px;
+    line-height: 1.2;
+    padding: 11px 10px;
+    text-transform: uppercase;
+}
+.monitoring-table td {
+    color: #191c1b;
+    font-size: 11px;
+    padding: 13px 10px;
+    vertical-align: middle;
+}
+.monitoring-table td strong,
+.monitoring-table td small {
+    display: block;
+}
+.monitoring-table td small {
+    color: #697069;
+    font-size: 9px;
+    line-height: 1.35;
+    margin-top: 3px;
+}
+.monitoring-code {
+    background: #edf0ed;
+    border: 1px solid #d9ded4;
+    border-radius: 4px;
+    color: #30342f;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 6px;
+}
+.monitoring-score {
+    color: #007f36;
+    font-size: 13px;
+}
+.monitoring-final-score {
+    align-items: center;
+    background: rgba(209, 255, 26, .34);
+    border-radius: 6px;
+    color: #2e3c00;
+    display: inline-flex !important;
+    font-size: 13px;
+    justify-content: center;
+    min-height: 30px;
+    min-width: 44px;
+}
+.monitoring-completeness {
+    align-items: center;
+    border: 1px solid;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 9px;
+    font-weight: 700;
+    gap: 4px;
+    padding: 5px 8px;
+    white-space: nowrap;
+}
+.monitoring-completeness svg {
+    height: 11px;
+    width: 11px;
+}
+.monitoring-completeness.is-complete {
+    background: #e7f9ef;
+    border-color: #82dca6;
+    color: #007f36;
+}
+.monitoring-completeness.is-incomplete {
+    background: #fff7df;
+    border-color: #f0cb57;
+    color: #9a6100;
+}
+.monitoring-row-actions {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+}
+.monitoring-view-button,
+.monitoring-update-button {
+    font-size: 10px;
+    min-height: 32px;
+    padding: 5px 9px;
+}
+.monitoring-update-button {
+    background: #edf0ed;
+    border-color: #d7dcd3;
+    color: #253127;
+    max-width: 76px;
+}
+.monitoring-update-button:hover {
+    background: #dde3dd;
+    border-color: #c4c9ac;
+    color: #191c1b;
+}
+.monitoring-icon-button {
+    align-items: center;
+    border: 1px solid #dce1d8;
+    border-radius: 7px;
+    color: #536052;
+    display: inline-flex;
+    flex: 0 0 32px;
+    height: 32px;
+    justify-content: center;
+    width: 32px;
+}
+.monitoring-icon-button:hover {
+    background: #edf5ee;
+    color: #007f36;
+}
+.monitoring-icon-button svg {
+    height: 14px;
+    width: 14px;
+}
+.monitoring-panel-footer {
+    align-items: center;
+    color: #697069;
+    display: flex;
+    font-size: 10px;
+    justify-content: space-between;
+    min-height: 48px;
+    padding: 9px 15px;
+}
+.monitoring-driver {
+    align-items: center;
+    display: flex;
+    gap: 9px;
+    min-width: 180px;
+}
+.monitoring-avatar {
+    align-items: center;
+    background: #e8efe8;
+    border: 1px solid #c4c9ac;
+    border-radius: 50%;
+    color: #006e2c;
+    display: flex;
+    flex: 0 0 34px;
+    font-size: 12px;
+    font-weight: 800;
+    height: 34px;
+    justify-content: center;
+    overflow: hidden;
+}
+.monitoring-avatar img,
+.monitoring-profile-photo img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+.monitoring-attendance-recap {
+    white-space: nowrap;
+}
+.monitoring-attendance-recap b {
+    display: inline !important;
+}
+.monitoring-muted {
+    color: #7b827a;
+    font-size: 10px;
+}
+.monitoring-modal[hidden] {
+    display: none;
+}
+.monitoring-modal {
+    align-items: center;
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 20px;
+    position: fixed;
+    z-index: 1200;
+}
+.monitoring-modal-backdrop {
+    background: rgba(20, 23, 21, .78);
+    border: 0;
+    inset: 0;
+    position: absolute;
+}
+.monitoring-modal-card {
+    background: #fff;
+    border: 1px solid rgba(196, 201, 172, .5);
+    border-radius: 8px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, .25);
+    max-width: 680px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+.monitoring-modal-card > header {
+    align-items: center;
+    background: rgba(242, 244, 242, .8);
+    border-bottom: 1px solid #e5e8e5;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 40px 1fr 32px;
+    padding: 17px 22px;
+}
+.monitoring-modal-icon {
+    align-items: center;
+    background: #007f36;
+    border-radius: 8px;
+    color: #fff;
+    display: inline-flex;
+    height: 38px;
+    justify-content: center;
+    width: 38px;
+}
+.monitoring-modal-icon svg {
+    height: 19px;
+    width: 19px;
+}
+.monitoring-modal-card h3,
+.monitoring-modal-card p {
+    margin: 0;
+}
+.monitoring-modal-card h3 {
+    color: #191c1b;
+    font-size: 18px;
+}
+.monitoring-modal-card p {
+    color: #5f5e5e;
+    font-size: 11px;
+    margin-top: 3px;
+}
+.monitoring-modal-close {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #444933;
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    padding: 0;
+    width: 32px;
+}
+.monitoring-modal-context {
+    align-items: center;
+    background: #f8faf7;
+    border-bottom: 1px solid #e7eae7;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 13px 22px;
+}
+.monitoring-modal-context strong {
+    color: #191c1b;
+    font-size: 13px;
+}
+.monitoring-modal-context span {
+    color: #5f5e5e;
+    font-size: 11px;
+}
+.monitoring-modal-context b {
+    background: #007f36;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 10px;
+    margin-left: auto;
+    padding: 5px 8px;
+}
+.monitoring-modal-card form {
+    padding: 20px 22px;
+}
+.monitoring-attendance-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.monitoring-attendance-grid label {
+    display: grid;
+    gap: 6px;
+}
+.monitoring-attendance-grid label span {
+    color: #191c1b;
+    font-size: 11px;
+    font-weight: 700;
+}
+.monitoring-attendance-grid input {
+    background: #f2f4f2;
+    border: 1px solid #dfe3df;
+    border-radius: 8px;
+    color: #191c1b;
+    font-size: 18px;
+    font-weight: 700;
+    height: 46px;
+    padding: 8px 11px;
+    width: 100%;
+}
+.monitoring-attendance-grid small {
+    color: #707770;
+    font-size: 9px;
+}
+.monitoring-score-preview {
+    align-items: center;
+    background: #f8faf7;
+    border: 1px solid #dfe3d7;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    margin-top: 18px;
+    padding: 12px 14px;
+}
+.monitoring-score-preview span {
+    color: #30342f;
+    font-size: 11px;
+    font-weight: 700;
+}
+.monitoring-score-preview strong {
+    color: #007f36;
+    font-size: 22px;
+    grid-row: span 2;
+}
+.monitoring-score-preview small {
+    color: #707770;
+    font-size: 9px;
+    margin-top: 3px;
+}
+.monitoring-form-error {
+    color: #b42318;
+    font-size: 11px;
+    margin-top: 10px;
+}
+.monitoring-modal-card form > footer {
+    border-top: 1px solid #e7eae7;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 18px;
+    padding-top: 14px;
+}
+.monitoring-modal-card form > footer button {
+    min-height: 42px;
+}
+.monitoring-modal-card form > footer button svg {
+    flex: 0 0 16px;
+    height: 16px;
+    width: 16px;
+}
+.monitoring-profile-card {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e5e8e5;
+    border-radius: 8px;
+    display: grid;
+    gap: 22px;
+    grid-template-columns: minmax(280px, 1.4fr) auto minmax(230px, .8fr);
+    margin-bottom: 18px;
+    padding: 20px;
+}
+.monitoring-profile-person {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+}
+.monitoring-profile-photo {
+    align-items: center;
+    background: #edf2ed;
+    border: 2px solid #e1e5e1;
+    border-radius: 8px;
+    color: #007f36;
+    display: flex;
+    flex: 0 0 62px;
+    font-size: 22px;
+    font-weight: 800;
+    height: 82px;
+    justify-content: center;
+    overflow: hidden;
+}
+.monitoring-profile-name {
+    align-items: center;
+    display: flex;
+    gap: 7px;
+}
+.monitoring-profile-name strong {
+    color: #191c1b;
+    font-size: 18px;
+}
+.monitoring-profile-name b {
+    background: #007f36;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 9px;
+    padding: 3px 7px;
+}
+.monitoring-profile-person p {
+    color: #5f5e5e;
+    font-size: 11px;
+    margin: 4px 0 8px;
+}
+.monitoring-profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+.monitoring-profile-tags span {
+    align-items: center;
+    background: #f2f4f2;
+    border-radius: 5px;
+    color: #444933;
+    display: inline-flex;
+    font-size: 9px;
+    gap: 4px;
+    padding: 5px 7px;
+}
+.monitoring-profile-tags svg {
+    height: 11px;
+    width: 11px;
+}
+.monitoring-profile-metrics {
+    align-items: center;
+    border-left: 1px solid #e5e8e5;
+    border-right: 1px solid #e5e8e5;
+    display: flex;
+    gap: 12px;
+    padding: 0 22px;
+}
+.monitoring-profile-metrics > div {
+    align-items: center;
+    background: rgba(209, 255, 26, .42);
+    border: 1px solid rgba(82, 102, 0, .2);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    height: 68px;
+    justify-content: center;
+    min-width: 62px;
+}
+.monitoring-profile-metrics > div strong {
+    color: #263400;
+    font-size: 25px;
+}
+.monitoring-profile-metrics > div span,
+.monitoring-profile-metrics p span {
+    color: #536052;
+    display: block;
+    font-size: 8px;
+    text-transform: uppercase;
+}
+.monitoring-profile-metrics p {
+    margin: 0;
+}
+.monitoring-profile-metrics p b {
+    background: #007f36;
+    border-radius: 5px;
+    color: #fff;
+    display: inline-block;
+    font-size: 10px;
+    margin-bottom: 5px;
+    padding: 5px 7px;
+}
+.monitoring-profile-breakdown {
+    display: grid;
+    gap: 7px;
+}
+.monitoring-profile-breakdown p {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin: 0;
+}
+.monitoring-profile-breakdown span {
+    color: #5f5e5e;
+    font-size: 10px;
+}
+.monitoring-profile-breakdown strong {
+    color: #007f36;
+    font-size: 13px;
+}
+.monitoring-preview-layout {
+    align-items: start;
+    display: grid;
+    gap: 18px;
+    grid-template-columns: minmax(0, 1.65fr) minmax(260px, .85fr);
+}
+.monitoring-preview-layout > main,
+.monitoring-preview-layout > aside {
+    display: grid;
+    gap: 16px;
+}
+.monitoring-evaluation-section,
+.monitoring-attendance-card,
+.monitoring-comparison-card,
+.monitoring-comments-card,
+.monitoring-grade-card {
+    background: #fff;
+    border: 1px solid #e5e8e5;
+    border-radius: 8px;
+    padding: 16px;
+}
+.monitoring-evaluation-section > header,
+.monitoring-attendance-card > header {
+    align-items: center;
+    border-bottom: 1px solid #e7eae7;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+}
+.monitoring-evaluation-section > header > span {
+    background: #edf0ed;
+    border-radius: 5px;
+    color: #444933;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 5px 7px;
+}
+.monitoring-indicator-list {
+    display: grid;
+    gap: 10px;
+}
+.monitoring-indicator-list article {
+    background: #f8faf7;
+    border: 1px solid #e7eae7;
+    border-radius: 7px;
+    padding: 11px;
+}
+.monitoring-indicator-heading {
+    align-items: center;
+    display: grid;
+    gap: 9px;
+    grid-template-columns: 24px 1fr auto;
+}
+.monitoring-indicator-heading > span {
+    align-items: center;
+    background: #edf0ed;
+    border-radius: 50%;
+    color: #444933;
+    display: flex;
+    font-size: 9px;
+    height: 24px;
+    justify-content: center;
+}
+.monitoring-indicator-heading strong,
+.monitoring-indicator-heading small {
+    display: block;
+}
+.monitoring-indicator-heading strong {
+    color: #191c1b;
+    font-size: 11px;
+}
+.monitoring-indicator-heading small {
+    color: #697069;
+    font-size: 9px;
+    margin-top: 2px;
+}
+.monitoring-indicator-heading > b {
+    color: #007f36;
+    font-size: 12px;
+}
+.monitoring-progress,
+.monitoring-comparison-card i {
+    background: #e3e7e3;
+    border-radius: 999px;
+    display: block;
+    height: 5px;
+    margin-top: 9px;
+    overflow: hidden;
+}
+.monitoring-progress i,
+.monitoring-comparison-card i b {
+    background: #007f36;
+    display: block;
+    height: 100%;
+}
+.monitoring-indicator-list article footer {
+    color: #697069;
+    display: flex;
+    font-size: 8px;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+.monitoring-attendance-card > header > strong {
+    color: #007f36;
+    font-size: 20px;
+}
+.monitoring-attendance-card > div {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.monitoring-attendance-card > div span {
+    align-items: center;
+    background: #f2f4f2;
+    border-radius: 7px;
+    color: #5f5e5e;
+    display: flex;
+    flex-direction: column;
+    font-size: 9px;
+    padding: 9px;
+}
+.monitoring-attendance-card > div b {
+    color: #191c1b;
+    font-size: 17px;
+}
+.monitoring-comparison-card > div {
+    margin-top: 14px;
+}
+.monitoring-comparison-card p {
+    align-items: center;
+    display: flex;
+    font-size: 10px;
+    justify-content: space-between;
+    margin: 10px 0 0;
+}
+.monitoring-comparison-card i {
+    margin-top: 5px;
+}
+.monitoring-comparison-card i.is-highlight b {
+    background: #8cae00;
+}
+.monitoring-comments-card article {
+    border-bottom: 1px solid #e7eae7;
+    padding: 11px 0;
+}
+.monitoring-comments-card article:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+.monitoring-comments-card article strong {
+    color: #617700;
+    font-size: 9px;
+}
+.monitoring-comments-card article p {
+    color: #444933;
+    font-size: 10px;
+    line-height: 1.5;
+    margin: 5px 0 0;
+}
+.monitoring-grade-card > div {
+    display: grid;
+    gap: 5px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin-top: 12px;
+}
+.monitoring-grade-card span {
+    background: #f2f4f2;
+    border-radius: 5px;
+    color: #5f5e5e;
+    font-size: 8px;
+    padding: 6px 3px;
+    text-align: center;
+}
+.monitoring-grade-card span b {
+    color: #191c1b;
+    display: block;
+}
+.monitoring-report-shell {
+    background: #222523;
+    border-radius: 8px;
+    padding: 18px;
+}
+.monitoring-report-shell > header {
+    align-items: center;
+    background: #f2f4f2;
+    border-radius: 7px 7px 0 0;
+    display: flex;
+    gap: 12px;
+    margin: -18px -18px 18px;
+    padding: 13px 18px;
+}
+.monitoring-report-shell > header h2,
+.monitoring-report-shell > header p {
+    margin: 0;
+}
+.monitoring-report-shell > header h2 {
+    font-size: 17px;
+}
+.monitoring-report-shell > header p {
+    color: #5f5e5e;
+    font-size: 10px;
+}
+.monitoring-document {
+    background: #fff;
+    color: #191c1b;
+    margin: 0 auto 18px;
+    max-width: 1120px;
+    min-height: 680px;
+    padding: 32px;
+}
+.monitoring-document:last-child {
+    margin-bottom: 0;
+}
+.monitoring-document > header {
+    border-bottom: 1px solid #bfc4bf;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    text-align: center;
+}
+.monitoring-document > header p {
+    color: #697069;
+    font-size: 9px;
+    margin: 0;
+    text-align: left;
+}
+.monitoring-document > header h2 {
+    font-size: 18px;
+    margin: 10px 0 5px;
+}
+.monitoring-document > header span {
+    color: #5f5e5e;
+    font-size: 10px;
+}
+.monitoring-document-table-wrap {
+    overflow-x: auto;
+}
+.monitoring-document table {
+    border-collapse: collapse;
+    font-size: 8px;
+    min-width: 980px;
+    width: 100%;
+}
+.monitoring-document th,
+.monitoring-document td {
+    border: 1px solid #303330;
+    padding: 7px 5px;
+    text-align: center;
+    vertical-align: middle;
+}
+.monitoring-document th {
+    background: #edf0ed;
+    font-size: 7px;
+    text-transform: uppercase;
+}
+.monitoring-document th:nth-child(2),
+.monitoring-document td:nth-child(2) {
+    min-width: 120px;
+    text-align: left;
+}
+.monitoring-document td:last-child {
+    background: rgba(209, 255, 26, .18);
+}
+.monitoring-document > footer {
+    align-items: end;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+}
+.monitoring-document > footer div {
+    border: 1px solid #bfc4bf;
+    display: grid;
+    font-size: 8px;
+    gap: 4px;
+    padding: 8px;
+}
+.monitoring-document > footer p {
+    color: #697069;
+    font-size: 8px;
+}
+
+@media (max-width: 900px) {
+    .admin-app .admin-page-heading--monitoring,
+    .admin-app .admin-page-heading--detail-monitoring,
+    .admin-app .admin-page-heading--preview-penilaian,
+    .admin-app .admin-page-heading--laporan-monitoring {
+        align-items: stretch;
+    }
+    .monitoring-period-panel,
+    .monitoring-detail-actions {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+    .monitoring-panel-header,
+    .monitoring-profile-card,
+    .monitoring-preview-layout {
+        grid-template-columns: 1fr;
+    }
+    .monitoring-panel-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .monitoring-profile-metrics {
+        border-left: 0;
+        border-right: 0;
+        border-top: 1px solid #e5e8e5;
+        border-bottom: 1px solid #e5e8e5;
+        padding: 16px 0;
+    }
+}
+
+@media (max-width: 620px) {
+    .monitoring-intro h2 {
+        font-size: 28px;
+    }
+    .monitoring-intro p {
+        font-size: 10px;
+        line-height: 1.5;
+    }
+    .monitoring-period-panel,
+    .monitoring-detail-actions,
+    .monitoring-detail-actions form,
+    .monitoring-report-actions {
+        align-items: stretch;
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+    .monitoring-period-panel input,
+    .monitoring-detail-actions input,
+    .monitoring-print-button {
+        width: 100%;
+    }
+    .monitoring-status-tabs {
+        overflow-x: auto;
+    }
+    .monitoring-status-tabs a {
+        flex: 1 0 auto;
+    }
+    .monitoring-attendance-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .monitoring-modal {
+        align-items: end;
+        padding: 0;
+    }
+    .monitoring-modal-card {
+        border-radius: 8px 8px 0 0;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+    .monitoring-modal-card > header {
+        padding: 14px 16px;
+    }
+    .monitoring-modal-card h3 {
+        font-size: 15px;
+    }
+    .monitoring-modal-context,
+    .monitoring-modal-card form {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .monitoring-profile-person {
+        align-items: flex-start;
+    }
+    .monitoring-profile-name {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .monitoring-profile-metrics {
+        align-items: flex-start;
+    }
+    .monitoring-attendance-card > div,
+    .monitoring-grade-card > div {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .monitoring-report-shell {
+        margin-left: -16px;
+        margin-right: -16px;
+        padding: 10px;
+    }
+    .monitoring-document {
+        padding: 14px;
+    }
+}
+
 /* Partnership inquiries are accessible by URL without adding another sidebar item. */
 .admin-app .inquiry-data-table th,
 .admin-app .inquiry-data-table td {
@@ -14118,6 +15126,8 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .admin-page-heading--report-driver,
     .admin-app .admin-page-heading--report-kendaraan,
     .admin-app .admin-page-heading--report-unit-kerja,
+    .admin-app .admin-page-heading--monitoring,
+    .admin-app .admin-page-heading--laporan-monitoring,
     .admin-app .admin-page-heading--log-aktivitas {
         align-items: end;
         display: flex;
@@ -14135,6 +15145,10 @@ body.auth-app:has(.bpd-login-page) {
         .admin-page-heading-actions,
     .admin-app
         .admin-page-heading--report-unit-kerja
+        .admin-page-heading-actions,
+    .admin-app .admin-page-heading--monitoring .admin-page-heading-actions,
+    .admin-app
+        .admin-page-heading--laporan-monitoring
         .admin-page-heading-actions,
     .admin-app .admin-page-heading--log-aktivitas .admin-page-heading-actions {
         margin-left: auto;

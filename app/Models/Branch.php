@@ -16,6 +16,7 @@ class Branch extends Model
     use HasFactory;
 
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_INACTIVE = 'inactive';
 
     public const BALI_REGENCIES = [
@@ -43,6 +44,11 @@ class Branch extends Model
     public function ratings(): HasMany
     {
         return $this->hasMany(Rating::class);
+    }
+
+    public function driverAttendances(): HasMany
+    {
+        return $this->hasMany(DriverAttendance::class);
     }
 
     public function scopeActive(Builder $query): Builder
