@@ -135,7 +135,7 @@ class OperationalMonitoringController extends Controller
         $filename = str('monitoring-'.($branch?->code ?? 'semua-cabang').'-'.$period->format('Y-m'))->slug().'.pdf';
 
         return Pdf::loadView('admin.monitoring.pdf', compact('period', 'reports'))
-            ->setPaper('a4', 'landscape')
+            ->setPaper('a4', 'portrait')
             ->download($filename);
     }
 

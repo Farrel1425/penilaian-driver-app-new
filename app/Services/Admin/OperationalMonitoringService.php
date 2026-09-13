@@ -110,7 +110,9 @@ class OperationalMonitoringService
             'rows' => $rows->map(function (array $row) use ($questions) {
                 $breakdown = $this->questionBreakdown($row['ratings'], Question::TARGET_DRIVER)->keyBy('question_id');
                 $row['report_scores'] = $questions->mapWithKeys(fn (Question $question) => [
-                    $question->id => $breakdown->get($question->id)['percentage'] ?? null,
+                    $question->id => isset($breakdown[$question->id])
+                        ? round($breakdown[$question->id]['percentage'] / 10, 1)
+                        : null,
                 ]);
 
                 return $row;

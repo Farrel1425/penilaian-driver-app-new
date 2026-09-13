@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\Rating;
 use App\Models\User;
 use App\Models\Vehicle;
+use App\Services\Admin\OperationalMonitoringService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -72,6 +73,20 @@ class OperationalMonitoringTest extends TestCase
             ->assertSee('90.0')
             ->assertSee('91.7')
             ->assertSee('90.2');
+
+        $monitoring = app(OperationalMonitoringService::class);
+        $report = $monitoring->reportRows($branch, $monitoring->period('2026-08'));
+        $scores = $report['rows']->first()['report_scores'];
+
+        $this->assertSame(10.0, $scores[$first->id]);
+        $this->assertSame(8.0, $scores[$second->id]);
+
+        $this->get(route('admin.monitoring.branch.report', [$branch, 'period' => '2026-08']))
+            ->assertOk()
+            ->assertSee('Sikap Kerja')
+            ->assertSee('Kinerja Pelayanan')
+            ->assertSee('Kehadiran / Absen')
+            ->assertDontSee('Kendaraan Terakhir');
     }
 
     public function test_branch_admin_only_accesses_own_monitoring_data(): void
