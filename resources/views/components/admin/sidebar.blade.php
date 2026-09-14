@@ -1,6 +1,8 @@
-@php($isSuperAdmin = auth()->user()?->role === \App\Models\User::ROLE_ADMIN)
-@php($systemName = App\Models\SystemSetting::value('system_name', 'Aplikasi Penilaian Driver'))
-@php($systemLogoUrl = App\Models\SystemSetting::logoUrl())
+@php
+    $isSuperAdmin = auth()->user()?->role === \App\Models\User::ROLE_ADMIN;
+    $systemName = App\Models\SystemSetting::systemName();
+    $systemLogoUrl = App\Models\SystemSetting::logoUrl();
+@endphp
 
 <aside id="admin-sidebar" class="admin-sidebar" data-admin-sidebar>
     <a class="sidebar-brand" href="{{ route('admin.dashboard') }}" aria-label="{{ $systemName }}">

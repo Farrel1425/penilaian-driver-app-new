@@ -13,6 +13,7 @@
     @php
         $icon = fn ($number = '') => asset('images/bds/imgContainer'.$number.'.svg');
         $logo = asset('images/bds/bds-logo.png');
+        $copyrightText = App\Models\SystemSetting::copyrightText();
         $partners = [
             ['Bank BPD Bali', 'Kantor Pusat & Seluruh Cabang', 'Mitra Utama Armada & SDM', 8],
             ['Bank Mandiri', 'Regional Bali & Nusa Tenggara', 'Rental Kendaraan Operasional', 9],
@@ -201,7 +202,19 @@
                 <div><h3>INFORMASI KORPORAT</h3><a href="#beranda">Beranda</a><a href="#profil">Profil &amp; Kepemilikan</a><a href="#mitra">Mitra Korporasi</a><a href="#sop">SOP &amp; Jaminan Kualitas</a><a href="#hubungi">Hubungi Sekretariat</a><a class="bds-footer-login" href="{{ route('login') }}">Login</a></div>
                 <div><h3>KEPATUHAN HUKUM</h3><p>Disnaker Prov. Bali</p><p>BPJS Ketenagakerjaan</p><p>BPJS Kesehatan</p><p>Standar K3 Operasional</p></div>
             </div>
-            <div class="bds-footer-bottom"><span>© {{ now()->year }} PT. Bali Dana Sejahtera (PT. BDS). Seluruh Hak Cipta Dilindungi Undang-Undang.</span><span><i></i> Denpasar, Bali</span></div>
+            <div class="bds-footer-bottom">
+                <div class="bds-footer-credit">
+                    @if ($copyrightText)<span>{{ $copyrightText }}</span>@endif
+                    @if ($copyrightText)<span class="bds-footer-divider" aria-hidden="true">|</span>@endif
+                    <span class="bds-footer-attribution">
+                        <span>Design by</span>
+                        <a class="bds-maiharta-mark" href="https://www.maiharta.com/home" target="_blank" rel="noopener noreferrer" aria-label="Kunjungi situs Maiharta">
+                            <img src="{{ asset('images/maiharta-logo.png') }}" alt="Maiharta" width="88" height="21">
+                        </a>
+                    </span>
+                </div>
+                <span class="bds-footer-location"><i></i> Denpasar, Bali</span>
+            </div>
         </div>
     </footer>
     <nav class="bds-mobile-nav" aria-label="Navigasi mobile">

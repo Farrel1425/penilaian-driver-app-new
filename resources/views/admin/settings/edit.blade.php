@@ -6,7 +6,7 @@
                 <span class="settings-panel-icon"><x-lucide-badge-check aria-hidden="true" /></span>
                 <div>
                     <p class="section-kicker">Identitas Aplikasi</p>
-                    <p>Informasi ini tampil pada area administrasi dan halaman autentikasi.</p>
+                    <p>Kelola identitas, bantuan, dan copyright yang digunakan di seluruh area aplikasi.</p>
                 </div>
             </div>
 
@@ -40,14 +40,14 @@
                     </div>
                     <div class="form-field">
                         <label for="support_contact">Kontak Bantuan</label>
-                        <input id="support_contact" name="support_contact" value="{{ old('support_contact', $settings['support_contact'] ?? '') }}" placeholder="Contoh: admin@perusahaan.com">
-                        <small class="settings-field-note">Disimpan sebagai kontak bantuan untuk pengguna internal.</small>
+                        <input id="support_contact" name="support_contact" value="{{ old('support_contact', $settings['support_contact'] ?? '') }}" placeholder="Email, nomor WhatsApp, atau URL bantuan">
+                        <small class="settings-field-note">Ditampilkan sebagai tautan bantuan pada halaman login dan penilaian penumpang.</small>
                         @error('support_contact')<small class="form-error">{{ $message }}</small>@enderror
                     </div>
                     <div class="form-field form-field-full">
                         <label for="copyright_text">Teks Copyright</label>
                         <input id="copyright_text" name="copyright_text" value="{{ old('copyright_text', $settings['copyright_text'] ?? '© '.now()->year.'. Seluruh hak dilindungi.') }}">
-                        <small class="settings-field-note">Digunakan sebagai identitas legal dan kepemilikan aplikasi.</small>
+                        <small class="settings-field-note">Ditampilkan pada footer landing page dan halaman login.</small>
                         @error('copyright_text')<small class="form-error">{{ $message }}</small>@enderror
                     </div>
                 </div>

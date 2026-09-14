@@ -1,11 +1,15 @@
+@php
+    $systemName = App\Models\SystemSetting::systemName();
+    $systemLogoUrl = App\Models\SystemSetting::logoUrl();
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/bds/bds-logo.png') }}">
-    <title>{{ $title ?? config('app.name', 'Penilaian Driver') }}</title>
+    <link rel="icon" type="image/png" href="{{ $systemLogoUrl }}">
+    <title>{{ isset($title) ? $title.' | '.$systemName : $systemName }}</title>
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else

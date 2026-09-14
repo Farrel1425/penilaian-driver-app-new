@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Driver;
 use App\Models\Question;
 use App\Models\Rating;
+use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -155,6 +156,19 @@ class AdminReportTest extends TestCase
         $this->assertDatabaseHas('system_settings', ['key' => 'system_name', 'value' => 'Sistem Penilaian Driver']);
         $this->assertDatabaseHas('activity_logs', ['user_id' => $user->id, 'module' => 'Pengaturan Sistem', 'action' => 'Edit']);
 
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('© 2026. Seluruh hak dilindungi.')
+            ->assertSee('Design by')
+            ->assertSee('images/maiharta-logo.png', false)
+            ->assertSee('https://www.maiharta.com/home', false);
+
+        $this->post(route('logout'));
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('© 2026. Seluruh hak dilindungi.')
+            ->assertSee('mailto:admin@example.com', false);
+
         $this->actingAs($user)
             ->get(route('admin.activity-logs.index'))
             ->assertOk()
@@ -164,8 +178,26 @@ class AdminReportTest extends TestCase
         $this->actingAs($user)
             ->get(route('admin.activity-logs.export', ['user_id' => $user->id]))
             ->assertOk()
-            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
-    }
+              ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+      }
+
+      public function test_system_support_contact_is_normalized_to_a_safe_link(): void
+      {
+          SystemSetting::put('support_contact', 'help@example.com');
+          $this->assertSame('mailto:help@example.com', SystemSetting::supportContactUrl());
+
+          SystemSetting::put('support_contact', '0812 3456 7890');
+          $this->assertSame('https://wa.me/6281234567890', SystemSetting::supportContactUrl());
+
+          SystemSetting::put('support_contact', 'https://support.example.com');
+          $this->assertSame('https://support.example.com', SystemSetting::supportContactUrl());
+
+          SystemSetting::put('support_contact', 'kontak tidak valid');
+          $this->assertNull(SystemSetting::supportContactUrl());
+
+          SystemSetting::put('copyright_text', null);
+          $this->assertNull(SystemSetting::copyrightText());
+      }
 
     private function makeEntities(): array
     {

@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Driver;
 use App\Models\Question;
 use App\Models\Rating;
+use App\Models\SystemSetting;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -23,7 +24,6 @@ class PassengerFlowTest extends TestCase
         $yesNo = Question::factory()->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_YES_NO, 'sort_order' => 2, 'status' => Question::STATUS_ACTIVE]);
         $choice = Question::factory()->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_MULTIPLE_CHOICE, 'sort_order' => 3, 'status' => Question::STATUS_ACTIVE]);
         $option = $choice->options()->create(['option_text' => 'AC', 'sort_order' => 1]);
-
         $this->get(route('passenger.rating.entry', $vehicle->qr_token))
             ->assertOk()
             ->assertSee($vehicle->police_number)
@@ -59,6 +59,18 @@ class PassengerFlowTest extends TestCase
         $this->assertSame('Kantor Pusat', $rating->passenger_unit);
         $this->assertCount(3, $rating->answers);
         $this->get(route('passenger.rating.success', [$vehicle->qr_token, $rating]))->assertOk()->assertSee('Terima Kasih');
+    }
+
+    public function test_passenger_header_uses_system_support_contact(): void
+    {
+        $branch = Branch::factory()->create();
+        $vehicle = Vehicle::factory()->for($branch)->create(['status' => Vehicle::STATUS_ACTIVE]);
+        SystemSetting::put('support_contact', '0812 3456 7890');
+
+        $this->get(route('passenger.rating.entry', $vehicle->qr_token))
+            ->assertOk()
+            ->assertSee('https://wa.me/6281234567890', false)
+            ->assertSee('Hubungi bantuan melalui 0812 3456 7890');
     }
 
     public function test_driver_selection_only_shows_active_drivers_from_vehicle_branch(): void

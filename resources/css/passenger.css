@@ -57,8 +57,27 @@
 .passenger-app-brand-actions {
     color: var(--passenger-green);
     display: flex;
-    gap: 12px;
+    gap: 6px;
     margin-left: auto;
+}
+
+.passenger-app-brand-actions a {
+    align-items: center;
+    border-radius: 50%;
+    color: var(--passenger-green);
+    display: inline-flex;
+    height: 32px;
+    justify-content: center;
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+    width: 32px;
+}
+
+.passenger-app-brand-actions a:hover,
+.passenger-app-brand-actions a:focus-visible {
+    background: #e1f3e8;
+    color: var(--passenger-green-dark);
+    outline: none;
+    transform: translateY(-1px);
 }
 
 .passenger-app-brand-actions svg {

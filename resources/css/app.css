@@ -12166,12 +12166,22 @@ form[aria-busy="true"] input[type="submit"].is-submitting {
     display: flex;
     gap: 18px;
 }
-.auth-app .bpd-login-help button {
+.auth-app .bpd-login-help :is(a, button) {
+    align-items: center;
     background: transparent;
     border: 0;
     color: #00b750;
     cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
     padding: 3px;
+    transition: color 160ms ease, transform 160ms ease;
+}
+.auth-app .bpd-login-help :is(a, button):hover,
+.auth-app .bpd-login-help :is(a, button):focus-visible {
+    color: #62f2a0;
+    outline: none;
+    transform: translateY(-1px);
 }
 .auth-app .bpd-login-help svg {
     height: 21px;
@@ -12445,7 +12455,7 @@ form[aria-busy="true"] input[type="submit"].is-submitting {
         margin-top: 30px;
         padding: 16px 20px;
     }
-    .auth-app .bpd-login-footer span:last-child {
+    .auth-app .bpd-login-footer .bpd-login-legal {
         display: none;
     }
 }
@@ -12876,7 +12886,7 @@ form[aria-busy="true"] input[type="submit"].is-submitting {
         flex: 0 0 auto;
         gap: 10px;
     }
-    .auth-app .bpd-login-help button {
+    .auth-app .bpd-login-help :is(a, button) {
         align-items: center;
         display: inline-flex;
         height: 32px;
@@ -12959,7 +12969,7 @@ form[aria-busy="true"] input[type="submit"].is-submitting {
         padding: 18px 20px 24px;
         text-align: center;
     }
-    .auth-app .bpd-login-footer span:last-child {
+    .auth-app .bpd-login-footer .bpd-login-legal {
         display: none;
     }
 }

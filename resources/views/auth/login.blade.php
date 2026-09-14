@@ -1,6 +1,11 @@
 <x-layouts.guest title="Login Admin">
-    @php($systemName = App\Models\SystemSetting::value('system_name', 'Aplikasi Penilaian Driver'))
-    @php($systemLogoUrl = App\Models\SystemSetting::logoUrl())
+    @php
+        $systemName = App\Models\SystemSetting::systemName();
+        $systemLogoUrl = App\Models\SystemSetting::logoUrl();
+        $supportContact = App\Models\SystemSetting::supportContact();
+        $supportContactUrl = App\Models\SystemSetting::supportContactUrl();
+        $copyrightText = App\Models\SystemSetting::copyrightText();
+    @endphp
     <main class="bpd-login-page">
         <header class="bpd-login-topbar">
             <a class="bpd-login-brand" href="{{ route('login') }}" aria-label="{{ $systemName }}">
@@ -8,8 +13,10 @@
                 <span class="bpd-login-brand-copy"><strong>{{ $systemName }}</strong><span class="bpd-login-support"><i>Supported by</i><b>Bank BPD Bali</b></span></span>
             </a>
             <div class="bpd-login-help">
-                <button type="button" aria-label="Bantuan" title="Bantuan"><x-lucide-circle-help aria-hidden="true" /></button>
-                <button type="button" aria-label="Informasi" title="Informasi"><x-lucide-info aria-hidden="true" /></button>
+                @if ($supportContactUrl)
+                    <a href="{{ $supportContactUrl }}" aria-label="Hubungi bantuan melalui {{ $supportContact }}" title="Hubungi bantuan: {{ $supportContact }}" @if (str_starts_with($supportContactUrl, 'http')) target="_blank" rel="noopener noreferrer" @endif><x-lucide-circle-help aria-hidden="true" /></a>
+                @endif
+                <a href="{{ route('home') }}" aria-label="Informasi aplikasi" title="Informasi aplikasi"><x-lucide-info aria-hidden="true" /></a>
             </div>
         </header>
 
@@ -65,6 +72,9 @@
             <footer>Lupa Kata Sandi? <a href="{{ route('password.request') }}">Reset Kata Sandi</a></footer>
         </section>
 
-        <footer class="bpd-login-footer"><span>&copy; {{ now()->year }} Aplikasi Penilaian Driver by Bank BPD Bali</span><span>Privasi &nbsp;&nbsp; Syarat &amp; Ketentuan &nbsp;&nbsp; Arsitektur Keamanan</span></footer>
+        <footer class="bpd-login-footer">
+            @if ($copyrightText)<span>{{ $copyrightText }}</span>@endif
+            <span class="bpd-login-legal">Privasi &nbsp;&nbsp; Syarat &amp; Ketentuan &nbsp;&nbsp; Arsitektur Keamanan</span>
+        </footer>
     </main>
 </x-layouts.guest>
