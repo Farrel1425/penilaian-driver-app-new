@@ -606,6 +606,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    const logoInput = document.querySelector('[data-settings-logo-input]');
+    const logoPreview = document.querySelector('[data-settings-logo-preview]');
+    const logoFileName = document.querySelector('[data-settings-logo-file-name]');
+    let logoObjectUrl;
+
+    logoInput?.addEventListener('change', () => {
+        const file = logoInput.files?.[0];
+        if (!file || !logoPreview || !logoFileName) return;
+
+        if (logoObjectUrl) URL.revokeObjectURL(logoObjectUrl);
+        logoObjectUrl = URL.createObjectURL(file);
+        logoPreview.src = logoObjectUrl;
+        logoFileName.textContent = file.name;
+    });
+
     document.querySelectorAll('[data-image-cropper]').forEach((field) => {
         const imageInput = field.querySelector('[data-image-input]');
         const cameraInput = field.querySelector('[data-camera-input]');

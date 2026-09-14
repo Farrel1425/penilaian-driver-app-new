@@ -4830,8 +4830,34 @@ button {
 .settings-page-grid {
     align-items: start;
     display: grid;
-    gap: 20px;
-    grid-template-columns: minmax(0, 1fr) minmax(250px, 0.32fr);
+    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+}
+.settings-page-grid > .admin-panel {
+    border-color: #c4c9ac;
+    box-shadow: 0 10px 28px rgba(25, 56, 38, .05);
+}
+.settings-panel-heading {
+    align-items: center;
+    border-bottom: 1px solid #e4e9df;
+    display: flex;
+    gap: 12px;
+    padding-bottom: 18px;
+}
+.settings-panel-icon {
+    align-items: center;
+    background: #e3f5e9;
+    border: 1px solid #c4e6d0;
+    border-radius: 8px;
+    color: #007b35;
+    display: inline-flex;
+    flex: 0 0 42px;
+    height: 42px;
+    justify-content: center;
+}
+.settings-panel-icon svg {
+    height: 20px;
+    width: 20px;
 }
 
 .settings-panel-heading h2,
@@ -4842,10 +4868,13 @@ button {
 }
 .settings-panel-heading p:not(.section-kicker),
 .settings-help-card p {
-    color: #64748b;
+    color: #536258;
     font-size: 14px;
     line-height: 1.6;
     margin: 0;
+}
+.settings-page-grid .section-kicker {
+    color: #007b35;
 }
 .section-kicker {
     color: #2463eb;
@@ -4885,59 +4914,132 @@ button {
 .admin-user-detail-grid {
     margin-top: 20px;
 }
-.settings-form {
+.admin-app .admin-panel form.settings-form {
     display: grid;
     gap: 24px;
-    margin-top: 24px;
+    margin-top: 22px;
 }
 .settings-logo-field {
     align-items: center;
-    background: #f7faff;
-    border: 1px solid #dbe5f4;
-    border-radius: 10px;
+    background: #f1f8f3;
+    border: 1px solid #c9dfcf;
+    border-radius: 8px;
     display: flex;
-    gap: 18px;
-    padding: 16px;
+    gap: 20px;
+    padding: 18px;
 }
 .settings-logo-preview {
     align-items: center;
-    background: #102a52;
-    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #bed6c5;
+    border-radius: 8px;
     display: flex;
-    height: 76px;
+    flex: 0 0 92px;
+    height: 92px;
     justify-content: center;
     overflow: hidden;
-    width: 76px;
+    width: 92px;
 }
 .settings-logo-preview img {
-    height: 54px;
+    height: 72px;
     object-fit: contain;
-    width: 54px;
+    width: 72px;
+}
+.settings-logo-copy {
+    min-width: 0;
 }
 .settings-logo-field label {
-    color: #102a52;
+    color: #173b28;
     display: block;
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 8px;
 }
-.settings-logo-field input {
-    font-size: 13px;
-    max-width: 300px;
-}
 .settings-logo-field p {
-    color: #71809a;
+    color: #536258;
     font-size: 12px;
-    margin: 7px 0 0;
+    margin: 0;
+}
+.settings-logo-actions {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+.settings-logo-upload {
+    align-items: center;
+    background: #007b35;
+    border: 1px solid #007b35;
+    border-radius: 8px;
+    color: #fff !important;
+    cursor: pointer;
+    display: inline-flex !important;
+    font-size: 12px !important;
+    gap: 7px;
+    margin: 0 !important;
+    min-height: 38px;
+    padding: 8px 13px;
+}
+.settings-logo-upload:hover {
+    background: #00652b;
+    border-color: #00652b;
+}
+.settings-logo-upload svg {
+    flex: 0 0 16px;
+    height: 16px;
+    width: 16px;
+}
+.settings-logo-file-name {
+    color: #536258;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.settings-logo-field small:not(.form-error) {
+    color: #708077;
+    display: block;
+    font-size: 11px;
+    margin-top: 8px;
+}
+.settings-form .form-field > input {
+    border-color: #c4c9ac;
+    border-radius: 8px;
+    min-height: 44px;
+}
+.settings-form .form-field > input:focus {
+    border-color: #007b35;
+    box-shadow: 0 0 0 3px rgba(0, 123, 53, .1);
+    outline: 0;
+}
+.settings-form .form-field .settings-field-note {
+    color: #6c776f;
+    display: block;
+    font-size: 11px;
+    line-height: 1.4;
+    margin-top: 7px;
+}
+.settings-form .form-actions {
+    border-top-color: #dce4d8;
+}
+.settings-form .form-actions a,
+.settings-form .form-actions button {
+    gap: 7px;
+    min-height: 44px;
+}
+.settings-form .form-actions svg {
+    flex: 0 0 16px;
+    height: 16px;
+    width: 16px;
 }
 .form-field-full {
     grid-column: 1 / -1;
 }
 .settings-help-card {
-    background: linear-gradient(145deg, #102a52, #183d74);
-    border: 1px solid rgb(110 160 255 / 28%);
-    border-radius: 10px;
-    box-shadow: 0 12px 28px rgb(15 35 68 / 12%);
+    background: #075b34;
+    border: 1px solid #0a6c40;
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(7, 91, 52, .14);
     color: #fff;
     padding: 24px;
 }
@@ -4946,13 +5048,36 @@ button {
     margin-top: 16px;
 }
 .settings-help-card p {
-    color: #d5e4ff;
+    color: #ddf5e7;
     margin-top: 12px;
+}
+.settings-help-card ul {
+    display: grid;
+    gap: 13px;
+    list-style: none;
+    margin: 20px 0 0;
+    padding: 18px 0 0;
+    border-top: 1px solid rgba(221, 245, 231, .2);
+}
+.settings-help-card li {
+    align-items: flex-start;
+    color: #e9f8ee;
+    display: flex;
+    font-size: 12px;
+    gap: 9px;
+    line-height: 1.5;
+}
+.settings-help-card li svg {
+    color: #a9e8bf;
+    flex: 0 0 16px;
+    height: 16px;
+    margin-top: 1px;
+    width: 16px;
 }
 .settings-help-icon {
     align-items: center;
-    background: rgb(255 255 255 / 12%);
-    border: 1px solid rgb(255 255 255 / 18%);
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .2);
     border-radius: 8px;
     display: inline-flex;
     height: 40px;
