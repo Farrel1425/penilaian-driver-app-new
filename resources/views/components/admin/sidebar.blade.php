@@ -34,7 +34,6 @@
             <summary class="sidebar-link sidebar-nav-group-toggle {{ $assessmentActive ? 'is-active' : '' }}" data-sidebar-group-toggle><x-lucide-clipboard-list class="nav-icon" aria-hidden="true" /><span>Penilaian</span><x-lucide-chevron-down class="sidebar-nav-chevron" aria-hidden="true" /></summary>
             <div class="sidebar-nav-submenu" aria-label="Penilaian">
                 <a class="{{ request()->routeIs('admin.assessments.index', 'admin.assessments.show') ? 'is-active' : '' }}" href="{{ route('admin.assessments.index') }}">Riwayat Penilaian</a>
-                <a class="{{ request()->routeIs('admin.assessments.recap') ? 'is-active' : '' }}" href="{{ route('admin.assessments.recap') }}">Rekap Penilaian</a>
                 <a class="{{ request()->routeIs('admin.monitoring.*') ? 'is-active' : '' }}" href="{{ route('admin.monitoring.index') }}">Monitoring</a>
             </div>
         </details>

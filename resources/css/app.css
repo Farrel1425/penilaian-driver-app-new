@@ -2228,6 +2228,10 @@ button {
     .admin-app .admin-page-heading--laporan-monitoring {
         align-items: stretch;
     }
+    .admin-app .admin-page-heading--monitoring {
+        display: grid;
+        gap: 16px;
+    }
     .monitoring-period-panel,
     .monitoring-detail-actions {
         align-items: stretch;
@@ -11559,6 +11563,14 @@ form[aria-busy="true"] input[type="submit"].is-submitting {
     letter-spacing: 0;
     line-height: 1.02;
     margin: 0;
+}
+.admin-app .admin-page-heading-description {
+    color: #444933;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-top: 8px;
+    max-width: 720px;
 }
 @media (max-width: 720px) {
     .admin-app .admin-page-heading {

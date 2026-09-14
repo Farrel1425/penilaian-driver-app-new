@@ -80,7 +80,10 @@
                 ])>
                     <div class="admin-page-heading-copy">
                         <p>{{ strtoupper($pageSection) }}@if (($title ?? '') !== $pageSection) <span>&rsaquo;</span> {{ strtoupper($title ?? '') }}@endif</p>
-                        <h1>{{ $title ?? 'Dashboard' }}</h1>
+                        <h1>{{ $pageHeading ?? ($title ?? 'Dashboard') }}</h1>
+                        @isset($pageDescription)
+                            <div class="admin-page-heading-description">{{ $pageDescription }}</div>
+                        @endisset
                     </div>
                     @isset ($pageActions)
                         <div class="admin-page-heading-actions">{{ $pageActions }}</div>

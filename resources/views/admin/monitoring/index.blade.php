@@ -1,4 +1,6 @@
 <x-layouts.admin title="Monitoring">
+    <x-slot:pageHeading>Monitoring Operasional &amp; Kelengkapan Cabang</x-slot>
+    <x-slot:pageDescription>Pantau penilaian, absensi, dan kelengkapan setiap unit kerja.</x-slot>
     <x-slot:pageActions>
         <form class="monitoring-period-panel" method="GET">
             <label><span>Periode</span><input type="month" name="period" value="{{ $period->format('Y-m') }}"></label>
@@ -7,11 +9,6 @@
             <a class="monitoring-print-button" data-no-loading href="{{ route('admin.monitoring.report', ['period' => $period->format('Y-m')]) }}"><x-lucide-printer aria-hidden="true" /><span>Cetak Laporan<br>Semua Cabang</span></a>
         </form>
     </x-slot>
-
-    <div class="monitoring-intro">
-        <h2>Monitoring Operasional &amp;<br>Kelengkapan Cabang</h2>
-        <p>Inspeksi kesiapan armada, verifikasi absensi driver, dan kelengkapan administrasi unit kerja wilayah Bali.</p>
-    </div>
 
     <section class="monitoring-panel">
         <header class="monitoring-panel-header">
