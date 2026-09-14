@@ -61,6 +61,22 @@ class AdminReportTest extends TestCase
             ->assertDontSee($driverB->full_name);
     }
 
+    public function test_dashboard_cards_link_to_filtered_reports_and_rating_detail(): void
+    {
+        $this->actingAs(User::factory()->create());
+        [$branch, $driver, $vehicle] = $this->makeEntities();
+        $question = Question::factory()->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_RATING]);
+        $rating = $this->makeRating($branch, $driver, $vehicle, $question, 5);
+
+        $this->get(route('admin.dashboard', ['branch_id' => $branch->id]))
+            ->assertOk()
+            ->assertSee(route('admin.assessments.index', ['branch_id' => $branch->id]), false)
+            ->assertSee(route('admin.reports.drivers', ['branch_id' => $branch->id]), false)
+            ->assertSee(route('admin.reports.vehicles', ['branch_id' => $branch->id]), false)
+            ->assertSee(route('admin.assessments.show', $rating), false)
+            ->assertSee('Buka riwayat penilaian hari ini');
+    }
+
     public function test_date_range_filter_limits_assessment_history(): void
     {
         $this->actingAs(User::factory()->create());

@@ -337,12 +337,14 @@ class RatingAnalyticsService
             'type' => 'rating',
             'description' => sprintf('Penilaian baru untuk %s dan %s.', $rating->driver?->full_name ?? 'driver', $rating->vehicle?->police_number ?? 'kendaraan'),
             'created_at' => $rating->submitted_at,
+            'url' => route('admin.assessments.show', $rating),
         ])->all());
 
         $adminActivities = $includeAdminActivities ? ActivityLog::query()->latest('created_at')->take(6)->get()->map(fn (ActivityLog $log) => [
             'type' => 'admin',
             'description' => $log->description,
             'created_at' => $log->created_at,
+            'url' => route('admin.activity-logs.index', ['search' => $log->description]),
         ]) : collect();
 
         return $ratingActivities->merge($adminActivities)->sortByDesc('created_at')->take(6)->values();

@@ -13728,7 +13728,7 @@ body.auth-app:has(.bpd-login-page) {
         gap: 16px;
         grid-template-columns: repeat(4, 1fr);
     }
-    .ui-metric-grid article,
+    .ui-metric-card,
     .ui-trend,
     .ui-activity,
     .ui-latest {
@@ -13737,7 +13737,9 @@ body.auth-app:has(.bpd-login-page) {
         border-radius: 12px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
     }
-    .ui-metric-grid article {
+    .ui-metric-card {
+        color: inherit;
+        display: block;
         min-height: 112px;
         padding: 17px;
         position: relative;
@@ -13891,11 +13893,16 @@ body.auth-app:has(.bpd-login-page) {
         gap: 18px;
         margin: 28px 0;
     }
-    .ui-activity-list > div {
+    .ui-activity-list > a {
+        align-items: center;
+        border-radius: 8px;
+        color: inherit;
         display: flex;
         gap: 16px;
+        margin: -6px;
+        padding: 6px;
     }
-    .ui-activity-list > div > span {
+    .ui-activity-list > a > span {
         align-items: center;
         border-radius: 50%;
         display: flex;
@@ -13917,9 +13924,11 @@ body.auth-app:has(.bpd-login-page) {
     }
     .ui-activity-list p {
         color: #191c1b;
+        flex: 1;
         font-size: 14px;
         font-weight: 600;
         margin: 0;
+        min-width: 0;
     }
     .ui-activity-list small {
         color: #444933;
@@ -14380,6 +14389,64 @@ body.auth-app:has(.bpd-login-page) {
 .ui-metric-grid--six {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.ui-metric-card,
+.ui-trend,
+.ui-activity-list > a {
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background-color 180ms ease;
+}
+.ui-metric-card:hover,
+.ui-metric-card:focus-visible {
+    border-color: #78b887;
+    box-shadow: 0 10px 22px rgba(0, 83, 43, 0.1);
+    outline: none;
+    transform: translateY(-2px);
+}
+.ui-metric-link-icon {
+    bottom: 15px;
+    color: #6a746c;
+    height: 15px;
+    position: absolute;
+    right: 16px;
+    transition: color 180ms ease, transform 180ms ease;
+    width: 15px;
+}
+.ui-metric-card:hover .ui-metric-link-icon,
+.ui-metric-card:focus-visible .ui-metric-link-icon {
+    color: #007b35;
+    transform: translate(2px, -2px);
+}
+.ui-dashboard-panel-link {
+    color: inherit;
+    display: block;
+    min-width: 0;
+}
+.ui-dashboard-panel-link:hover .ui-trend,
+.ui-dashboard-panel-link:focus-visible .ui-trend {
+    border-color: #78b887;
+    box-shadow: 0 12px 26px rgba(0, 83, 43, 0.08);
+    transform: translateY(-2px);
+}
+.ui-dashboard-panel-link:focus-visible {
+    outline: none;
+}
+.ui-activity-list > a:hover,
+.ui-activity-list > a:focus-visible {
+    background: #f0f6f1;
+    outline: none;
+}
+.ui-activity-link-icon {
+    color: #7a847c;
+    flex: 0 0 auto;
+    height: 16px;
+    margin-left: auto;
+    transition: color 180ms ease, transform 180ms ease;
+    width: 16px;
+}
+.ui-activity-list > a:hover .ui-activity-link-icon,
+.ui-activity-list > a:focus-visible .ui-activity-link-icon {
+    color: #007b35;
+    transform: translateX(2px);
+}
 .ui-metric-grid .blue {
     background: #3973d8;
 }
@@ -14670,7 +14737,7 @@ body.auth-app:has(.bpd-login-page) {
         gap: 12px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .ui-metric-grid--six article,
+    .ui-metric-card,
     .ui-trend,
     .ui-activity,
     .ui-insight-card,
@@ -14679,6 +14746,36 @@ body.auth-app:has(.bpd-login-page) {
         border: 1px solid #c4c9ac;
         border-radius: 10px;
         padding: 18px;
+    }
+    .ui-metric-card {
+        min-height: 112px;
+        position: relative;
+    }
+    .ui-metric-card p {
+        color: #444933;
+        font-size: 12px;
+        letter-spacing: 0.6px;
+        margin: 0;
+    }
+    .ui-metric-card > i {
+        border-radius: 50%;
+        height: 8px;
+        position: absolute;
+        right: 18px;
+        top: 18px;
+        width: 8px;
+    }
+    .ui-metric-card strong {
+        color: #191c1b;
+        display: block;
+        font-size: 28px;
+        font-weight: 400;
+        margin-top: 8px;
+    }
+    .ui-metric-card small {
+        color: #444933;
+        display: block;
+        font-size: 10px;
     }
     .admin-dashboard-middle,
     .ui-insight-grid {

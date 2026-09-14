@@ -29,6 +29,8 @@ class BranchAdminAccessTest extends TestCase
             ->get(route('admin.dashboard', ['branch_id' => $branchB->id]))
             ->assertOk()
             ->assertSee($ratingA->driver->full_name)
+            ->assertSee('Lihat Semua Penilaian')
+            ->assertDontSee('Lihat Semua Aktivitas')
             ->assertDontSee($ratingB->driver->full_name);
 
         $this->get(route('admin.assessments.index', ['branch_id' => $branchB->id]))

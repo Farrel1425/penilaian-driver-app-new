@@ -9,6 +9,14 @@
     $branchStats = $data['branchStats']->take(5);
     $branchMax = max(5, (float) $branchStats->max('average'));
     $displayTimezone = config('app.display_timezone');
+    $filterQuery = $filters->queryString();
+    $today = now($displayTimezone)->toDateString();
+    $todayQuery = array_merge($filterQuery, ['start_date' => $today, 'end_date' => $today]);
+    $canViewActivityLogs = auth()->user()?->role === \App\Models\User::ROLE_ADMIN;
+    $activityIndexUrl = $canViewActivityLogs
+        ? route('admin.activity-logs.index')
+        : route('admin.assessments.index', $filterQuery);
+    $activityIndexLabel = $canViewActivityLogs ? 'Lihat Semua Aktivitas' : 'Lihat Semua Penilaian';
 @endphp
 
 <section class="admin-dashboard">
@@ -26,16 +34,16 @@
     </header>
 
     <div class="ui-metric-grid ui-metric-grid--six">
-        <article><p>Total Penilaian</p><i class="ink"></i><strong>{{ number_format($stats['total_assessments'] ?? 0) }}</strong><small>Dalam periode terpilih</small></article>
-        <article><p>Rata-rata Driver</p><i class="lime"></i><strong>{{ number_format($stats['average_driver_rating'] ?? 0, 2) }}</strong><small>Dari skala 5.00</small></article>
-        <article><p>Rata-rata Kendaraan</p><i class="blue"></i><strong>{{ number_format($stats['average_vehicle_rating'] ?? 0, 2) }}</strong><small>Dari skala 5.00</small></article>
-        <article><p>Driver Dinilai</p><i class="green"></i><strong>{{ number_format($stats['rated_drivers'] ?? 0) }}</strong><small>Driver unik</small></article>
-        <article><p>Kendaraan Dinilai</p><i class="amber"></i><strong>{{ number_format($stats['rated_vehicles'] ?? 0) }}</strong><small>Kendaraan unik</small></article>
-        <article><p>Penilaian Hari Ini</p><i class="red"></i><strong>{{ number_format($stats['today_assessments'] ?? 0) }}</strong><small>Waktu lokal sistem</small></article>
+        <a class="ui-metric-card" href="{{ route('admin.assessments.index', $filterQuery) }}" aria-label="Buka riwayat seluruh penilaian"><p>Total Penilaian</p><i class="ink"></i><strong>{{ number_format($stats['total_assessments'] ?? 0) }}</strong><small>Dalam periode terpilih</small><x-lucide-arrow-up-right class="ui-metric-link-icon" aria-hidden="true" /></a>
+        <a class="ui-metric-card" href="{{ route('admin.reports.drivers', $filterQuery) }}" aria-label="Buka laporan rata-rata driver"><p>Rata-rata Driver</p><i class="lime"></i><strong>{{ number_format($stats['average_driver_rating'] ?? 0, 2) }}</strong><small>Dari skala 5.00</small><x-lucide-arrow-up-right class="ui-metric-link-icon" aria-hidden="true" /></a>
+        <a class="ui-metric-card" href="{{ route('admin.reports.vehicles', $filterQuery) }}" aria-label="Buka laporan rata-rata kendaraan"><p>Rata-rata Kendaraan</p><i class="blue"></i><strong>{{ number_format($stats['average_vehicle_rating'] ?? 0, 2) }}</strong><small>Dari skala 5.00</small><x-lucide-arrow-up-right class="ui-metric-link-icon" aria-hidden="true" /></a>
+        <a class="ui-metric-card" href="{{ route('admin.reports.drivers', $filterQuery) }}" aria-label="Buka laporan driver yang dinilai"><p>Driver Dinilai</p><i class="green"></i><strong>{{ number_format($stats['rated_drivers'] ?? 0) }}</strong><small>Driver unik</small><x-lucide-arrow-up-right class="ui-metric-link-icon" aria-hidden="true" /></a>
+        <a class="ui-metric-card" href="{{ route('admin.reports.vehicles', $filterQuery) }}" aria-label="Buka laporan kendaraan yang dinilai"><p>Kendaraan Dinilai</p><i class="amber"></i><strong>{{ number_format($stats['rated_vehicles'] ?? 0) }}</strong><small>Kendaraan unik</small><x-lucide-arrow-up-right class="ui-metric-link-icon" aria-hidden="true" /></a>
+        <a class="ui-metric-card" href="{{ route('admin.assessments.index', $todayQuery) }}" aria-label="Buka riwayat penilaian hari ini"><p>Penilaian Hari Ini</p><i class="red"></i><strong>{{ number_format($stats['today_assessments'] ?? 0) }}</strong><small>Waktu lokal sistem</small><x-lucide-arrow-up-right class="ui-metric-link-icon" aria-hidden="true" /></a>
     </div>
 
     <div class="admin-dashboard-middle">
-        <article class="ui-trend">
+        <a class="ui-dashboard-panel-link" href="{{ route('admin.assessments.index', $filterQuery) }}" aria-label="Buka riwayat penilaian untuk periode terpilih"><article class="ui-trend">
             <header><div><h2>Tren Penilaian</h2><p>Rata-rata skor driver dan kendaraan dari waktu ke waktu</p></div><div class="ui-chart-legend"><span><i class="driver"></i>Driver</span><span><i class="vehicle"></i>Kendaraan</span></div></header>
             <div class="ui-bar-groups">
                 @forelse ($trend as $row)
@@ -44,18 +52,18 @@
                     <p class="ui-empty">Belum ada data tren pada periode ini.</p>
                 @endforelse
             </div>
-        </article>
+        </article></a>
 
         <article class="ui-activity">
             <header><h2>Aktivitas Terkini</h2><x-lucide-ellipsis aria-hidden="true" /></header>
             <div class="ui-activity-list">
                 @forelse ($data['latestActivities']->take(4) as $activity)
-                    <div><span class="{{ $activity['type'] === 'rating' ? 'ok' : 'warn' }}">@if ($activity['type'] === 'rating')<x-lucide-circle-check aria-hidden="true" />@else<x-lucide-clipboard-list aria-hidden="true" />@endif</span><p>{{ $activity['description'] }}<small>{{ $activity['created_at']?->diffForHumans() }}</small></p></div>
+                    <a href="{{ $activity['url'] }}"><span class="{{ $activity['type'] === 'rating' ? 'ok' : 'warn' }}">@if ($activity['type'] === 'rating')<x-lucide-circle-check aria-hidden="true" />@else<x-lucide-clipboard-list aria-hidden="true" />@endif</span><p>{{ $activity['description'] }}<small>{{ $activity['created_at']?->diffForHumans() }}</small></p><x-lucide-chevron-right class="ui-activity-link-icon" aria-hidden="true" /></a>
                 @empty
                     <p class="ui-empty">Belum ada aktivitas.</p>
                 @endforelse
             </div>
-            <a href="{{ route('admin.activity-logs.index') }}">Lihat Semua Aktivitas</a>
+            <a href="{{ $activityIndexUrl }}">{{ $activityIndexLabel }}</a>
         </article>
     </div>
 
