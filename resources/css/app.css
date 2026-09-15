@@ -14366,6 +14366,22 @@ body.auth-app:has(.bpd-login-page) {
     background: #fff0cb;
     color: #8d5c00;
 }
+.delete-confirmation-modal.is-status-confirmation:not(.is-deactivation-confirmation) .delete-confirmation-actions .primary-button {
+    background: var(--ui-green);
+    border-right: 1px solid #d0d4cf;
+    color: #ffffff;
+    grid-column: 1;
+    grid-row: 1;
+}
+.delete-confirmation-modal.is-status-confirmation:not(.is-deactivation-confirmation) .delete-confirmation-actions .primary-button:hover {
+    background: var(--ui-green-dark);
+    color: #ffffff;
+}
+.delete-confirmation-modal.is-status-confirmation:not(.is-deactivation-confirmation) .delete-confirmation-actions .primary-button:focus-visible {
+    box-shadow: inset 0 0 0 2px #8ce3ad;
+    color: #ffffff;
+    outline: none;
+}
 .delete-confirmation-actions .danger-button:hover {
     background: #fce9e8;
     color: #c72625;
