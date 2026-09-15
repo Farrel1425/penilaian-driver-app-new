@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Branch;
 use App\Models\User;
 use App\Models\Vehicle;
+use App\Services\VehicleQrCodeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,38 +48,41 @@ class VehicleQrCodeTest extends TestCase
         $this->assertSame(40, strlen($vehicle->fresh()->qr_token));
     }
 
-    public function test_admin_can_download_print_ready_vehicle_qr_pdf(): void
+    public function test_vehicle_qr_url_uses_the_active_app_url(): void
+    {
+        config(['app.url' => 'https://penilaian.example.test']);
+        $vehicle = Vehicle::factory()->create(['qr_token' => 'token-kendaraan']);
+
+        $this->assertSame(
+            'https://penilaian.example.test/rating/token-kendaraan',
+            app(VehicleQrCodeService::class)->vehicleUrl($vehicle),
+        );
+    }
+
+    public function test_vehicle_qr_poster_template_has_the_expected_dimensions(): void
+    {
+        $size = getimagesize(public_path('images/qr-vehicle-template.png'));
+
+        $this->assertIsArray($size);
+        $this->assertSame('image/png', $size['mime']);
+        $this->assertSame(700, $size[0]);
+        $this->assertSame(1000, $size[1]);
+    }
+
+    public function test_admin_can_download_vehicle_qr_as_exact_size_png(): void
     {
         $this->actingAs(User::factory()->create());
         $vehicle = Vehicle::factory()->for(Branch::factory())->create();
 
-        $this->get(route('admin.vehicles.qr.download', $vehicle))
+        $response = $this->get(route('admin.vehicles.qr.download', $vehicle))
             ->assertOk()
-            ->assertHeader('Content-Type', 'application/pdf')
-            ->assertHeader('Content-Disposition', 'attachment; filename=qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.pdf')
-            ->assertSee('%PDF', false);
-    }
+            ->assertHeader('Content-Type', 'image/png')
+            ->assertHeader('Content-Disposition', 'attachment; filename=qr-kendaraan-'.str($vehicle->police_number)->slug()->toString().'.png');
 
-    public function test_admin_can_open_vehicle_qr_print_page(): void
-    {
-        $this->actingAs(User::factory()->create());
-        $vehicle = Vehicle::factory()->for(Branch::factory())->create();
-
-        $this->get(route('admin.vehicles.qr.print', $vehicle))
-            ->assertOk()
-            ->assertSee('Print QR')
-            ->assertSee($vehicle->police_number)
-            ->assertDontSee('/rating/'.$vehicle->qr_token, false);
-    }
-
-    public function test_admin_can_open_label_sized_qr_print_page(): void
-    {
-        $this->actingAs(User::factory()->create());
-        $vehicle = Vehicle::factory()->create();
-
-        $this->get(route('admin.vehicles.qr.print', ['vehicle' => $vehicle, 'format' => 'label']))
-            ->assertOk()
-            ->assertSee('qr-print-card is-label', false);
+        $size = getimagesizefromstring($response->getContent());
+        $this->assertIsArray($size);
+        $this->assertSame(700, $size[0]);
+        $this->assertSame(1000, $size[1]);
     }
 
     public function test_admin_can_preview_vehicle_qr(): void
@@ -93,7 +97,7 @@ class VehicleQrCodeTest extends TestCase
             ->assertDontSee($vehicle->qr_token, false);
     }
 
-    public function test_vehicle_detail_uses_modal_qr_actions_without_preview_navigation(): void
+    public function test_vehicle_detail_keeps_qr_popup_and_only_download_and_regenerate_actions(): void
     {
         $this->actingAs(User::factory()->create());
         $vehicle = Vehicle::factory()->for(Branch::factory())->create();
@@ -101,11 +105,14 @@ class VehicleQrCodeTest extends TestCase
         $this->get(route('admin.vehicles.show', $vehicle))
             ->assertOk()
             ->assertSee('data-vehicle-qr-modal', false)
-            ->assertSee('data-vehicle-qr-print-modal', false)
-            ->assertSee('data-vehicle-qr-print-open', false)
+            ->assertSee('data-vehicle-qr-trigger', false)
             ->assertSee('data-confirm-icon="refresh"', false)
             ->assertSee(route('admin.vehicles.qr.download', $vehicle), false)
-            ->assertSee(route('admin.vehicles.qr.print', $vehicle), false)
+            ->assertSee('Download QR')
+            ->assertSee('Regenerate QR')
+            ->assertDontSee('Atur &amp; Cetak QR', false)
+            ->assertDontSee('data-vehicle-qr-print-modal', false)
+            ->assertDontSee('data-vehicle-qr-print-open', false)
             ->assertDontSee('href="'.route('admin.vehicles.qr.preview', $vehicle).'"', false)
             ->assertDontSee('Preview QR')
             ->assertDontSee('target="_blank"', false);

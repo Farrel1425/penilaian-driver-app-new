@@ -24,11 +24,7 @@
                         <div><dt><x-lucide-building-2 aria-hidden="true" /> Unit Kerja / Cabang</dt><dd>{{ $vehicle->branch?->name ?? '-' }}</dd></div>
                         <div><dt><x-lucide-circle-check aria-hidden="true" /> Status Kendaraan</dt><dd><span class="status-badge {{ $vehicle->status === 'active' ? 'is-active' : 'is-inactive' }}">{{ $vehicle->status === 'active' ? 'Aktif' : 'Nonaktif' }}</span></dd></div>
                     </dl>
-                    <form class="qr-print-settings" method="GET" action="{{ route('admin.vehicles.qr.print', $vehicle) }}" target="_blank">
-                        <label for="qr-print-format">Format cetak</label>
-                        <select id="qr-print-format" name="format"><option value="a4">A4</option><option value="label">Label QR kecil</option></select>
-                        <button class="primary-button" type="submit"><x-lucide-printer aria-hidden="true" /><span>Atur & Cetak QR</span></button>
-                    </form>
+                    <a class="primary-button" href="{{ route('admin.vehicles.qr.download', $vehicle) }}" data-no-loading download><x-lucide-download aria-hidden="true" /><span>Download QR</span></a>
                 </div>
             </div>
         </x-admin.panel>

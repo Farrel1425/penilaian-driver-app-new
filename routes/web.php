@@ -97,7 +97,6 @@ Route::middleware(['auth', 'active.admin', 'admin.inactivity', LogAdminActivity:
             Route::resource('vehicles', VehicleController::class);
             Route::get('vehicles/{vehicle}/qr', [VehicleQrController::class, 'preview'])->name('vehicles.qr.preview');
             Route::get('vehicles/{vehicle}/qr/download', [VehicleQrController::class, 'download'])->name('vehicles.qr.download');
-            Route::get('vehicles/{vehicle}/qr/print', [VehicleQrController::class, 'print'])->name('vehicles.qr.print');
             Route::patch('vehicles/{vehicle}/toggle-status', [VehicleController::class, 'toggleStatus'])->name('vehicles.toggle-status');
             Route::patch('vehicles/{vehicle}/regenerate-qr', [VehicleController::class, 'regenerateQrToken'])->name('vehicles.regenerate-qr');
             Route::patch('questions/reorder', [QuestionController::class, 'reorder'])->name('questions.reorder');

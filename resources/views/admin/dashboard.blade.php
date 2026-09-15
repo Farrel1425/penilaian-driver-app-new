@@ -102,9 +102,9 @@
     <div class="admin-dashboard-tables">
         <article class="ui-latest">
             <header><div><h2>Penilaian Terbaru</h2><p>Penilaian yang terakhir masuk</p></div><x-lucide-filter aria-hidden="true" /></header>
-            <div class="table-wrap"><table><thead><tr><th>DRIVER</th><th>KENDARAAN</th><th>UNIT KERJA</th><th>SKOR</th><th>TANGGAL</th><th>AKSI</th></tr></thead><tbody>
+            <div class="table-wrap"><table><thead><tr><th>DRIVER</th><th>KENDARAAN</th><th>UNIT KERJA</th><th>SKOR</th><th>TANGGAL</th><th class="ui-latest-action-heading">AKSI</th></tr></thead><tbody>
                 @forelse ($data['latestRatings']->take(5) as $rating)
-                    <tr><td>{{ $rating->driver?->full_name ?? '-' }}</td><td>{{ $rating->vehicle?->police_number ?? '-' }}</td><td>{{ $rating->branch?->name ?? '-' }}</td><td><b class="ui-score">{{ number_format($analytics->ratingScore($rating) ?? 0, 2) }}</b></td><td>{{ $rating->submitted_at?->timezone($displayTimezone)?->format('d M, H:i') ?? '-' }}</td><td><a href="{{ route('admin.assessments.show', $rating) }}" aria-label="Lihat penilaian"><x-lucide-eye aria-hidden="true" /></a></td></tr>
+                    <tr><td>{{ $rating->driver?->full_name ?? '-' }}</td><td>{{ $rating->vehicle?->police_number ?? '-' }}</td><td>{{ $rating->branch?->name ?? '-' }}</td><td><b class="ui-score">{{ number_format($analytics->ratingScore($rating) ?? 0, 2) }}</b></td><td>{{ $rating->submitted_at?->timezone($displayTimezone)?->format('d M, H:i') ?? '-' }}</td><td class="ui-latest-action-cell"><div class="table-row-actions"><a class="ui-latest-view-action" href="{{ route('admin.assessments.show', $rating) }}" aria-label="Lihat detail penilaian" title="Lihat detail"><x-lucide-eye aria-hidden="true" /></a></div></td></tr>
                 @empty
                     <tr><td colspan="6">Belum ada penilaian.</td></tr>
                 @endforelse

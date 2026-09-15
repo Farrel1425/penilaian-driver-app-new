@@ -61,7 +61,6 @@ class LogAdminActivity
             str_contains($route, 'toggle-status') => 'Ubah Status',
             str_contains($route, 'regenerate-qr') => 'Regenerate QR',
             str_contains($route, '.qr.download') => 'Unduh QR',
-            str_contains($route, '.qr.print') => 'Cetak QR',
             str_contains($route, '.qr.preview') => 'Preview QR',
             str_ends_with($route, '.export') => 'Export Excel',
             str_ends_with($route, '.print') => 'Cetak Laporan',

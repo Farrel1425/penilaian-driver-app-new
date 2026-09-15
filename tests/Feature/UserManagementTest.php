@@ -91,7 +91,12 @@ class UserManagementTest extends TestCase
 
         $this->actingAs($admin);
 
-        $this->get(route('admin.users.index'))->assertOk();
+        $this->get(route('admin.users.index'))
+            ->assertOk()
+            ->assertSee('status-badge-success', false)
+            ->assertSee('user-status-cell', false)
+            ->assertSee('user-actions-cell', false)
+            ->assertSee('table-row-actions', false);
         $this->get(route('admin.users.create'))->assertOk();
         $this->get(route('admin.users.show', $otherAdmin))->assertOk();
         $this->get(route('admin.users.edit', $otherAdmin))->assertOk();

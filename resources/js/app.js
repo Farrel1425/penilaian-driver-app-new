@@ -426,52 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.querySelector('[data-vehicle-qr-print-modal]');
-    const openButton = document.querySelector('[data-vehicle-qr-print-open]');
-    const form = modal?.querySelector('[data-vehicle-qr-print-form]');
-    const frame = modal?.querySelector('[data-vehicle-qr-print-frame]');
-    const submitButton = form?.querySelector('button[type="submit"]');
-
-    if (!modal || !openButton || !(form instanceof HTMLFormElement) || !(frame instanceof HTMLIFrameElement) || !(submitButton instanceof HTMLButtonElement)) {
-        return;
-    }
-
-    const closeModal = () => {
-        modal.hidden = true;
-        openButton.focus();
-    };
-
-    openButton.addEventListener('click', () => {
-        document.querySelectorAll('.vehicle-qr-menu[open]').forEach(menu => menu.removeAttribute('open'));
-        modal.hidden = false;
-        modal.querySelector('[data-vehicle-qr-print-close]')?.focus();
-    });
-
-    modal.querySelectorAll('[data-vehicle-qr-print-close]').forEach(button => button.addEventListener('click', closeModal));
-
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const url = new URL(form.dataset.printUrl ?? '', window.location.href);
-        url.searchParams.set('format', new FormData(form).get('format')?.toString() ?? 'a4');
-        url.searchParams.set('_print', Date.now().toString());
-        submitButton.disabled = true;
-        submitButton.querySelector('span').textContent = 'Menyiapkan...';
-
-        frame.addEventListener('load', () => {
-            frame.contentWindow?.focus();
-            frame.contentWindow?.print();
-            submitButton.disabled = false;
-            submitButton.querySelector('span').textContent = 'Cetak QR';
-        }, { once: true });
-        frame.src = url.toString();
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !modal.hidden) closeModal();
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
     const targetInput = document.querySelector('[data-weight-target]');
     const weightInput = document.querySelector('[data-question-weight]');
     const indicatorInput = document.querySelector('[data-indicator-input]');
