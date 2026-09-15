@@ -311,15 +311,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const label = isDelete ? 'Hapus Data' : (form.dataset.confirmLabel || 'Hapus');
         confirm.querySelector('[data-delete-modal-confirm-label]').textContent = label;
         const isPrimary = form.dataset.confirmTone === 'primary';
-        const isDeactivation = !isDelete && form.dataset.confirmIcon === 'power' && label.toLowerCase().startsWith('nonaktifkan');
+        const confirmIcon = form.dataset.confirmIcon;
+        const hasActionIcon = confirmIcon === 'power' || confirmIcon === 'refresh';
+        const isDeactivation = !isDelete && confirmIcon === 'power' && label.toLowerCase().startsWith('nonaktifkan');
         confirm.classList.toggle('primary-button', isPrimary);
         confirm.classList.toggle('danger-button', !isPrimary);
-        modal.classList.toggle('is-status-confirmation', form.dataset.confirmIcon === 'power');
+        modal.classList.toggle('is-status-confirmation', hasActionIcon);
         modal.classList.toggle('is-deactivation-confirmation', isDeactivation);
-        modal.querySelector('[data-delete-modal-icon]')?.toggleAttribute('hidden', form.dataset.confirmIcon === 'power');
-        modal.querySelector('[data-confirm-modal-power-icon]')?.toggleAttribute('hidden', form.dataset.confirmIcon !== 'power');
-        confirm.querySelector('[data-delete-modal-confirm-trash]')?.toggleAttribute('hidden', form.dataset.confirmIcon === 'power');
-        confirm.querySelector('[data-delete-modal-confirm-power]')?.toggleAttribute('hidden', form.dataset.confirmIcon !== 'power');
+        modal.querySelector('[data-delete-modal-icon]')?.toggleAttribute('hidden', hasActionIcon);
+        modal.querySelector('[data-confirm-modal-power-icon]')?.toggleAttribute('hidden', confirmIcon !== 'power');
+        modal.querySelector('[data-confirm-modal-refresh-icon]')?.toggleAttribute('hidden', confirmIcon !== 'refresh');
+        confirm.querySelector('[data-delete-modal-confirm-trash]')?.toggleAttribute('hidden', hasActionIcon);
+        confirm.querySelector('[data-delete-modal-confirm-power]')?.toggleAttribute('hidden', confirmIcon !== 'power');
+        confirm.querySelector('[data-delete-modal-confirm-refresh]')?.toggleAttribute('hidden', confirmIcon !== 'refresh');
         modal.hidden = false;
         confirm.focus();
     };
@@ -418,6 +422,52 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key === 'Escape' && !modal.hidden) {
             closeModal();
         }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.querySelector('[data-vehicle-qr-print-modal]');
+    const openButton = document.querySelector('[data-vehicle-qr-print-open]');
+    const form = modal?.querySelector('[data-vehicle-qr-print-form]');
+    const frame = modal?.querySelector('[data-vehicle-qr-print-frame]');
+    const submitButton = form?.querySelector('button[type="submit"]');
+
+    if (!modal || !openButton || !(form instanceof HTMLFormElement) || !(frame instanceof HTMLIFrameElement) || !(submitButton instanceof HTMLButtonElement)) {
+        return;
+    }
+
+    const closeModal = () => {
+        modal.hidden = true;
+        openButton.focus();
+    };
+
+    openButton.addEventListener('click', () => {
+        document.querySelectorAll('.vehicle-qr-menu[open]').forEach(menu => menu.removeAttribute('open'));
+        modal.hidden = false;
+        modal.querySelector('[data-vehicle-qr-print-close]')?.focus();
+    });
+
+    modal.querySelectorAll('[data-vehicle-qr-print-close]').forEach(button => button.addEventListener('click', closeModal));
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const url = new URL(form.dataset.printUrl ?? '', window.location.href);
+        url.searchParams.set('format', new FormData(form).get('format')?.toString() ?? 'a4');
+        url.searchParams.set('_print', Date.now().toString());
+        submitButton.disabled = true;
+        submitButton.querySelector('span').textContent = 'Menyiapkan...';
+
+        frame.addEventListener('load', () => {
+            frame.contentWindow?.focus();
+            frame.contentWindow?.print();
+            submitButton.disabled = false;
+            submitButton.querySelector('span').textContent = 'Cetak QR';
+        }, { once: true });
+        frame.src = url.toString();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) closeModal();
     });
 });
 

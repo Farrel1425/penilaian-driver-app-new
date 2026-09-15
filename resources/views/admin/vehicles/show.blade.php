@@ -29,10 +29,9 @@
                     <details class="vehicle-qr-menu">
                         <summary aria-label="Aksi QR kendaraan" title="Aksi QR"><x-lucide-download aria-hidden="true" /></summary>
                         <div class="vehicle-qr-menu-content">
-                            <a href="{{ route('admin.vehicles.qr.preview', $vehicle) }}"><x-lucide-expand aria-hidden="true" /><span>Preview QR</span></a>
-                            <a href="{{ route('admin.vehicles.qr.download', $vehicle) }}"><x-lucide-download aria-hidden="true" /><span>Download QR</span></a>
-                            <a href="{{ route('admin.vehicles.qr.print', $vehicle) }}" target="_blank" rel="noopener"><x-lucide-printer aria-hidden="true" /><span>Atur & Cetak QR</span></a>
-                            <form method="POST" action="{{ route('admin.vehicles.regenerate-qr', $vehicle) }}">@csrf @method('PATCH')<button type="submit"><x-lucide-refresh-cw aria-hidden="true" /><span>Regenerate QR</span></button></form>
+                            <a href="{{ route('admin.vehicles.qr.download', $vehicle) }}" data-no-loading download><x-lucide-download aria-hidden="true" /><span>Download QR</span></a>
+                            <button type="button" data-vehicle-qr-print-open><x-lucide-printer aria-hidden="true" /><span>Atur & Cetak QR</span></button>
+                            <form method="POST" action="{{ route('admin.vehicles.regenerate-qr', $vehicle) }}" data-confirm data-no-loading data-confirm-title="Regenerate QR kendaraan?" data-confirm-description="QR lama untuk {{ $vehicle->police_number }} akan langsung tidak berlaku dan diganti dengan QR baru." data-confirm-label="Regenerate QR" data-confirm-tone="primary" data-confirm-icon="refresh">@csrf @method('PATCH')<button type="submit"><x-lucide-refresh-cw aria-hidden="true" /><span>Regenerate QR</span></button></form>
                         </div>
                     </details>
                     <button class="vehicle-detail-qr-open" type="button" data-vehicle-qr-trigger data-qr-src="{{ $qrDataUri }}" data-qr-title="{{ $vehicle->police_number }}" data-qr-description="{{ trim($vehicle->brand.' '.$vehicle->model) }} - {{ $vehicle->branch?->name }}" data-qr-download="{{ route('admin.vehicles.qr.download', $vehicle) }}" aria-label="Buka QR {{ $vehicle->police_number }}">
@@ -50,5 +49,30 @@
                 </div>
             </x-admin.panel>
         </div>
+    </div>
+
+    @include('admin.vehicles._qr-modal')
+
+    <div class="vehicle-qr-modal" data-vehicle-qr-print-modal hidden>
+        <button class="vehicle-qr-modal-backdrop" type="button" data-vehicle-qr-print-close aria-label="Tutup pengaturan cetak QR"></button>
+        <section class="vehicle-qr-dialog vehicle-qr-print-dialog" role="dialog" aria-modal="true" aria-labelledby="vehicle-qr-print-title">
+            <button class="vehicle-qr-close" type="button" data-vehicle-qr-print-close aria-label="Tutup pengaturan cetak QR"><x-lucide-x aria-hidden="true" /></button>
+            <span class="vehicle-qr-dialog-label">Pengaturan Cetak</span>
+            <h2 id="vehicle-qr-print-title">Atur &amp; Cetak QR</h2>
+            <p>{{ $vehicle->police_number }} &middot; {{ trim($vehicle->brand.' '.$vehicle->model) }}</p>
+            <div class="vehicle-qr-print-preview"><img src="{{ $qrDataUri }}" alt="QR {{ $vehicle->police_number }}"></div>
+            <form class="vehicle-qr-print-form" data-vehicle-qr-print-form data-print-url="{{ route('admin.vehicles.qr.print', $vehicle) }}">
+                <label for="vehicle-qr-print-format">Format cetak</label>
+                <select id="vehicle-qr-print-format" name="format">
+                    <option value="a4">A4</option>
+                    <option value="label">Label QR kecil</option>
+                </select>
+                <div class="vehicle-qr-print-actions">
+                    <button class="secondary-button" type="button" data-vehicle-qr-print-close>Batal</button>
+                    <button class="primary-button" type="submit"><x-lucide-printer aria-hidden="true" /><span>Cetak QR</span></button>
+                </div>
+            </form>
+            <iframe class="vehicle-qr-print-frame" data-vehicle-qr-print-frame title="Dokumen cetak QR" hidden></iframe>
+        </section>
     </div>
 </x-layouts.admin>

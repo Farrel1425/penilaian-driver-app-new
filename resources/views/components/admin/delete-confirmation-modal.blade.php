@@ -4,6 +4,7 @@
         <div class="delete-confirmation-icon" aria-hidden="true">
             <span data-delete-modal-icon><x-lucide-trash-2 /></span>
             <span data-confirm-modal-power-icon hidden><x-lucide-power /></span>
+            <span data-confirm-modal-refresh-icon hidden><x-lucide-refresh-cw /></span>
         </div>
         <h2 id="delete-confirmation-title" data-delete-modal-title>Delete Data</h2>
         <p id="delete-confirmation-description" data-delete-modal-description>Apakah anda yakin ingin menghapus data?</p>
@@ -12,6 +13,7 @@
             <button class="danger-button" type="button" data-delete-modal-confirm>
                 <span data-delete-modal-confirm-trash aria-hidden="true"><x-lucide-trash-2 /></span>
                 <span data-delete-modal-confirm-power aria-hidden="true" hidden><x-lucide-power /></span>
+                <span data-delete-modal-confirm-refresh aria-hidden="true" hidden><x-lucide-refresh-cw /></span>
                 <span data-delete-modal-confirm-label>Hapus Data</span>
             </button>
         </div>

@@ -92,4 +92,22 @@ class VehicleQrCodeTest extends TestCase
             ->assertDontSee('/rating/'.$vehicle->qr_token, false)
             ->assertDontSee($vehicle->qr_token, false);
     }
+
+    public function test_vehicle_detail_uses_modal_qr_actions_without_preview_navigation(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $vehicle = Vehicle::factory()->for(Branch::factory())->create();
+
+        $this->get(route('admin.vehicles.show', $vehicle))
+            ->assertOk()
+            ->assertSee('data-vehicle-qr-modal', false)
+            ->assertSee('data-vehicle-qr-print-modal', false)
+            ->assertSee('data-vehicle-qr-print-open', false)
+            ->assertSee('data-confirm-icon="refresh"', false)
+            ->assertSee(route('admin.vehicles.qr.download', $vehicle), false)
+            ->assertSee(route('admin.vehicles.qr.print', $vehicle), false)
+            ->assertDontSee('href="'.route('admin.vehicles.qr.preview', $vehicle).'"', false)
+            ->assertDontSee('Preview QR')
+            ->assertDontSee('target="_blank"', false);
+    }
 }
