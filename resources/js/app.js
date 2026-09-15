@@ -1,7 +1,3 @@
-import Cropper from 'cropperjs';
-import 'cropperjs/dist/cropper.css';
-import lottie from 'lottie-web/build/player/lottie_light';
-import QrScanner from 'qr-scanner';
 import '../css/passenger.css';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,21 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         categorySelect.addEventListener('change', syncSimSection);
         syncSimSection();
     }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-app-loading-animation]').forEach((container) => {
-        lottie.loadAnimation({
-            autoplay: true,
-            container,
-            loop: true,
-            path: container.dataset.appLoadingAnimation,
-            renderer: 'svg',
-            rendererSettings: {
-                preserveAspectRatio: 'xMidYMid meet',
-            },
-        });
-    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -178,14 +159,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.querySelector('[data-app-loading]');
     let loadingTimer;
     let loadingSafetyTimer;
+    let loadingAnimationPromise;
 
     if (!loadingOverlay) {
         return;
     }
+    const startLoadingAnimation = () => {
+        const container = loadingOverlay.querySelector('[data-app-loading-animation]');
+
+        if (!container || loadingAnimationPromise) {
+            return;
+        }
+
+        loadingAnimationPromise = import('lottie-web/build/player/lottie_light').then(({ default: lottie }) => {
+            lottie.loadAnimation({
+                autoplay: true,
+                container,
+                loop: true,
+                path: container.dataset.appLoadingAnimation,
+                renderer: 'svg',
+                rendererSettings: {
+                    preserveAspectRatio: 'xMidYMid meet',
+                },
+            });
+        });
+    };
+
     const showLoading = () => {
         window.clearTimeout(loadingTimer);
         window.clearTimeout(loadingSafetyTimer);
         loadingTimer = window.setTimeout(() => {
+            startLoadingAnimation();
             loadingOverlay.hidden = false;
             loadingOverlay.setAttribute('aria-busy', 'true');
             window.requestAnimationFrame(() => loadingOverlay.classList.add('is-visible'));
@@ -609,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderQuestionPreview();
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const logoInput = document.querySelector('[data-settings-logo-input]');
     const logoPreview = document.querySelector('[data-settings-logo-preview]');
     const logoFileName = document.querySelector('[data-settings-logo-file-name]');
@@ -625,7 +629,18 @@ document.addEventListener('DOMContentLoaded', () => {
         logoFileName.textContent = file.name;
     });
 
-    document.querySelectorAll('[data-image-cropper]').forEach((field) => {
+    const cropperFields = [...document.querySelectorAll('[data-image-cropper]')];
+
+    if (cropperFields.length === 0) {
+        return;
+    }
+
+    const [{ default: Cropper }] = await Promise.all([
+        import('cropperjs'),
+        import('cropperjs/dist/cropper.css'),
+    ]);
+
+    cropperFields.forEach((field) => {
         const imageInput = field.querySelector('[data-image-input]');
         const cameraInput = field.querySelector('[data-camera-input]');
         const pickerTrigger = field.querySelector('[data-image-open-picker]');
@@ -887,6 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let qrScanner;
+    let QrScanner;
 
     const stopCamera = () => {
         qrScanner?.stop();
@@ -935,6 +951,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            QrScanner ??= (await import('qr-scanner')).default;
             qrScanner ??= new QrScanner(
                 video,
                 (result) => openRating(result.data),

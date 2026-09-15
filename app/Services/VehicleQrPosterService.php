@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Vehicle;
 use GdImage;
+use Illuminate\Support\Facades\Cache;
 use RuntimeException;
 
 class VehicleQrPosterService
@@ -37,6 +38,37 @@ class VehicleQrPosterService
         }
 
         $template = public_path('images/qr-vehicle-template.png');
+
+        if (! is_file($template)) {
+            throw new RuntimeException('Template poster QR kendaraan tidak ditemukan.');
+        }
+
+        $cacheKey = 'vehicle-qr-poster:'.hash('sha256', json_encode([
+            'template' => hash_file('sha256', $template),
+            'vehicle_id' => $vehicle->getKey(),
+            'qr_token' => $vehicle->qr_token,
+            'police_number' => $vehicle->police_number,
+            'brand' => $vehicle->brand,
+            'model' => $vehicle->model,
+            'branch' => $vehicle->branch?->name,
+        ], JSON_THROW_ON_ERROR));
+
+        $cachedPoster = Cache::remember(
+            $cacheKey,
+            now()->addDay(),
+            fn (): string => base64_encode($this->renderUncached($vehicle, $template)),
+        );
+        $poster = base64_decode($cachedPoster, true);
+
+        if (! is_string($poster)) {
+            throw new RuntimeException('Cache poster QR kendaraan tidak valid.');
+        }
+
+        return $poster;
+    }
+
+    private function renderUncached(Vehicle $vehicle, string $template): string
+    {
         $canvas = is_file($template) ? imagecreatefrompng($template) : false;
 
         if (! $canvas || imagesx($canvas) !== self::WIDTH || imagesy($canvas) !== self::HEIGHT) {
@@ -50,7 +82,7 @@ class VehicleQrPosterService
         $this->drawVehicleInformation($canvas, $vehicle);
 
         ob_start();
-        imagepng($canvas, null, 9);
+        imagepng($canvas, null, 6);
         $png = ob_get_clean();
         imagedestroy($canvas);
 

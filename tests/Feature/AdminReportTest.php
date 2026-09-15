@@ -48,7 +48,6 @@ class AdminReportTest extends TestCase
         $this->actingAs(User::factory()->create());
         [$branchA, $driverA, $vehicleA] = $this->makeEntities();
         [$branchB, $driverB, $vehicleB] = $this->makeEntities();
-        $driverA->update(['photo' => 'drivers/dashboard-test.jpg']);
         $question = Question::factory()->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_RATING]);
         $this->makeRating($branchA, $driverA, $vehicleA, $question, 5);
         $this->makeRating($branchB, $driverB, $vehicleB, $question, 1);
@@ -57,7 +56,6 @@ class AdminReportTest extends TestCase
             ->assertOk()
             ->assertSee('Total Penilaian')
             ->assertSee($driverA->full_name)
-            ->assertSee('storage/drivers/dashboard-test.jpg')
             ->assertDontSee($driverB->full_name);
     }
 

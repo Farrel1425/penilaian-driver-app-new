@@ -85,18 +85,6 @@ class VehicleQrCodeTest extends TestCase
         $this->assertSame(1000, $size[1]);
     }
 
-    public function test_admin_can_preview_vehicle_qr(): void
-    {
-        $this->actingAs(User::factory()->create());
-        $vehicle = Vehicle::factory()->create();
-
-        $this->get(route('admin.vehicles.qr.preview', $vehicle))
-            ->assertOk()
-            ->assertSee('Preview QR')
-            ->assertDontSee('/rating/'.$vehicle->qr_token, false)
-            ->assertDontSee($vehicle->qr_token, false);
-    }
-
     public function test_vehicle_detail_keeps_qr_popup_and_only_download_and_regenerate_actions(): void
     {
         $this->actingAs(User::factory()->create());
@@ -113,7 +101,6 @@ class VehicleQrCodeTest extends TestCase
             ->assertDontSee('Atur &amp; Cetak QR', false)
             ->assertDontSee('data-vehicle-qr-print-modal', false)
             ->assertDontSee('data-vehicle-qr-print-open', false)
-            ->assertDontSee('href="'.route('admin.vehicles.qr.preview', $vehicle).'"', false)
             ->assertDontSee('Preview QR')
             ->assertDontSee('target="_blank"', false);
     }

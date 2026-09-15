@@ -95,7 +95,6 @@ Route::middleware(['auth', 'active.admin', 'admin.inactivity', LogAdminActivity:
             Route::resource('indicator-categories', IndicatorCategoryController::class)->except('show');
             Route::patch('indicator-categories/{indicator_category}/toggle-status', [IndicatorCategoryController::class, 'toggleStatus'])->name('indicator-categories.toggle-status');
             Route::resource('vehicles', VehicleController::class);
-            Route::get('vehicles/{vehicle}/qr', [VehicleQrController::class, 'preview'])->name('vehicles.qr.preview');
             Route::get('vehicles/{vehicle}/qr/download', [VehicleQrController::class, 'download'])->name('vehicles.qr.download');
             Route::patch('vehicles/{vehicle}/toggle-status', [VehicleController::class, 'toggleStatus'])->name('vehicles.toggle-status');
             Route::patch('vehicles/{vehicle}/regenerate-qr', [VehicleController::class, 'regenerateQrToken'])->name('vehicles.regenerate-qr');

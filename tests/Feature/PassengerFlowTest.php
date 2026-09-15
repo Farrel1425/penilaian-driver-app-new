@@ -30,7 +30,7 @@ class PassengerFlowTest extends TestCase
             ->assertSee('Scan Ulang QR');
         $this->get(route('passenger.rating.drivers', $vehicle->qr_token))->assertOk()->assertSee($driver->full_name);
         $this->get(route('passenger.rating.driver', [$vehicle->qr_token, $driver]))->assertOk()->assertSee($driver->full_name);
-        $this->get(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]))->assertOk()->assertSee('Input Nama');
+        $this->get(route('passenger.rating.assessor', [$vehicle->qr_token, $driver]))->assertOk()->assertSee('Data Penumpang');
         $this->post(route('passenger.rating.assessor.store', [$vehicle->qr_token, $driver]), ['passenger_name' => 'Made Penilai', 'passenger_unit' => 'Kantor Pusat'])
             ->assertRedirect(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]));
         $this->get(route('passenger.rating.assessment', [$vehicle->qr_token, $driver]))->assertOk()->assertSee($driverRating->question)->assertSee($yesNo->question);
