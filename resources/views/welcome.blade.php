@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="PT. Bali Dana Sejahtera: persewaan armada, tenaga alih daya, serta pengadaan ATK dan percetakan untuk institusi di Bali.">
+    <meta name="description" content="PT. Bali Dana Sejahtera: persewaan armada, tenaga alih daya, pengadaan dan percetakan, serta layanan pembersihan dan perawatan AC untuk institusi di Bali.">
     <link rel="icon" type="image/png" href="{{ asset('images/bds/bds-logo.png') }}">
     <title>PT. Bali Dana Sejahtera</title>
     {!! Illuminate\Support\Facades\Vite::fonts() !!}
@@ -21,6 +21,8 @@
             ['PT. GTA', 'General Trading Agency', 'Outsourcing & Logistik ATK', 11],
             ['Dana Pensiun BPD', 'Lembaga Pengelola', 'Kerjasama Korporat', 12],
             ['Metric Salon Bali', 'Sektor Swasta & Komersial', 'Percetakan & Promosi', 13],
+            ['PT. Jamkrida Bali Mandara', 'Penjaminan Kredit Daerah Bali', 'BUMD Penjaminan Kredit', 'images/bds/icon-jamkrida.svg'],
+            ['Lembaga Perkreditan Desa (LPD) se-Bali', 'Pengadaan cetak formulir bank, slip transaksi & perlengkapan administrasi kantor', 'Jaringan Se-Bali', 14],
         ];
         $standards = [
             ['SOP Terintegrasi', 'Menyelaraskan prosedur kerja internal BDS secara fleksibel dengan kode etik dan standar operasional klien.', 15],
@@ -51,7 +53,7 @@
         <section id="beranda" class="bds-hero bds-shell">
             <div class="bds-hero-copy">
                 <p class="bds-badge"><img src="{{ $icon() }}" alt="" width="15" height="14"> TERDAFTAR KEMENKUMHAM RI • SEJAK 2007</p>
-                <h1><span>Solusi Terintegrasi</span><span><em>Mitra Andal</em> bagi</span><span>Pertumbuhan &amp; Efisiensi</span><span>Korporat</span></h1>
+                <h1>Solusi Anda<em>Prioritas</em> Kami</h1>
                 <p class="bds-lead">PT. Bali Dana Sejahtera (PT. BDS) menghadirkan ekosistem terpadu persewaan armada kendaraan operasional, tenaga alih daya (outsourcing) tersertifikasi, serta pengadaan ATK &amp; percetakan resmi instansi perbankan di seluruh Bali.</p>
                 <div class="bds-hero-actions">
                     <a class="bds-button" href="#hubungi">Hubungi Kami <img src="{{ $icon(1) }}" alt="" width="11" height="11"></a>
@@ -64,7 +66,7 @@
             </div>
             <div class="bds-hero-visual">
                 <div class="bds-photo">
-                    <img class="bds-armada" src="{{ asset('images/bds/armada.png') }}" alt="Armada operasional dan tenaga pengamanan PT. Bali Dana Sejahtera di Denpasar Bali" width="600" height="400">
+                    <img class="bds-armada" src="{{ asset('images/bds/hero-driver-evaluation.png') }}" alt="Aplikasi Penilaian Driver PT. Bali Dana Sejahtera digunakan dari dalam kendaraan" width="417" height="329">
                     <a class="bds-photo-link" href="#layanan" aria-label="Lihat layanan armada"><img src="{{ $icon(2) }}" alt="" width="12" height="12"></a>
                     <div class="bds-photo-caption"><span>STANDAR PERBANKAN</span><strong>Pengelolaan 100+ Armada &amp; Tenaga Tersertifikasi</strong></div>
                 </div>
@@ -83,8 +85,7 @@
 
         <section id="layanan" class="bds-services-section bds-shell">
             <div class="bds-section-heading">
-                <div><p class="bds-eyebrow">PILAR SOLUSI KORPORAT</p><h2>Solusi Tiga Pilar Bisnis<br><em>Menjawab Segala Kebutuhan</em> Operasional<br>Anda</h2></div>
-                <p>Integrasi persewaan kendaraan dinas, rekrutmen SDM profesional, serta pengadaan ATK &amp; percetakan dalam satu pintu manajemen terpercaya.</p>
+                <div><p class="bds-eyebrow">PILAR SOLUSI KORPORAT</p><h2>Solusi Empat Pilar Bisnis<br><em>Menjawab Segala Kebutuhan</em> Operasional<br>Anda</h2></div>
             </div>
             <div class="bds-services">
                 <article class="bds-service-card">
@@ -92,7 +93,7 @@
                     <h3>Persewaan Armada Kendaraan</h3>
                     <p>Armada representatif terawat dengan garansi penggantian unit 24 jam dan asuransi all-risk komprehensif.</p>
                     <dl class="bds-fleet">
-                        @foreach (['Toyota Avanza (Operasional Dinas)' => '72 Unit', 'Innova Reborn & Innova Zenix' => '8 Unit', 'Toyota Fortuner & Voxy (VIP)' => '10 Unit', 'Mobil Kas Keliling Bank' => '7 Unit', 'Grand Max & Sepeda Motor' => '5 Unit'] as $name => $total)
+                        @foreach (['Toyota Avanza (Dinas)' => '72 Unit', 'Innova Reborn & Zenix' => '8 Unit', 'Toyota Fortuner & Voxy' => '10 Unit', 'Mobil Kas Keliling Bank' => '7 Unit', 'Grand Max & Sepeda Motor' => '5 Unit'] as $name => $total)
                             <div><dt>{{ $name }}</dt><dd>{{ $total }}</dd></div>
                         @endforeach
                     </dl>
@@ -112,14 +113,25 @@
                 </article>
                 <article class="bds-service-card">
                     <div class="bds-service-label"><span>Layanan 03</span><small><img src="{{ $icon(6) }}" alt="">Presisi Tinggi</small></div>
-                    <h3>Kertas, Percetakan &amp; ATK</h3>
-                    <p>Pengadaan dokumen sekuriti perbankan, continuous form, dan suplai kebutuhan ATK rutin kantor cabang instansi se-Bali.</p>
+                    <h3>Perdagangan dan Percetakan</h3>
+                    <p>Pengadaan dokumen sekuriti perbankan, continuous form, dan suplai kebutuhan ATK rutin kantor cabang se-Bali.</p>
                     <ul class="bds-supplies">
-                        @foreach (['Buku Cek, Formulir Bank & Bilyet Giro', 'Continuous Form & Kertas Segala Gramatur', 'Slip Transaksi, Map Kantor & Amplop Kop', 'Distribusi Rutin Cepat ke Seluruh Wilayah Bali'] as $item)
+                        @foreach (['Buku Cek, Formulir & Giro', 'Continuous Form Aneka Gramatur', 'Slip Transaksi & Amplop Kop', 'Distribusi Cepat Wilayah Bali'] as $item)
                             <li><img src="{{ $icon(7) }}" alt="">{{ $item }}</li>
                         @endforeach
                     </ul>
                     <a class="bds-card-footer" href="#hubungi">Standar Kerapihan Perbankan <span><img src="{{ $icon(4) }}" alt=""></span></a>
+                </article>
+                <article class="bds-service-card">
+                    <div class="bds-service-label"><span>Layanan 04</span><small><img src="{{ asset('images/bds/icon-cleaning-ac.svg') }}" alt="">Kebersihan &amp; AC</small></div>
+                    <h3>Kelola Pembersihan &amp; Perawatan AC</h3>
+                    <p>Layanan terintegrasi pembersihan gedung kantor, sanitasi berkala, serta instalasi dan pemeliharaan sistem AC pendingin ruangan berstandar prima.</p>
+                    <ul class="bds-supplies">
+                        @foreach (['Servis & Cuci AC Berkala (Split, Cassette, Central)', 'Pengadaan & Instalasi Pendingin Ruangan', 'Deep Cleaning & Sanitasi Gedung Kantor', 'Perawatan Saluran Udara & Filter Berkala'] as $item)
+                            <li><img src="{{ $icon(7) }}" alt="">{{ $item }}</li>
+                        @endforeach
+                    </ul>
+                    <a class="bds-card-footer" href="#hubungi">Teknisi AC Bersertifikat &amp; Higienis <span><img src="{{ $icon(4) }}" alt=""></span></a>
                 </article>
             </div>
         </section>
@@ -137,9 +149,8 @@
             <div class="bds-centered-heading"><p class="bds-eyebrow">JEJARING KEPERCAYAAN</p><h2>Mitra Klien &amp; Rekanan Institusional</h2><p>Menjadi bagian tak terpisahkan dari operasional perbankan terkemuka, lembaga pembangunan, dan korporasi swasta di Bali.</p></div>
             <div class="bds-partner-grid">
                 @foreach ($partners as [$name, $description, $service, $image])
-                    <article class="bds-partner"><span class="bds-partner-icon"><img src="{{ $icon($image) }}" alt=""></span><h3>{{ $name }}</h3><p>{{ $description }}</p><small>{{ $service }}</small></article>
+                    <article class="bds-partner"><span class="bds-partner-icon"><img src="{{ is_int($image) ? $icon($image) : asset($image) }}" alt=""></span><h3>{{ $name }}</h3><p>{{ $description }}</p><small>{{ $service }}</small></article>
                 @endforeach
-                <article class="bds-partner bds-partner-wide"><span class="bds-partner-icon"><img src="{{ $icon(14) }}" alt=""></span><div><h3>Lembaga Perkreditan Desa (LPD) se-Bali</h3><p>Pengadaan cetak formulir bank, slip transaksi &amp; perlengkapan administrasi kantor</p></div><small>Jaringan Se-Bali</small></article>
             </div>
         </section>
 
@@ -157,7 +168,7 @@
         <section id="hubungi" class="bds-contact-section">
             <div class="bds-contact">
                 <div class="bds-contact-copy">
-                    <div><span class="bds-dark-badge"><img src="{{ $icon(19) }}" alt="">Respon Cepat &lt; 24 Jam Kerja</span><h2>Mulai Kemitraan Bersama PT. BDS</h2><p>Diskusikan kebutuhan sewa armada, penyediaan tenaga alih daya bersertifikasi, atau pencetakan formulir resmi instansi Anda.</p></div>
+                    <div><span class="bds-dark-badge"><img src="{{ $icon(19) }}" alt="">Respon Cepat &lt; 24 Jam Kerja</span><h2>Mulai Kemitraan Bersama PT. BDS</h2><p>Diskusikan kebutuhan sewa armada, tenaga alih daya bersertifikasi, pengadaan dan percetakan, atau layanan pembersihan dan perawatan AC.</p></div>
                     <address>
                         <div><span><img src="{{ $icon(20) }}" alt=""></span><p><strong>Kantor Operasional &amp; Sekretariat:</strong>Denpasar, Bali - Indonesia (Melayani seluruh kabupaten/kota se-Bali)</p></div>
                         <div><span><img src="{{ $icon(21) }}" alt=""></span><p><strong>Surat Elektronik (Email):</strong><a href="mailto:sekretariat@balidanasejahtera.co.id">sekretariat@balidanasejahtera.co.id</a> /<br><a href="mailto:corporate@bdsbali.com">corporate@bdsbali.com</a></p></div>
@@ -183,7 +194,7 @@
                         <label>Nama PIC &amp; Jabatan *<input name="contact_name" value="{{ old('contact_name') }}" placeholder="Nama PIC Pengadaan" required autocomplete="name"></label>
                         <label>Nomor WhatsApp PIC *<input name="whatsapp" value="{{ old('whatsapp') }}" type="tel" placeholder="0812-xxxx-xxxx" required autocomplete="tel"></label>
                         <label>Email Resmi *<input name="email" value="{{ old('email') }}" type="email" placeholder="pic@perusahaan.co.id" required autocomplete="email"></label>
-                        <label class="bds-field-wide">Kebutuhan Layanan *<select name="service" required><option @selected(old('service') === 'Persewaan Armada Kendaraan (Avanza, Innova, VIP, Kas Mobil)')>Persewaan Armada Kendaraan (Avanza, Innova, VIP, Kas Mobil)</option><option @selected(old('service') === 'Tenaga Alih Daya Terpadu')>Tenaga Alih Daya Terpadu</option><option @selected(old('service') === 'Kertas, Percetakan & ATK')>Kertas, Percetakan &amp; ATK</option></select></label>
+                        <label class="bds-field-wide">Kebutuhan Layanan *<select name="service" required><option @selected(old('service') === 'Persewaan Armada Kendaraan (Avanza, Innova, VIP, Kas Mobil)')>Persewaan Armada Kendaraan (Avanza, Innova, VIP, Kas Mobil)</option><option @selected(old('service') === 'Tenaga Alih Daya Terpadu')>Tenaga Alih Daya Terpadu</option><option @selected(old('service') === 'Perdagangan dan Percetakan')>Perdagangan dan Percetakan</option><option @selected(old('service') === 'Kelola Pembersihan & Perawatan AC')>Kelola Pembersihan &amp; Perawatan AC</option></select></label>
                         <label>Estimasi Kebutuhan Unit/Personel<input name="estimated_need" value="{{ old('estimated_need') }}" placeholder="Contoh: 5 Unit Armada / 10 Satpam"></label>
                         <label>Durasi Kontrak Kerjasama<select name="contract_duration"><option @selected(old('contract_duration') === 'Kontrak Tahunan (1 - 3 Tahun)')>Kontrak Tahunan (1 - 3 Tahun)</option><option @selected(old('contract_duration') === 'Kurang dari 1 Tahun')>Kurang dari 1 Tahun</option><option @selected(old('contract_duration') === 'Lebih dari 3 Tahun')>Lebih dari 3 Tahun</option></select></label>
                         <label class="bds-field-wide">Keterangan Tambahan<textarea name="notes" rows="3" placeholder="Sebutkan detail rute dinas, kualifikasi khusus, atau jadwal pengiriman proposal...">{{ old('notes') }}</textarea></label>
@@ -197,8 +208,8 @@
     <footer class="bds-footer">
         <div class="bds-shell">
             <div class="bds-footer-grid">
-                <div class="bds-footer-brand"><a class="bds-brand" href="#beranda"><img src="{{ $logo }}" alt="Logo PT. Bali Dana Sejahtera" width="38" height="38"><strong>PT. Bali Dana Sejahtera</strong></a><p>Perusahaan penyedia persewaan kendaraan operasional, tenaga alih daya (outsourcing) tersertifikasi, serta pengadaan ATK &amp; formulir perbankan di Bali sejak 2007.</p><small>SK Kemenkumham RI Terdaftar Resmi</small></div>
-                <div><h3>LAYANAN UTAMA</h3><a href="#layanan">Persewaan Armada Mobil Dinas</a><a href="#layanan">Mobil Kas Keliling Bank</a><a href="#layanan">Satpam Sertifikasi Gada Pratama</a><a href="#layanan">Tenaga Driver &amp; Cleaning Service</a><a href="#layanan">Kertas Continuous Form &amp; ATK Bank</a></div>
+                <div class="bds-footer-brand"><a class="bds-brand" href="#beranda"><img src="{{ $logo }}" alt="Logo PT. Bali Dana Sejahtera" width="38" height="38"><strong>PT. Bali Dana Sejahtera</strong></a><p>Perusahaan penyedia persewaan kendaraan operasional, tenaga alih daya tersertifikasi, pengadaan dan percetakan, serta layanan pembersihan dan perawatan AC di Bali sejak 2007.</p><small>SK Kemenkumham RI Terdaftar Resmi</small></div>
+                <div><h3>LAYANAN UTAMA</h3><a href="#layanan">Persewaan Armada Mobil Dinas</a><a href="#layanan">Mobil Kas Keliling Bank</a><a href="#layanan">Tenaga Driver &amp; Cleaning Service</a><a href="#layanan">Continuous Form &amp; ATK Bank</a><a href="#layanan">Pembersihan &amp; Perawatan AC</a></div>
                 <div><h3>INFORMASI KORPORAT</h3><a href="#beranda">Beranda</a><a href="#profil">Profil &amp; Kepemilikan</a><a href="#mitra">Mitra Korporasi</a><a href="#sop">SOP &amp; Jaminan Kualitas</a><a href="#hubungi">Hubungi Sekretariat</a><a class="bds-footer-login" href="{{ route('login') }}">Login</a></div>
                 <div><h3>KEPATUHAN HUKUM</h3><p>Disnaker Prov. Bali</p><p>BPJS Ketenagakerjaan</p><p>BPJS Kesehatan</p><p>Standar K3 Operasional</p></div>
             </div>

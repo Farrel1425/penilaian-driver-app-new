@@ -38,10 +38,9 @@ body.bds-landing { margin: 0; overflow-x: clip; background: #fbfcfe; color: var(
 .bds-login img { width: 9px; height: 9px; }
 .bds-hero { display: grid; grid-template-columns: minmax(0,7fr) minmax(0,5fr); gap: 32px; align-items: center; padding-top: 25px; padding-bottom: 44px; min-height: 631px; }
 .bds-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 15px; background: #e4f8ed; border: 1px solid #006c4933; border-radius: 999px; color: var(--bds-green); font: 700 12px/16px 'Manrope', sans-serif; }
-.bds-hero h1 { font-size: 54px; line-height: 54px; font-weight: 800; margin-top: 24px; }
-.bds-hero h1 > span { display: block; }
+.bds-hero h1 { font-size: 54px; line-height: 54px; font-weight: 800; letter-spacing: -1.35px; margin-top: 24px; }
 .bds-landing em { font-family: 'Newsreader', Georgia, serif; font-weight: 400; color: var(--bds-green); }
-.bds-hero h1 em { text-decoration: underline wavy #006c49 1px; text-underline-offset: 5px; }
+.bds-hero h1 em { display: inline-block; margin-inline: .08em .18em; text-decoration: underline wavy #006c49 1px; text-underline-offset: 5px; }
 .bds-lead { max-width: 576px; margin-top: 24px !important; font-size: 18px; line-height: 28px; color: var(--bds-copy); }
 .bds-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
 .bds-trust { display: flex; align-items: center; gap: 14px; margin-top: 36px; }
@@ -76,8 +75,8 @@ body.bds-landing { margin: 0; overflow-x: clip; background: #fbfcfe; color: var(
 .bds-eyebrow { color: #006c49; font: 700 12px/16px 'Manrope', sans-serif; margin-bottom: 8px !important; }
 .bds-landing h2 { font-size: 36px; line-height: 40px; font-weight: 800; }
 .bds-section-heading > p { width: 384px; color: var(--bds-copy); line-height: 20px; }
-.bds-services { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 32px; }
-.bds-service-card { display: flex; flex-direction: column; min-height: 520px; border: 1px solid var(--bds-line); border-radius: 28px; padding: 25px; background: white; }
+.bds-services { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 24px; }
+.bds-service-card { display: flex; flex-direction: column; min-height: 583px; border: 1px solid var(--bds-line); border-radius: 28px; padding: 25px; background: white; }
 .bds-service-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 8px; }
 .bds-service-label > span { color: white; background: var(--bds-green); border-radius: 99px; font: 700 11px/16px 'Manrope',sans-serif; padding: 3px 10px; }
 .bds-service-label small { display: flex; align-items: center; gap: 5px; color: #006c49; font-size: 11px; }
@@ -119,9 +118,6 @@ body.bds-landing { margin: 0; overflow-x: clip; background: #fbfcfe; color: var(
 .bds-partner h3 { font-size: 14px; line-height: 20px; color: #00351f; }
 .bds-partner p { font-size: 11px; color: var(--bds-copy); margin-top: 4px; }
 .bds-partner small { display: inline-block; color: #006c49; background: #e4f8ed80; font-size: 10px; margin-top: 12px; padding: 2px 8px; border-radius: 99px; }
-.bds-partner-wide { grid-column: span 2; display: flex; align-items: center; gap: 16px; text-align: left; }
-.bds-partner-wide .bds-partner-icon { margin: 0; }
-.bds-partner-wide small { flex-shrink: 0; font-size: 9px; }
 .bds-standards { background: #f3f6f4; border-block: 1px solid var(--bds-line); padding-block: 65px; }
 .bds-standards h2 { font-size: 30px; line-height: 36px; }
 .bds-standard-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 24px; }
@@ -184,8 +180,8 @@ body.bds-landing { margin: 0; overflow-x: clip; background: #fbfcfe; color: var(
 .bds-service-card, .bds-partner, .bds-standard-grid article { transition: transform 280ms cubic-bezier(.22,1,.36,1), border-color 280ms ease, box-shadow 280ms ease; }
 .bds-service-card:hover, .bds-partner:hover, .bds-standard-grid article:hover { transform: translateY(-5px); border-color: #b9cbc0; box-shadow: 0 18px 35px #0f4d3212; }
 .bds-photo { transform: translateZ(0); }
-.bds-armada { transform: scale(1.06); transition: transform 900ms cubic-bezier(.22,1,.36,1); }
-.bds-hero-visual:hover .bds-armada { transform: scale(1.085); }
+.bds-armada { transform: scale(1); transition: transform 900ms cubic-bezier(.22,1,.36,1); }
+.bds-hero-visual:hover .bds-armada { transform: scale(1.025); }
 [data-scroll-shift] { translate: 0 var(--bds-scroll-shift,0); will-change: translate; }
 .bds-readiness i { animation: bds-pulse 2.4s ease-in-out infinite; }
 @keyframes bds-pulse { 0%,100% { opacity: .45; box-shadow: 0 0 0 0 #6ffbbe66; } 50% { opacity: 1; box-shadow: 0 0 0 6px #6ffbbe00; } }
@@ -194,7 +190,7 @@ body.bds-landing { margin: 0; overflow-x: clip; background: #fbfcfe; color: var(
     .bds-nav a { padding-inline: 9px; font-size: 12px; }
     .bds-brand strong { font-size: 15px; }
     .bds-hero h1 { font-size: 44px; line-height: 48px; }
-    .bds-partner-wide { flex-wrap: wrap; }
+    .bds-services { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 960px) {
     .bds-shell, .bds-header-inner { width: calc(100% - 48px); }
@@ -221,7 +217,6 @@ body.bds-landing { margin: 0; overflow-x: clip; background: #fbfcfe; color: var(
     .bds-login { padding: 8px 12px; font-size: 12px; }
     .bds-hero { display: flex; flex-direction: column; gap: 32px; padding-block: 20px 32px; min-height: 0; }
     .bds-hero h1 { font-size: 34px; line-height: 41px; }
-    .bds-hero h1 > span { display: block; }
     .bds-badge { font-size: 9px; padding: 8px 10px; }
     .bds-lead { font-size: 16px; line-height: 26px; }
     .bds-hero-actions { gap: 8px; }
@@ -248,7 +243,6 @@ body.bds-landing { margin: 0; overflow-x: clip; background: #fbfcfe; color: var(
     .bds-centered-heading { margin-bottom: 28px; }
     .bds-partner-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     .bds-partner { padding: 16px 12px; }
-    .bds-partner-wide { align-items: center; }
     .bds-standard-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     .bds-standard-grid article { padding: 16px; }
     .bds-standards { padding-block: 40px; }
