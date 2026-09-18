@@ -30,6 +30,7 @@ class QuestionRequest extends FormRequest
             'rating_min_label' => ['nullable', 'string', 'max:100'],
             'rating_max_label' => ['nullable', 'string', 'max:100'],
             'icon' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_icon' => ['sometimes', 'boolean'],
             'indicator_category_id' => ['required', 'integer', Rule::exists(IndicatorCategory::class, 'id')],
             'target_type' => ['required', Rule::in([Question::TARGET_DRIVER, Question::TARGET_VEHICLE, Question::TARGET_FEEDBACK])],
             'answer_type' => ['required', Rule::in([

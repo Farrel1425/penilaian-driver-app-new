@@ -39,7 +39,9 @@ class VehicleRequest extends FormRequest
             'kir_expired_at' => ['nullable', 'date'],
             'description' => ['nullable', 'string'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_photo' => ['sometimes', 'boolean'],
             'interior_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'remove_interior_photo' => ['sometimes', 'boolean'],
             'status' => ['required', Rule::in([Vehicle::STATUS_ACTIVE, Vehicle::STATUS_INACTIVE])],
         ];
     }

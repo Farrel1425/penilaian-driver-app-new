@@ -3,6 +3,8 @@
         $exteriorPhotoUrl = $vehicle->photo ? (Str::startsWith($vehicle->photo, ['http://', 'https://', '/']) ? $vehicle->photo : asset('storage/'.$vehicle->photo)) : null;
         $interiorPhotoUrl = $vehicle->interior_photo ? (Str::startsWith($vehicle->interior_photo, ['http://', 'https://', '/']) ? $vehicle->interior_photo : asset('storage/'.$vehicle->interior_photo)) : null;
         $qrDataUri = app(App\Services\VehicleQrCodeService::class)->dataUri($vehicle);
+        $qrDownloadUrl = route('admin.vehicles.qr.download', $vehicle);
+        $qrDownloadFilename = 'qr-kendaraan-'.str($vehicle->police_number)->slug().'.png';
     @endphp
 
     <x-slot:pageActions><div class="resource-page-navigation"><a class="primary-button" href="{{ route('admin.vehicles.index') }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></div></x-slot>
@@ -29,11 +31,11 @@
                     <details class="vehicle-qr-menu">
                         <summary aria-label="Aksi QR kendaraan" title="Aksi QR"><x-lucide-download aria-hidden="true" /></summary>
                         <div class="vehicle-qr-menu-content">
-                            <a href="{{ route('admin.vehicles.qr.download', $vehicle) }}" data-no-loading download><x-lucide-download aria-hidden="true" /><span>Download QR</span></a>
+                            <a href="{{ $qrDownloadUrl }}" data-vehicle-qr-download-link data-qr-download-url="{{ $qrDownloadUrl }}" data-qr-download-filename="{{ $qrDownloadFilename }}" data-no-loading download><x-lucide-download aria-hidden="true" /><span>Download QR</span></a>
                             <form method="POST" action="{{ route('admin.vehicles.regenerate-qr', $vehicle) }}" data-confirm data-no-loading data-confirm-title="Regenerate QR kendaraan?" data-confirm-description="QR lama untuk {{ $vehicle->police_number }} akan langsung tidak berlaku dan diganti dengan QR baru." data-confirm-label="Regenerate QR" data-confirm-tone="primary" data-confirm-icon="refresh">@csrf @method('PATCH')<button type="submit"><x-lucide-refresh-cw aria-hidden="true" /><span>Regenerate QR</span></button></form>
                         </div>
                     </details>
-                    <button class="vehicle-detail-qr-open" type="button" data-vehicle-qr-trigger data-qr-src="{{ $qrDataUri }}" data-qr-title="{{ $vehicle->police_number }}" data-qr-description="{{ trim($vehicle->brand.' '.$vehicle->model) }} - {{ $vehicle->branch?->name }}" data-qr-download="{{ route('admin.vehicles.qr.download', $vehicle) }}" aria-label="Buka QR {{ $vehicle->police_number }}">
+                    <button class="vehicle-detail-qr-open" type="button" data-vehicle-qr-trigger data-qr-src="{{ $qrDataUri }}" data-qr-title="{{ $vehicle->police_number }}" data-qr-description="{{ trim($vehicle->brand.' '.$vehicle->model) }} - {{ $vehicle->branch?->name }}" data-qr-download="{{ $qrDownloadUrl }}" aria-label="Buka QR {{ $vehicle->police_number }}">
                         <img src="{{ $qrDataUri }}" alt="QR {{ $vehicle->police_number }}"><strong>{{ $vehicle->police_number }}</strong><span>Ketuk untuk memperbesar QR</span>
                     </button>
                     <div class="vehicle-qr-rating"><strong>{{ $vehicle->ratings_count }}</strong><span>Total Rating</span></div>

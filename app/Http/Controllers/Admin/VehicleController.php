@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\VehicleRequest;
 use App\Models\Branch;
 use App\Models\Vehicle;
+use App\Services\PublicImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 class VehicleController extends Controller
 {
@@ -41,13 +42,19 @@ class VehicleController extends Controller
         return view('admin.vehicles.create', ['vehicle' => new Vehicle, 'branches' => Branch::query()->orderBy('name')->get()]);
     }
 
-    public function store(VehicleRequest $request): RedirectResponse
+    public function store(VehicleRequest $request, PublicImageStorage $images): RedirectResponse
     {
-        $data = $request->safe()->except(['photo', 'interior_photo']);
-        $data['photo'] = $this->storeImage($request, 'photo', 'vehicles/exterior');
-        $data['interior_photo'] = $this->storeImage($request, 'interior_photo', 'vehicles/interior');
-
-        $vehicle = Vehicle::query()->create($data + ['qr_token' => Str::random(40)]);
+        $data = $request->safe()->except(['photo', 'interior_photo', 'remove_photo', 'remove_interior_photo']);
+        $data['photo'] = null;
+        $data['interior_photo'] = null;
+        try {
+            $data['photo'] = $request->hasFile('photo') ? $images->store($request->file('photo'), 'vehicles/exterior') : null;
+            $data['interior_photo'] = $request->hasFile('interior_photo') ? $images->store($request->file('interior_photo'), 'vehicles/interior') : null;
+            $vehicle = Vehicle::query()->create($data + ['qr_token' => Str::random(40)]);
+        } catch (Throwable $exception) {
+            $images->deleteMany([$data['photo'], $data['interior_photo']]);
+            throw $exception;
+        }
 
         return redirect()->route('admin.vehicles.show', $vehicle)->with('status', 'Kendaraan berhasil dibuat.');
     }
@@ -68,21 +75,35 @@ class VehicleController extends Controller
         ]);
     }
 
-    public function update(VehicleRequest $request, Vehicle $vehicle): RedirectResponse
+    public function update(VehicleRequest $request, Vehicle $vehicle, PublicImageStorage $images): RedirectResponse
     {
-        $data = $request->safe()->except(['photo', 'interior_photo']);
+        $data = $request->safe()->except(['photo', 'interior_photo', 'remove_photo', 'remove_interior_photo']);
+        $newFiles = [];
+        $oldFiles = [];
 
-        if ($request->hasFile('photo')) {
-            $this->deletePhoto($vehicle->photo);
-            $data['photo'] = $this->storeImage($request, 'photo', 'vehicles/exterior');
+        try {
+            if ($request->hasFile('photo')) {
+                $oldFiles[] = $vehicle->photo;
+                $newFiles[] = $data['photo'] = $images->store($request->file('photo'), 'vehicles/exterior');
+            } elseif ($request->boolean('remove_photo')) {
+                $oldFiles[] = $vehicle->photo;
+                $data['photo'] = null;
+            }
+
+            if ($request->hasFile('interior_photo')) {
+                $oldFiles[] = $vehicle->interior_photo;
+                $newFiles[] = $data['interior_photo'] = $images->store($request->file('interior_photo'), 'vehicles/interior');
+            } elseif ($request->boolean('remove_interior_photo')) {
+                $oldFiles[] = $vehicle->interior_photo;
+                $data['interior_photo'] = null;
+            }
+
+            $vehicle->update($data);
+        } catch (Throwable $exception) {
+            $images->deleteMany($newFiles);
+            throw $exception;
         }
-
-        if ($request->hasFile('interior_photo')) {
-            $this->deletePhoto($vehicle->interior_photo);
-            $data['interior_photo'] = $this->storeImage($request, 'interior_photo', 'vehicles/interior');
-        }
-
-        $vehicle->update($data);
+        $images->deleteMany($oldFiles);
 
         if ($request->input('return_to') === 'detail') {
             return redirect()->route('admin.vehicles.show', $vehicle)->with('status', 'Kendaraan berhasil diperbarui.');
@@ -105,7 +126,7 @@ class VehicleController extends Controller
         return back()->with('status', 'Status kendaraan berhasil diperbarui.');
     }
 
-    public function destroy(Vehicle $vehicle): RedirectResponse
+    public function destroy(Vehicle $vehicle, PublicImageStorage $images): RedirectResponse
     {
         if ($vehicle->ratings()->exists()) {
             $vehicle->update(['status' => Vehicle::STATUS_INACTIVE]);
@@ -113,24 +134,9 @@ class VehicleController extends Controller
             return back()->with('status', 'Kendaraan sudah memiliki rating, jadi dinonaktifkan.');
         }
 
-        $this->deletePhoto($vehicle->photo);
-        $this->deletePhoto($vehicle->interior_photo);
         $vehicle->delete();
+        $images->deleteMany([$vehicle->photo, $vehicle->interior_photo]);
 
         return redirect()->route('admin.vehicles.index')->with('status', 'Kendaraan berhasil dihapus.');
-    }
-
-    private function storeImage(VehicleRequest $request, string $input, string $directory): ?string
-    {
-        return $request->hasFile($input)
-            ? $request->file($input)->store($directory, 'public')
-            : null;
-    }
-
-    private function deletePhoto(?string $photo): void
-    {
-        if ($photo && ! Str::startsWith($photo, ['http://', 'https://', '/'])) {
-            Storage::disk('public')->delete($photo);
-        }
     }
 }

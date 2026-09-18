@@ -25,6 +25,19 @@ class OperationalMonitoringService
         return CarbonImmutable::now($timezone)->startOfMonth();
     }
 
+    public function workingDays(CarbonImmutable $period): int
+    {
+        $workingDays = 0;
+
+        for ($date = $period->startOfMonth(); $date->lte($period->endOfMonth()); $date = $date->addDay()) {
+            if ($date->isWeekday()) {
+                $workingDays++;
+            }
+        }
+
+        return $workingDays;
+    }
+
     public function branchRows(CarbonImmutable $period, ?int $branchId = null): Collection
     {
         $branches = Branch::query()
@@ -41,11 +54,14 @@ class OperationalMonitoringService
         $attendances = $this->attendances($period, $driverIds)->keyBy('driver_id');
         $ratings = $this->ratings($period, $driverIds)->groupBy('driver_id');
 
-        return $branches->map(function (Branch $branch) use ($attendances, $ratings) {
+        $workingDays = $this->workingDays($period);
+
+        return $branches->map(function (Branch $branch) use ($attendances, $ratings, $workingDays) {
             $driverRows = $branch->drivers->map(fn (Driver $driver) => $this->driverRow(
                 $driver,
                 $ratings->get($driver->id, collect()),
                 $attendances->get($driver->id),
+                $workingDays,
             ));
             $completed = $driverRows->where('is_complete', true)->count();
             $attendanceScores = $driverRows->pluck('attendance_score')->filter(fn ($score) => $score !== null);
@@ -70,11 +86,13 @@ class OperationalMonitoringService
         $driverIds = $drivers->pluck('id');
         $attendances = $this->attendances($period, $driverIds)->keyBy('driver_id');
         $ratings = $this->ratings($period, $driverIds)->groupBy('driver_id');
+        $workingDays = $this->workingDays($period);
 
         return $drivers->map(fn (Driver $driver) => $this->driverRow(
             $driver,
             $ratings->get($driver->id, collect()),
             $attendances->get($driver->id),
+            $workingDays,
         ));
     }
 
@@ -82,7 +100,7 @@ class OperationalMonitoringService
     {
         $ratings = $this->ratings($period, collect([$driver->id]))->sortByDesc('submitted_at')->values();
         $attendance = $this->attendances($period, collect([$driver->id]))->first();
-        $row = $this->driverRow($driver, $ratings, $attendance);
+        $row = $this->driverRow($driver, $ratings, $attendance, $this->workingDays($period));
         $row['question_breakdown'] = $this->questionBreakdown($ratings, Question::TARGET_DRIVER);
         $row['vehicle_score'] = $this->weightedScore($ratings, Question::TARGET_VEHICLE);
         $row['comments'] = $ratings->flatMap->answers
@@ -120,7 +138,7 @@ class OperationalMonitoringService
         ];
     }
 
-    private function driverRow(Driver $driver, Collection $ratings, ?DriverAttendance $attendance): array
+    private function driverRow(Driver $driver, Collection $ratings, ?DriverAttendance $attendance, int $workingDays): array
     {
         $ratings = $ratings->sortByDesc('submitted_at')->values();
         $driverScore = $this->weightedScore($ratings, Question::TARGET_DRIVER);
@@ -134,10 +152,11 @@ class OperationalMonitoringService
             'driver_score' => $driverScore,
             'attendance' => $attendance,
             'attendance_score' => $attendanceScore,
+            'working_days' => $workingDays,
             'final_score' => $driverScore !== null && $attendanceScore !== null
                 ? round(($driverScore * 0.9) + ($attendanceScore * 0.1), 2)
                 : null,
-            'is_complete' => $attendanceScore !== null,
+            'is_complete' => $attendance !== null && $attendance->totalDays() === $workingDays,
         ];
     }
 

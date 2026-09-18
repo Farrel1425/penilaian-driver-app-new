@@ -32,7 +32,7 @@
                             <td><strong>{{ $row['vehicles'] }}</strong><small>Kendaraan aktif</small></td>
                             <td><strong>{{ $row['drivers'] }}</strong><small>Driver aktif</small></td>
                             <td><strong class="monitoring-score">{{ $row['attendance_average'] !== null ? number_format($row['attendance_average'], 1).'%' : '-' }}</strong></td>
-                            <td><span @class(['monitoring-completeness', 'is-complete' => $row['is_complete'], 'is-incomplete' => !$row['is_complete']])><x-lucide-circle-check aria-hidden="true" />{{ $row['is_complete'] ? 'Lengkap' : 'Belum Lengkap' }}</span><small>{{ $row['completed'] }}/{{ $row['drivers'] }} driver</small></td>
+                            <td><div class="monitoring-completeness-cell"><span @class(['monitoring-completeness', 'is-complete' => $row['is_complete'], 'is-incomplete' => !$row['is_complete']])><x-lucide-circle-check aria-hidden="true" />{{ $row['is_complete'] ? 'Lengkap' : 'Belum Lengkap' }}</span><small>{{ $row['completed'] }}/{{ $row['drivers'] }} driver</small></div></td>
                             <td><div class="monitoring-row-actions"><a class="monitoring-view-button" href="{{ route('admin.monitoring.show', [$row['branch'], 'period' => $period->format('Y-m')]) }}"><x-lucide-users aria-hidden="true" /><span>Lihat Driver</span></a><a class="monitoring-icon-button" data-no-loading href="{{ route('admin.monitoring.branch.report', [$row['branch'], 'period' => $period->format('Y-m')]) }}" title="Preview laporan" aria-label="Preview laporan {{ $row['branch']->name }}"><x-lucide-printer aria-hidden="true" /></a></div></td>
                         </tr>
                     @empty

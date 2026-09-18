@@ -53,6 +53,7 @@ class OperationalMonitoringController extends Controller
             'period' => $period,
             'rows' => $this->paginate($rows, $request, 10),
             'status' => $status,
+            'workingDays' => $monitoring->workingDays($period),
         ]);
     }
 
@@ -72,21 +73,22 @@ class OperationalMonitoringController extends Controller
         $this->authorizeDriver($request, $branch, $driver);
         $data = $request->validate([
             'period' => ['required', 'date_format:Y-m'],
-            'present_days' => ['required', 'integer', 'min:0', 'max:31'],
-            'sick_days' => ['required', 'integer', 'min:0', 'max:31'],
-            'permitted_days' => ['required', 'integer', 'min:0', 'max:31'],
-            'absent_days' => ['required', 'integer', 'min:0', 'max:31'],
+            'present_days' => ['required', 'integer', 'min:0'],
+            'sick_days' => ['required', 'integer', 'min:0'],
+            'permitted_days' => ['required', 'integer', 'min:0'],
+            'absent_days' => ['required', 'integer', 'min:0'],
         ]);
 
+        $period = $monitoring->period($data['period']);
+        $workingDays = $monitoring->workingDays($period);
         $total = collect($data)->only(['present_days', 'sick_days', 'permitted_days', 'absent_days'])->sum();
         if ($total < 1) {
             throw ValidationException::withMessages(['present_days' => 'Total data absensi harus lebih dari 0 hari.']);
         }
-        if ($total > 31) {
-            throw ValidationException::withMessages(['present_days' => 'Total data absensi tidak boleh lebih dari 31 hari.']);
+        if ($total > $workingDays) {
+            throw ValidationException::withMessages(['present_days' => "Total data absensi tidak boleh lebih dari {$workingDays} hari kerja pada periode ini."]);
         }
 
-        $period = $monitoring->period($data['period']);
         $attendance = DriverAttendance::query()
             ->where('driver_id', $driver->id)
             ->whereDate('period', $period->toDateString())

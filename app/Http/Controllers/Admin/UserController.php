@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
 use App\Models\Branch;
 use App\Models\User;
+use App\Services\PublicImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -38,15 +39,20 @@ class UserController extends Controller
         ]);
     }
 
-    public function store(UserRequest $request): RedirectResponse
+    public function store(UserRequest $request, PublicImageStorage $images): RedirectResponse
     {
         $data = $this->normalizedData($request);
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('profiles', 'public');
+            $data['photo'] = $images->store($request->file('photo'), 'profiles');
         }
 
-        $user = User::query()->create($data);
+        try {
+            $user = User::query()->create($data);
+        } catch (Throwable $exception) {
+            $images->delete($data['photo'] ?? null);
+            throw $exception;
+        }
 
         return redirect()->route('admin.users.show', $user)->with('status', 'Akun pengguna berhasil ditambahkan.');
     }
@@ -69,7 +75,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(UserRequest $request, User $user): RedirectResponse
+    public function update(UserRequest $request, User $user, PublicImageStorage $images): RedirectResponse
     {
         $data = $this->normalizedData($request);
 
@@ -81,15 +87,23 @@ class UserController extends Controller
             unset($data['password']);
         }
 
+        $oldPhoto = null;
+        $newPhoto = null;
         if ($request->hasFile('photo')) {
-            if ($user->photo && ! str_starts_with($user->photo, 'http')) {
-                Storage::disk('public')->delete($user->photo);
-            }
-
-            $data['photo'] = $request->file('photo')->store('profiles', 'public');
+            $oldPhoto = $user->photo;
+            $newPhoto = $data['photo'] = $images->store($request->file('photo'), 'profiles');
+        } elseif ($request->boolean('remove_photo')) {
+            $oldPhoto = $user->photo;
+            $data['photo'] = null;
         }
 
-        $user->update($data);
+        try {
+            $user->update($data);
+        } catch (Throwable $exception) {
+            $images->delete($newPhoto);
+            throw $exception;
+        }
+        $images->delete($oldPhoto);
 
         return $request->string('return_to')->toString() === 'detail'
             ? redirect()->route('admin.users.show', $user)->with('status', 'Akun pengguna berhasil diperbarui.')
@@ -111,7 +125,7 @@ class UserController extends Controller
         return back()->with('status', 'Status akun berhasil diperbarui.');
     }
 
-    public function destroy(User $user): RedirectResponse
+    public function destroy(User $user, PublicImageStorage $images): RedirectResponse
     {
         if ($user->is(auth()->user())) {
             return back()->with('status', 'Akun yang sedang digunakan tidak dapat dihapus.');
@@ -121,18 +135,15 @@ class UserController extends Controller
             return back()->with('status', 'Minimal satu admin utama aktif harus tersedia.');
         }
 
-        if ($user->photo && ! str_starts_with($user->photo, 'http')) {
-            Storage::disk('public')->delete($user->photo);
-        }
-
         $user->delete();
+        $images->delete($user->photo);
 
         return redirect()->route('admin.users.index')->with('status', 'Akun pengguna berhasil dihapus.');
     }
 
     private function normalizedData(UserRequest $request): array
     {
-        $data = $request->safe()->except('photo');
+        $data = $request->safe()->except(['photo', 'remove_photo']);
         $data['branch_id'] = $data['role'] === User::ROLE_BRANCH_ADMIN ? $data['branch_id'] : null;
 
         return $data;

@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\QuestionRequest;
 use App\Models\IndicatorCategory;
 use App\Models\Question;
+use App\Services\PublicImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 class QuestionController extends Controller
 {
@@ -46,17 +46,24 @@ class QuestionController extends Controller
         ]);
     }
 
-    public function store(QuestionRequest $request): RedirectResponse
+    public function store(QuestionRequest $request, PublicImageStorage $images): RedirectResponse
     {
-        $question = DB::transaction(function () use ($request): Question {
-            $data = $request->questionData();
-            $data['sort_order'] = ((int) Question::query()->max('sort_order')) + 1;
-            $data['icon_path'] = $this->storeIcon($request);
-            $question = Question::query()->create($data);
-            $this->syncOptions($question, $request->normalizedOptions());
+        $iconPath = $request->hasFile('icon') ? $images->store($request->file('icon'), 'question-icons') : null;
 
-            return $question;
-        });
+        try {
+            $question = DB::transaction(function () use ($request, $iconPath): Question {
+                $data = $request->questionData();
+                $data['sort_order'] = ((int) Question::query()->max('sort_order')) + 1;
+                $data['icon_path'] = $iconPath;
+                $question = Question::query()->create($data);
+                $this->syncOptions($question, $request->normalizedOptions());
+
+                return $question;
+            });
+        } catch (Throwable $exception) {
+            $images->delete($iconPath);
+            throw $exception;
+        }
 
         return redirect()->route('admin.questions.show', $question)->with('status', 'Pertanyaan berhasil dibuat.');
     }
@@ -83,19 +90,35 @@ class QuestionController extends Controller
         ]);
     }
 
-    public function update(QuestionRequest $request, Question $question): RedirectResponse
+    public function update(QuestionRequest $request, Question $question, PublicImageStorage $images): RedirectResponse
     {
-        DB::transaction(function () use ($request, $question): void {
-            $data = $request->questionData();
+        $oldIcon = null;
+        $newIcon = null;
+        if ($request->hasFile('icon')) {
+            $oldIcon = $question->icon_path;
+            $newIcon = $images->store($request->file('icon'), 'question-icons');
+        } elseif ($request->boolean('remove_icon')) {
+            $oldIcon = $question->icon_path;
+        }
 
-            if ($request->hasFile('icon')) {
-                $this->deleteIcon($question->icon_path);
-                $data['icon_path'] = $this->storeIcon($request);
-            }
+        try {
+            DB::transaction(function () use ($request, $question, $newIcon, $oldIcon): void {
+                $data = $request->questionData();
 
-            $question->update($data);
-            $this->syncOptions($question, $request->normalizedOptions());
-        });
+                if ($newIcon !== null) {
+                    $data['icon_path'] = $newIcon;
+                } elseif ($oldIcon !== null) {
+                    $data['icon_path'] = null;
+                }
+
+                $question->update($data);
+                $this->syncOptions($question, $request->normalizedOptions());
+            });
+        } catch (Throwable $exception) {
+            $images->delete($newIcon);
+            throw $exception;
+        }
+        $images->delete($oldIcon);
 
         if ($request->input('return_to') === 'detail') {
             return redirect()->route('admin.questions.show', $question)->with('status', 'Pertanyaan berhasil diperbarui.');
@@ -149,7 +172,7 @@ class QuestionController extends Controller
         return redirect()->route('admin.questions.index')->with('status', 'Urutan pertanyaan berhasil diperbarui.');
     }
 
-    public function destroy(Question $question): RedirectResponse
+    public function destroy(Question $question, PublicImageStorage $images): RedirectResponse
     {
         if ($question->ratingAnswers()->exists()) {
             $question->update(['status' => Question::STATUS_INACTIVE]);
@@ -157,8 +180,8 @@ class QuestionController extends Controller
             return back()->with('status', 'Pertanyaan sudah dipakai pada rating, jadi dinonaktifkan.');
         }
 
-        $this->deleteIcon($question->icon_path);
         $question->delete();
+        $images->delete($question->icon_path);
 
         return redirect()->route('admin.questions.index')->with('status', 'Pertanyaan berhasil dihapus.');
     }
@@ -176,20 +199,6 @@ class QuestionController extends Controller
                 'option_text' => $option['option_text'],
                 'sort_order' => $option['sort_order'] ?: $index + 1,
             ]);
-        }
-    }
-
-    private function storeIcon(QuestionRequest $request): ?string
-    {
-        return $request->hasFile('icon')
-            ? $request->file('icon')->store('question-icons', 'public')
-            : null;
-    }
-
-    private function deleteIcon(?string $iconPath): void
-    {
-        if ($iconPath && ! Str::startsWith($iconPath, ['http://', 'https://', '/'])) {
-            Storage::disk('public')->delete($iconPath);
         }
     }
 

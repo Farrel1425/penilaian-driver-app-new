@@ -26,6 +26,10 @@
                             <span class="settings-logo-file-name" data-settings-logo-file-name aria-live="polite">Belum ada file baru</span>
                         </div>
                         <input class="sr-only" id="logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp" data-settings-logo-input>
+                        <input name="remove_logo" type="hidden" value="0" data-settings-logo-remove-input>
+                        @if (! empty($settings['logo']))
+                            <button class="image-cropper-remove" type="button" data-settings-logo-remove><x-lucide-trash-2 aria-hidden="true" /> Hapus logo khusus</button>
+                        @endif
                         <small>PNG, JPG, atau WEBP. Maksimal 2 MB.</small>
                         @error('logo')<small class="form-error">{{ $message }}</small>@enderror
                     </div>

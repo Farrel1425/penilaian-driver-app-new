@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Vehicle;
 use GdImage;
-use Illuminate\Support\Facades\Cache;
 use RuntimeException;
 
 class VehicleQrPosterService
@@ -43,8 +42,9 @@ class VehicleQrPosterService
             throw new RuntimeException('Template poster QR kendaraan tidak ditemukan.');
         }
 
-        $cacheKey = 'vehicle-qr-poster:'.hash('sha256', json_encode([
+        $cacheKey = hash('sha256', json_encode([
             'template' => hash_file('sha256', $template),
+            'app_url' => $this->qrCode->vehicleUrl($vehicle),
             'vehicle_id' => $vehicle->getKey(),
             'qr_token' => $vehicle->qr_token,
             'police_number' => $vehicle->police_number,
@@ -52,16 +52,30 @@ class VehicleQrPosterService
             'model' => $vehicle->model,
             'branch' => $vehicle->branch?->name,
         ], JSON_THROW_ON_ERROR));
+        $cacheDirectory = storage_path('app/qr-posters');
+        $cachePath = $cacheDirectory.'/vehicle-'.$vehicle->getKey().'-'.$cacheKey.'.png';
 
-        $cachedPoster = Cache::remember(
-            $cacheKey,
-            now()->addDay(),
-            fn (): string => base64_encode($this->renderUncached($vehicle, $template)),
-        );
-        $poster = base64_decode($cachedPoster, true);
+        if (is_file($cachePath) && ($poster = file_get_contents($cachePath)) !== false) {
+            return $poster;
+        }
 
-        if (! is_string($poster)) {
-            throw new RuntimeException('Cache poster QR kendaraan tidak valid.');
+        if (! is_dir($cacheDirectory) && ! mkdir($cacheDirectory, 0775, true) && ! is_dir($cacheDirectory)) {
+            throw new RuntimeException('Direktori cache poster QR kendaraan tidak dapat dibuat.');
+        }
+
+        $poster = $this->renderUncached($vehicle, $template);
+        $temporaryPath = $cachePath.'.'.bin2hex(random_bytes(6)).'.tmp';
+
+        if (file_put_contents($temporaryPath, $poster, LOCK_EX) === false) {
+            throw new RuntimeException('Poster QR kendaraan gagal disimpan ke cache.');
+        }
+
+        if (! @rename($temporaryPath, $cachePath)) {
+            @unlink($temporaryPath);
+
+            if (! is_file($cachePath)) {
+                throw new RuntimeException('Poster QR kendaraan gagal dipindahkan ke cache.');
+            }
         }
 
         return $poster;

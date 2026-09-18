@@ -1425,6 +1425,18 @@ button {
     padding: 5px 8px;
     white-space: nowrap;
 }
+.monitoring-table .monitoring-completeness {
+    display: inline-flex;
+}
+.monitoring-completeness-cell {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.monitoring-completeness-cell small {
+    margin: 0;
+}
 .monitoring-completeness svg {
     height: 11px;
     width: 11px;
@@ -1508,6 +1520,10 @@ button {
     height: 34px;
     justify-content: center;
     overflow: hidden;
+}
+.monitoring-driver-table .monitoring-avatar {
+    display: flex;
+    flex: 0 0 34px;
 }
 .monitoring-avatar img,
 .monitoring-profile-photo img {
@@ -3315,6 +3331,12 @@ button {
     height: 28px;
     justify-content: center;
     width: 28px;
+}
+.report-performance-table .report-rank {
+    display: inline-flex;
+}
+.report-performance-table td:first-child {
+    text-align: center;
 }
 
 .report-average {
@@ -5393,6 +5415,22 @@ button {
 .image-cropper-summary:hover {
     border-color: #7da0e7;
     background: #f2f6ff;
+}
+.image-cropper-remove {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #b42318;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 12px;
+    gap: 5px;
+    margin-top: 8px;
+    padding: 0;
+}
+.image-cropper-remove svg {
+    height: 14px;
+    width: 14px;
 }
 
 .image-cropper-summary-arrow {

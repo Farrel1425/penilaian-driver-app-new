@@ -412,7 +412,9 @@ document.addEventListener('DOMContentLoaded', () => {
             image.alt = `QR ${trigger.dataset.qrTitle ?? 'Kendaraan'}`;
             title.textContent = trigger.dataset.qrTitle ?? 'QR Kendaraan';
             description.textContent = trigger.dataset.qrDescription ?? '';
-            download.href = trigger.dataset.qrDownload ?? '#';
+            if (download.dataset.qrDownloadPrepared !== 'true') {
+                download.href = trigger.dataset.qrDownload ?? '#';
+            }
             modal.hidden = false;
             modal.querySelector('[data-vehicle-qr-close]')?.focus();
         });
@@ -427,6 +429,64 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadLinks = [...document.querySelectorAll('[data-vehicle-qr-download-link]')];
+    const sourceLink = downloadLinks.find((link) => link.dataset.qrDownloadUrl);
+
+    if (!sourceLink) {
+        return;
+    }
+
+    const sourceUrl = sourceLink.dataset.qrDownloadUrl;
+    const filename = sourceLink.dataset.qrDownloadFilename || 'qr-kendaraan.png';
+    let preparedUrl;
+
+    const prepareDownload = fetch(sourceUrl, {
+        credentials: 'same-origin',
+        headers: { Accept: 'image/png' },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Poster QR gagal dipersiapkan.');
+            }
+
+            return response.blob();
+        })
+        .then((blob) => {
+            preparedUrl = URL.createObjectURL(blob);
+            downloadLinks.forEach((link) => {
+                link.href = preparedUrl;
+                link.download = filename;
+                link.dataset.qrDownloadPrepared = 'true';
+            });
+        })
+        .catch(() => undefined);
+
+    downloadLinks.forEach((link) => {
+        link.addEventListener('click', async (event) => {
+            if (preparedUrl) {
+                return;
+            }
+
+            event.preventDefault();
+            await prepareDownload;
+
+            if (preparedUrl) {
+                link.click();
+                return;
+            }
+
+            window.location.assign(sourceUrl);
+        });
+    });
+
+    window.addEventListener('pagehide', () => {
+        if (preparedUrl) {
+            URL.revokeObjectURL(preparedUrl);
+        }
+    }, { once: true });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -617,6 +677,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logoInput = document.querySelector('[data-settings-logo-input]');
     const logoPreview = document.querySelector('[data-settings-logo-preview]');
     const logoFileName = document.querySelector('[data-settings-logo-file-name]');
+    const logoRemoveInput = document.querySelector('[data-settings-logo-remove-input]');
+    const logoRemoveButton = document.querySelector('[data-settings-logo-remove]');
     let logoObjectUrl;
 
     logoInput?.addEventListener('change', () => {
@@ -627,6 +689,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         logoObjectUrl = URL.createObjectURL(file);
         logoPreview.src = logoObjectUrl;
         logoFileName.textContent = file.name;
+        if (logoRemoveInput) logoRemoveInput.value = '0';
+        if (logoRemoveButton) logoRemoveButton.hidden = false;
+    });
+
+    logoRemoveButton?.addEventListener('click', () => {
+        logoInput.value = '';
+        if (logoRemoveInput) logoRemoveInput.value = '1';
+        if (logoPreview) logoPreview.hidden = true;
+        if (logoFileName) logoFileName.textContent = 'Logo khusus akan dihapus saat disimpan';
+        logoRemoveButton.hidden = true;
     });
 
     const cropperFields = [...document.querySelectorAll('[data-image-cropper]')];
@@ -649,6 +721,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const cropImage = field.querySelector('[data-cropper-image]');
         const preview = field.querySelector('[data-image-preview]');
         const fileName = field.querySelector('[data-image-file-name]');
+        const removeInput = field.querySelector('[data-image-remove-input]');
+        const removeButton = field.querySelector('[data-image-remove]');
         const zoom = field.querySelector('[data-cropper-zoom]');
         const controls = field.querySelector('[data-cropper-controls]');
         const cropperActions = field.querySelector('[data-cropper-actions]');
@@ -707,6 +781,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             image.alt = 'Preview foto yang dipilih';
             preview.replaceChildren(image);
             fileName.textContent = file.name;
+            if (removeInput) removeInput.value = '0';
+            if (removeButton) removeButton.hidden = false;
         };
 
         const writeImageFile = (file) => {
@@ -816,6 +892,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         cameraButton?.addEventListener('click', openCamera);
         imageInput.addEventListener('change', () => openEditor(imageInput.files?.[0]));
         cameraInput?.addEventListener('change', () => openEditor(cameraInput.files?.[0]));
+        removeButton?.addEventListener('click', () => {
+            imageInput.value = '';
+            if (removeInput) removeInput.value = '1';
+            preview.replaceChildren();
+            preview.textContent = 'Dihapus';
+            fileName.textContent = 'Foto akan dihapus saat disimpan';
+            removeButton.hidden = true;
+        });
 
         field.querySelectorAll('[data-image-close]').forEach((button) => {
             button.addEventListener('click', closeModal);
@@ -1233,6 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const driverId = form?.elements.namedItem('attendance_driver_id');
     const scoreOutput = modal?.querySelector('[data-attendance-score]');
     const totalOutput = modal?.querySelector('[data-attendance-total]');
+    const maximumDays = Number.parseInt(modal?.dataset.attendanceMaxDays || '0', 10);
 
     if (!modal || !form || !driverId || !driverName || !identity || !scoreOutput || !totalOutput) {
         return;
@@ -1255,7 +1340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const points = (present * 100) + (sick * 75) + (permitted * 50);
         totalOutput.textContent = String(total);
         scoreOutput.textContent = total > 0 ? (points / total).toFixed(1) : '0.0';
-        scoreOutput.classList.toggle('is-invalid', total > 31);
+        scoreOutput.classList.toggle('is-invalid', total > maximumDays);
     };
 
     const openModal = (trigger) => {

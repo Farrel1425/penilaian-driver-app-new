@@ -7,11 +7,11 @@ use App\Http\Requests\Admin\DriverRequest;
 use App\Models\Branch;
 use App\Models\Driver;
 use App\Models\EmployeeCategory;
+use App\Services\PublicImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 class DriverController extends Controller
 {
@@ -52,16 +52,22 @@ class DriverController extends Controller
         ]);
     }
 
-    public function store(DriverRequest $request): RedirectResponse
+    public function store(DriverRequest $request, PublicImageStorage $images): RedirectResponse
     {
-        $data = $request->safe()->except(['photo', 'sim_photo']);
+        $data = $request->safe()->except(['photo', 'sim_photo', 'remove_photo', 'remove_sim_photo']);
         $data['employee_category_id'] ??= EmployeeCategory::query()
             ->where('name', 'Driver')
             ->value('id');
-        $data['photo'] = $this->storeImage($request, 'photo', 'drivers');
-        $data['sim_photo'] = $this->storeImage($request, 'sim_photo', 'driver-sims');
-
-        $driver = Driver::query()->create($data);
+        $data['photo'] = null;
+        $data['sim_photo'] = null;
+        try {
+            $data['photo'] = $request->hasFile('photo') ? $images->store($request->file('photo'), 'drivers') : null;
+            $data['sim_photo'] = $request->hasFile('sim_photo') ? $images->store($request->file('sim_photo'), 'driver-sims') : null;
+            $driver = Driver::query()->create($data);
+        } catch (Throwable $exception) {
+            $images->deleteMany([$data['photo'], $data['sim_photo']]);
+            throw $exception;
+        }
 
         return redirect()->route('admin.employees.show', $driver)->with('status', 'Pegawai berhasil dibuat.');
     }
@@ -83,22 +89,36 @@ class DriverController extends Controller
         ]);
     }
 
-    public function update(DriverRequest $request, Driver $driver): RedirectResponse
+    public function update(DriverRequest $request, Driver $driver, PublicImageStorage $images): RedirectResponse
     {
-        $data = $request->safe()->except(['photo', 'sim_photo']);
+        $data = $request->safe()->except(['photo', 'sim_photo', 'remove_photo', 'remove_sim_photo']);
         $data['employee_category_id'] ??= $driver->employee_category_id;
+        $newFiles = [];
+        $oldFiles = [];
 
-        if ($request->hasFile('photo')) {
-            $this->deletePhoto($driver->photo);
-            $data['photo'] = $this->storeImage($request, 'photo', 'drivers');
+        try {
+            if ($request->hasFile('photo')) {
+                $oldFiles[] = $driver->photo;
+                $newFiles[] = $data['photo'] = $images->store($request->file('photo'), 'drivers');
+            } elseif ($request->boolean('remove_photo')) {
+                $oldFiles[] = $driver->photo;
+                $data['photo'] = null;
+            }
+
+            if ($request->hasFile('sim_photo')) {
+                $oldFiles[] = $driver->sim_photo;
+                $newFiles[] = $data['sim_photo'] = $images->store($request->file('sim_photo'), 'driver-sims');
+            } elseif ($request->boolean('remove_sim_photo')) {
+                $oldFiles[] = $driver->sim_photo;
+                $data['sim_photo'] = null;
+            }
+
+            $driver->update($data);
+        } catch (Throwable $exception) {
+            $images->deleteMany($newFiles);
+            throw $exception;
         }
-
-        if ($request->hasFile('sim_photo')) {
-            $this->deletePhoto($driver->sim_photo);
-            $data['sim_photo'] = $this->storeImage($request, 'sim_photo', 'driver-sims');
-        }
-
-        $driver->update($data);
+        $images->deleteMany($oldFiles);
 
         if ($request->input('return_to') === 'detail') {
             return redirect()->route('admin.employees.show', $driver)->with('status', 'Pegawai berhasil diperbarui.');
@@ -114,7 +134,7 @@ class DriverController extends Controller
         return back()->with('status', 'Status pegawai berhasil diperbarui.');
     }
 
-    public function destroy(Driver $driver): RedirectResponse
+    public function destroy(Driver $driver, PublicImageStorage $images): RedirectResponse
     {
         if ($driver->ratings()->exists()) {
             $driver->update(['status' => Driver::STATUS_INACTIVE]);
@@ -122,24 +142,9 @@ class DriverController extends Controller
             return back()->with('status', 'Pegawai sudah memiliki rating, jadi dinonaktifkan.');
         }
 
-        $this->deletePhoto($driver->photo);
-        $this->deletePhoto($driver->sim_photo);
         $driver->delete();
+        $images->deleteMany([$driver->photo, $driver->sim_photo]);
 
         return redirect()->route('admin.employees.index')->with('status', 'Pegawai berhasil dihapus.');
-    }
-
-    private function storeImage(DriverRequest $request, string $input, string $directory): ?string
-    {
-        return $request->hasFile($input)
-            ? $request->file($input)->store($directory, 'public')
-            : null;
-    }
-
-    private function deletePhoto(?string $photo): void
-    {
-        if ($photo && ! Str::startsWith($photo, ['http://', 'https://', '/'])) {
-            Storage::disk('public')->delete($photo);
-        }
     }
 }

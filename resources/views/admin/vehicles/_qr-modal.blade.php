@@ -10,7 +10,7 @@
         <div class="vehicle-qr-large-frame">
             <img data-vehicle-qr-image src="" alt="">
         </div>
-        <a class="primary-button vehicle-qr-download" data-vehicle-qr-download data-no-loading download href="#">
+        <a class="primary-button vehicle-qr-download" data-vehicle-qr-download @isset($qrDownloadUrl) data-vehicle-qr-download-link data-qr-download-url="{{ $qrDownloadUrl }}" data-qr-download-filename="{{ $qrDownloadFilename }}" @endisset data-no-loading download href="{{ $qrDownloadUrl ?? '#' }}">
             <x-lucide-download aria-hidden="true" />
             <span>Download QR</span>
         </a>

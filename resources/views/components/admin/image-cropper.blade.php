@@ -10,7 +10,9 @@
 
 @php
     $inputId = 'image-cropper-'.str($name)->replace('_', '-').'-'.str()->random(8);
-    $previewUrl = $value
+    $removeName = 'remove_'.$name;
+    $isRemoved = old($removeName, false);
+    $previewUrl = $value && ! $isRemoved
         ? (Str::startsWith($value, ['http://', 'https://', '/']) ? $value : asset('storage/'.$value))
         : null;
 @endphp
@@ -41,7 +43,11 @@
     </div>
 
     <input id="{{ $inputId }}" name="{{ $name }}" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" data-image-input>
+    <input name="{{ $removeName }}" type="hidden" value="{{ $isRemoved ? 1 : 0 }}" data-image-remove-input>
     <input type="file" accept="image/*" capture="environment" class="sr-only" data-camera-input>
+    @if ($value)
+        <button class="image-cropper-remove" type="button" data-image-remove><x-lucide-trash-2 aria-hidden="true" /> Hapus {{ strtolower($label) }}</button>
+    @endif
     @error($name)<span class="form-error">{{ $message }}</span>@enderror
 
     <div class="image-cropper-modal" data-image-modal hidden>

@@ -28,8 +28,9 @@
                     @forelse($rows as $row)
                         @php($driver = $row['driver'])
                         @php($attendance = $row['attendance'])
+                        @php($hasDriverPhoto = $driver->photo && (Str::startsWith($driver->photo, ['http://', 'https://', '/']) || Storage::disk('public')->exists($driver->photo)))
                         <tr>
-                            <td><div class="monitoring-driver"><span class="monitoring-avatar">@if($driver->photo)<img src="{{ str_starts_with($driver->photo, 'http') ? $driver->photo : asset('storage/'.$driver->photo) }}" alt="Foto {{ $driver->full_name }}">@else{{ strtoupper(substr($driver->full_name, 0, 1)) }}@endif</span><span><strong>{{ $driver->full_name }}</strong><small>NIK: DRV-{{ $branch->code }}-{{ str_pad((string) $driver->id, 3, '0', STR_PAD_LEFT) }}</small><small>{{ $driver->sim_type ? 'SIM '.$driver->sim_type : 'Data SIM tidak tersedia' }}</small></span></div></td>
+                            <td><div class="monitoring-driver"><span class="monitoring-avatar">@if($hasDriverPhoto)<img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/'.$driver->photo) }}" alt="Foto {{ $driver->full_name }}">@else{{ Str::upper(Str::substr($driver->full_name, 0, 1)) }}@endif</span><span><strong>{{ $driver->full_name }}</strong><small>NIK: DRV-{{ $branch->code }}-{{ str_pad((string) $driver->id, 3, '0', STR_PAD_LEFT) }}</small><small>{{ $driver->sim_type ? 'SIM '.$driver->sim_type : 'Data SIM tidak tersedia' }}</small></span></div></td>
                             <td>@if($row['vehicle'])<strong>{{ trim($row['vehicle']->brand.' '.$row['vehicle']->model) }}</strong><small>{{ $row['vehicle']->police_number }}</small>@else<span class="monitoring-muted">Belum ada penilaian</span>@endif</td>
                             <td>@if($attendance)<span class="monitoring-attendance-recap"><b>{{ $attendance->present_days }}</b>/<b>{{ $attendance->sick_days }}</b>/<b>{{ $attendance->permitted_days }}</b>/<b>{{ $attendance->absent_days }}</b></span>@else-@endif</td>
                             <td><strong class="monitoring-score">{{ $row['driver_score'] !== null ? number_format($row['driver_score'], 1) : '-' }}</strong><small>{{ $row['rating_count'] }} penilaian</small></td>
@@ -47,7 +48,7 @@
         <footer class="monitoring-panel-footer"><span>Menampilkan {{ $rows->firstItem() ?? 0 }} - {{ $rows->lastItem() ?? 0 }} dari {{ $rows->total() }} driver</span>@if($rows->hasPages())<x-admin.pagination :paginator="$rows" label="Pagination driver monitoring" />@endif</footer>
     </section>
 
-    <div class="monitoring-modal" data-attendance-modal data-error-driver-id="{{ old('attendance_driver_id') }}" hidden>
+    <div class="monitoring-modal" data-attendance-modal data-attendance-max-days="{{ $workingDays }}" data-error-driver-id="{{ old('attendance_driver_id') }}" hidden>
         <button class="monitoring-modal-backdrop" type="button" data-attendance-close aria-label="Tutup modal"></button>
         <section class="monitoring-modal-card" role="dialog" aria-modal="true" aria-labelledby="attendance-modal-title">
             <header><span class="monitoring-modal-icon"><x-lucide-clipboard-check aria-hidden="true" /></span><div><h3 id="attendance-modal-title">Input &amp; Validasi Absensi Driver</h3><p>Rekap kehadiran bulanan dan kalkulasi skor kedisiplinan</p></div><button class="monitoring-modal-close" type="button" data-attendance-close aria-label="Tutup"><x-lucide-x aria-hidden="true" /></button></header>
@@ -57,12 +58,12 @@
                 <input type="hidden" name="period" value="{{ $period->format('Y-m') }}">
                 <input type="hidden" name="attendance_driver_id" value="{{ old('attendance_driver_id') }}">
                 <div class="monitoring-attendance-grid">
-                    <label><span>Hadir</span><input type="number" min="0" max="31" name="present_days" value="0" required><small>Bobot 100%</small></label>
-                    <label><span>Sakit</span><input type="number" min="0" max="31" name="sick_days" value="0" required><small>Bobot 75%</small></label>
-                    <label><span>Izin</span><input type="number" min="0" max="31" name="permitted_days" value="0" required><small>Bobot 50%</small></label>
-                    <label><span>Alpha</span><input type="number" min="0" max="31" name="absent_days" value="0" required><small>Bobot 0%</small></label>
+                    <label><span>Hadir</span><input type="number" min="0" max="{{ $workingDays }}" name="present_days" value="0" required><small>Bobot 100%</small></label>
+                    <label><span>Sakit</span><input type="number" min="0" max="{{ $workingDays }}" name="sick_days" value="0" required><small>Bobot 75%</small></label>
+                    <label><span>Izin</span><input type="number" min="0" max="{{ $workingDays }}" name="permitted_days" value="0" required><small>Bobot 50%</small></label>
+                    <label><span>Alpha</span><input type="number" min="0" max="{{ $workingDays }}" name="absent_days" value="0" required><small>Bobot 0%</small></label>
                 </div>
-                <div class="monitoring-score-preview"><span>Perkiraan Nilai Absensi</span><strong data-attendance-score>0.0</strong><small>Total hari: <b data-attendance-total>0</b> dari maksimal 31 hari</small></div>
+                <div class="monitoring-score-preview"><span>Perkiraan Nilai Absensi</span><strong data-attendance-score>0.0</strong><small>Total hari: <b data-attendance-total>0</b> dari {{ $workingDays }} hari kerja</small></div>
                 @if($errors->any())<div class="monitoring-form-error">{{ $errors->first() }}</div>@endif
                 <footer><button class="secondary-button" type="button" data-attendance-close>Batal</button><button class="primary-button" type="submit"><x-lucide-save aria-hidden="true" /> Simpan Absensi</button></footer>
             </form>

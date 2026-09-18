@@ -94,6 +94,8 @@ class VehicleQrCodeTest extends TestCase
             ->assertOk()
             ->assertSee('data-vehicle-qr-modal', false)
             ->assertSee('data-vehicle-qr-trigger', false)
+            ->assertSee('data-vehicle-qr-download-link', false)
+            ->assertSee('data-qr-download-filename="qr-kendaraan-'.str($vehicle->police_number)->slug().'.png"', false)
             ->assertSee('data-confirm-icon="refresh"', false)
             ->assertSee(route('admin.vehicles.qr.download', $vehicle), false)
             ->assertSee('Download QR')

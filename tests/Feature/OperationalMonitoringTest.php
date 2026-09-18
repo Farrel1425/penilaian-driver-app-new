@@ -23,11 +23,11 @@ class OperationalMonitoringTest extends TestCase
         [$branch, $driver] = $this->makeDriver();
 
         $payload = [
-            'period' => '2026-08',
-            'present_days' => 20,
+            'period' => '2026-09',
+            'present_days' => 19,
             'sick_days' => 2,
             'permitted_days' => 1,
-            'absent_days' => 1,
+            'absent_days' => 0,
         ];
 
         $this->actingAs($admin)
@@ -35,15 +35,61 @@ class OperationalMonitoringTest extends TestCase
             ->assertRedirect();
 
         $attendance = DriverAttendance::query()->sole();
-        $this->assertSame(24, $attendance->totalDays());
-        $this->assertSame(91.67, $attendance->score());
+        $this->assertSame(22, $attendance->totalDays());
+        $this->assertSame(95.45, $attendance->score());
 
-        $payload['present_days'] = 21;
+        $payload['present_days'] = 20;
         $payload['sick_days'] = 1;
         $this->actingAs($admin)->post(route('admin.monitoring.attendance.store', [$branch, $driver]), $payload);
 
         $this->assertDatabaseCount('driver_attendances', 1);
-        $this->assertDatabaseHas('driver_attendances', ['driver_id' => $driver->id, 'present_days' => 21]);
+        $this->assertDatabaseHas('driver_attendances', ['driver_id' => $driver->id, 'present_days' => 20]);
+    }
+
+    public function test_september_attendance_uses_weekdays_and_rejects_excess_days(): void
+    {
+        $admin = User::factory()->create();
+        [$branch, $driver] = $this->makeDriver();
+        $monitoring = app(OperationalMonitoringService::class);
+
+        $this->assertSame(22, $monitoring->workingDays($monitoring->period('2026-09')));
+
+        $this->actingAs($admin)
+            ->post(route('admin.monitoring.attendance.store', [$branch, $driver]), [
+                'period' => '2026-09',
+                'present_days' => 23,
+                'sick_days' => 0,
+                'permitted_days' => 0,
+                'absent_days' => 0,
+            ])
+            ->assertSessionHasErrors('present_days');
+
+        $this->assertDatabaseCount('driver_attendances', 0);
+    }
+
+    public function test_attendance_is_complete_only_after_all_workdays_are_recorded(): void
+    {
+        $admin = User::factory()->create();
+        [$branch, $driver] = $this->makeDriver();
+        $monitoring = app(OperationalMonitoringService::class);
+        $period = $monitoring->period('2026-09');
+
+        DriverAttendance::query()->create([
+            'branch_id' => $branch->id,
+            'driver_id' => $driver->id,
+            'entered_by' => $admin->id,
+            'period' => $period->toDateString(),
+            'present_days' => 10,
+            'sick_days' => 0,
+            'permitted_days' => 0,
+            'absent_days' => 0,
+        ]);
+
+        $this->assertFalse($monitoring->driverRows($branch, $period)->first()['is_complete']);
+
+        DriverAttendance::query()->where('driver_id', $driver->id)->update(['present_days' => 22]);
+
+        $this->assertTrue($monitoring->driverRows($branch, $period)->first()['is_complete']);
     }
 
     public function test_monitoring_calculates_weighted_driver_and_attendance_score(): void

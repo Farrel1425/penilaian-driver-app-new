@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -70,5 +71,46 @@ class ImageUploadTest extends TestCase
         $this->assertStringStartsWith('vehicles/interior/', $vehicle->interior_photo);
         Storage::disk('public')->assertExists($vehicle->photo);
         Storage::disk('public')->assertExists($vehicle->interior_photo);
+    }
+
+    public function test_admin_can_remove_vehicle_photos_and_files_are_removed(): void
+    {
+        Storage::fake('public');
+        $this->actingAs(User::factory()->create());
+        $branch = Branch::factory()->create();
+        $photo = UploadedFile::fake()->image('exterior.jpg')->store('vehicles/exterior', 'public');
+        $interior = UploadedFile::fake()->image('interior.jpg')->store('vehicles/interior', 'public');
+        $vehicle = Vehicle::factory()->for($branch)->create(['photo' => $photo, 'interior_photo' => $interior]);
+
+        $this->put(route('admin.vehicles.update', $vehicle), [
+            'branch_id' => $branch->id,
+            'police_number' => $vehicle->police_number,
+            'brand' => $vehicle->brand,
+            'model' => $vehicle->model,
+            'status' => Vehicle::STATUS_ACTIVE,
+            'remove_photo' => 1,
+            'remove_interior_photo' => 1,
+        ])->assertRedirect(route('admin.vehicles.index'));
+
+        $vehicle->refresh();
+        $this->assertNull($vehicle->photo);
+        $this->assertNull($vehicle->interior_photo);
+        Storage::disk('public')->assertMissing([$photo, $interior]);
+    }
+
+    public function test_orphan_image_cleanup_keeps_referenced_files_and_requires_delete_option(): void
+    {
+        Storage::fake('public');
+        $branch = Branch::factory()->create();
+        $referenced = UploadedFile::fake()->image('used.jpg')->store('vehicles/exterior', 'public');
+        $orphan = UploadedFile::fake()->image('unused.jpg')->store('vehicles/exterior', 'public');
+        Vehicle::factory()->for($branch)->create(['photo' => $referenced]);
+
+        $this->assertSame(0, Artisan::call('images:prune-orphans'));
+        Storage::disk('public')->assertExists([$referenced, $orphan]);
+
+        $this->assertSame(0, Artisan::call('images:prune-orphans', ['--delete' => true]));
+        Storage::disk('public')->assertExists($referenced);
+        Storage::disk('public')->assertMissing($orphan);
     }
 }
