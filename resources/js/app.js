@@ -16,6 +16,177 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    const periodModal = document.querySelector('[data-period-modal]');
+    const vacancyModal = document.querySelector('[data-vacancy-modal]');
+    const applicantModal = document.querySelector('[data-applicant-modal]');
+    if (!periodModal && !vacancyModal && !applicantModal) return;
+
+    const parseRecords = (selector) => {
+        try {
+            return JSON.parse(document.querySelector(selector)?.textContent ?? '[]');
+        } catch {
+            return [];
+        }
+    };
+    const periods = parseRecords('[data-period-records]');
+    const vacancies = parseRecords('[data-vacancy-records]');
+    const applicants = parseRecords('[data-applicant-records]');
+    const oldValues = parseRecords('[data-recruitment-old-values]');
+    const oldInput = document.querySelector('[data-recruitment-old-input]');
+
+    const openDialog = (dialog) => {
+        if (!(dialog instanceof HTMLDialogElement)) return;
+        if (!dialog.open) dialog.showModal();
+        document.body.style.overflow = 'hidden';
+    };
+    const closeDialog = (dialog) => {
+        if (dialog?.open) dialog.close();
+    };
+
+    [periodModal, vacancyModal, applicantModal].forEach((dialog) => {
+        dialog?.querySelectorAll('[data-modal-close]').forEach((button) => button.addEventListener('click', () => closeDialog(dialog)));
+        dialog?.addEventListener('click', (event) => {
+            if (event.target === dialog) closeDialog(dialog);
+        });
+        dialog?.addEventListener('close', () => {
+            if (!document.querySelector('dialog[open]')) document.body.style.removeProperty('overflow');
+        });
+    });
+
+    const configureForm = (form, record) => {
+        form.reset();
+        const isEditing = Boolean(record?.id);
+        form.action = isEditing
+            ? form.dataset.updateAction.replace('__ID__', record.id)
+            : form.dataset.storeAction;
+        form.querySelector('[data-form-method]').disabled = !isEditing;
+        form.querySelector('[data-record-id]').value = record?.id ?? '';
+    };
+    const setValue = (form, name, value) => {
+        const field = form.elements.namedItem(name);
+        if (field && 'value' in field) field.value = value ?? '';
+    };
+
+    const openPeriod = (record = null, values = null) => {
+        const form = periodModal?.querySelector('[data-period-form]');
+        if (!form) return;
+        configureForm(form, record);
+        const source = values ?? record ?? {};
+        setValue(form, 'name', source.name);
+        periodModal.querySelector('[data-period-modal-title]').textContent = record ? 'Edit Gelombang Recruitment' : 'Tambah Gelombang Recruitment';
+        periodModal.querySelector('[data-period-submit-label]').textContent = record ? 'Simpan Perubahan' : 'Buat Gelombang';
+        openDialog(periodModal);
+    };
+
+    document.querySelectorAll('[data-period-create]').forEach((button) => button.addEventListener('click', () => openPeriod()));
+    document.querySelectorAll('[data-period-edit]').forEach((button) => button.addEventListener('click', () => {
+        openPeriod(periods.find((period) => String(period.id) === button.dataset.periodEdit));
+    }));
+
+    const vacancyForm = vacancyModal?.querySelector('[data-vacancy-form]');
+    const branchCheckboxes = [...(vacancyModal?.querySelectorAll('[data-branch-option] input[type="checkbox"]') ?? [])];
+    const branchChips = vacancyModal?.querySelector('[data-branch-chips]');
+    const branchSearch = vacancyModal?.querySelector('[data-branch-search]');
+
+    const refreshBranchChips = () => {
+        if (!branchChips) return;
+        branchChips.replaceChildren();
+        const selected = branchCheckboxes.filter((checkbox) => checkbox.checked);
+        if (!selected.length) {
+            const empty = document.createElement('span');
+            empty.textContent = 'Belum ada cabang dipilih';
+            branchChips.append(empty);
+            return;
+        }
+        selected.forEach((checkbox) => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.textContent = checkbox.closest('label').querySelector('strong').textContent;
+            const close = document.createElement('span');
+            close.textContent = '×';
+            close.setAttribute('aria-hidden', 'true');
+            chip.append(close);
+            chip.addEventListener('click', () => {
+                checkbox.checked = false;
+                refreshBranchChips();
+            });
+            branchChips.append(chip);
+        });
+    };
+
+    branchCheckboxes.forEach((checkbox) => checkbox.addEventListener('change', refreshBranchChips));
+    branchSearch?.addEventListener('input', () => {
+        const term = branchSearch.value.trim().toLocaleLowerCase('id');
+        vacancyModal.querySelectorAll('[data-branch-option]').forEach((option) => {
+            option.hidden = term !== '' && !option.dataset.search.includes(term);
+        });
+    });
+
+    const openVacancy = (record = null, periodId = '', values = null) => {
+        if (!vacancyForm) return;
+        configureForm(vacancyForm, record);
+        const source = values ?? record ?? {};
+        ['recruitment_period_id', 'category', 'work_type', 'title', 'description', 'qualification', 'compensation', 'quota'].forEach((name) => setValue(vacancyForm, name, source[name]));
+        if (!record && !values) {
+            setValue(vacancyForm, 'recruitment_period_id', periodId || periods.find((period) => period.is_active)?.id || '');
+        }
+        const selectedBranches = (source.branch_ids ?? []).map(String);
+        branchCheckboxes.forEach((checkbox) => {
+            checkbox.checked = selectedBranches.includes(checkbox.value);
+            checkbox.closest('[data-branch-option]').hidden = false;
+        });
+        if (branchSearch) branchSearch.value = '';
+        refreshBranchChips();
+        vacancyModal.querySelector('[data-vacancy-modal-title]').textContent = record ? 'Edit Lowongan' : 'Tambah Lowongan';
+        vacancyModal.querySelector('[data-vacancy-submit-label]').textContent = record ? 'Simpan Perubahan' : 'Buat Lowongan';
+        openDialog(vacancyModal);
+    };
+
+    document.querySelectorAll('[data-vacancy-create]').forEach((button) => button.addEventListener('click', () => openVacancy(null, button.dataset.periodId ?? '')));
+    document.querySelectorAll('[data-vacancy-edit]').forEach((button) => button.addEventListener('click', () => {
+        openVacancy(vacancies.find((vacancy) => String(vacancy.id) === button.dataset.vacancyEdit));
+    }));
+
+    const applicantFields = {
+        full_name: '[data-applicant-name]',
+        vacancy: '[data-applicant-position]',
+        nik: '[data-applicant-nik]',
+        submitted_at: '[data-applicant-date]',
+        whatsapp: '[data-applicant-whatsapp]',
+        email: '[data-applicant-email]',
+        domicile: '[data-applicant-domicile]',
+        branch: '[data-applicant-branch]',
+        period: '[data-applicant-period]',
+        document_name: '[data-applicant-document]',
+        experience: '[data-applicant-experience]',
+    };
+    document.querySelectorAll('[data-applicant-open]').forEach((button) => button.addEventListener('click', () => {
+        const applicant = applicants.find((item) => String(item.id) === button.dataset.applicantOpen);
+        if (!applicant || !applicantModal) return;
+        Object.entries(applicantFields).forEach(([key, selector]) => {
+            applicantModal.querySelector(selector).textContent = applicant[key] ?? '-';
+        });
+        applicantModal.querySelector('[data-applicant-position]').textContent = `${applicant.vacancy} • ${applicant.status_label}`;
+        const statusForm = applicantModal.querySelector('[data-applicant-status-form]');
+        statusForm.action = applicant.status_url;
+        statusForm.elements.namedItem('status').value = applicant.status;
+        const documentLink = applicantModal.querySelector('[data-applicant-document-link]');
+        documentLink.href = applicant.document_url;
+        applicantModal.querySelector('[data-applicant-whatsapp-link]').href = applicant.whatsapp_url;
+        applicantModal.querySelector('[data-applicant-email-link]').href = `mailto:${applicant.email}`;
+        openDialog(applicantModal);
+    }));
+
+    if (oldInput?.dataset.context === 'period') {
+        const record = periods.find((period) => String(period.id) === oldInput.dataset.recordId) ?? null;
+        openPeriod(record, oldValues);
+    } else if (oldInput?.dataset.context === 'vacancy') {
+        const record = vacancies.find((vacancy) => String(vacancy.id) === oldInput.dataset.recordId) ?? null;
+        openVacancy(record, '', oldValues);
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.querySelector('[data-sidebar-toggle]');
     const sidebar = document.querySelector('[data-admin-sidebar]');
     const sidebarCollapse = document.querySelector('[data-sidebar-collapse]');
@@ -1284,6 +1455,22 @@ document.addEventListener('DOMContentLoaded', () => {
             window.localStorage.setItem(storageKey, String(group.open));
         }
     });
+
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    if (!sidebarNav) return;
+
+    const scrollStorageKey = 'admin-sidebar-scroll-top';
+    const savedScrollTop = Number.parseFloat(window.sessionStorage.getItem(scrollStorageKey) ?? '0');
+
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+            sidebarNav.scrollTop = Number.isFinite(savedScrollTop) ? savedScrollTop : 0;
+        });
+    });
+
+    sidebarNav.addEventListener('scroll', () => {
+        window.sessionStorage.setItem(scrollStorageKey, String(sidebarNav.scrollTop));
+    }, { passive: true });
 });
 
 document.addEventListener('click', (event) => {

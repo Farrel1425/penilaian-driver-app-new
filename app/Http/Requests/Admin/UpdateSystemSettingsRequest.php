@@ -16,6 +16,7 @@ class UpdateSystemSettingsRequest extends FormRequest
         return [
             'system_name' => ['required', 'string', 'max:100'],
             'support_contact' => ['nullable', 'string', 'max:150'],
+            'recruitment_whatsapp' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+()\-\s]+$/'],
             'copyright_text' => ['nullable', 'string', 'max:150'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'remove_logo' => ['sometimes', 'boolean'],

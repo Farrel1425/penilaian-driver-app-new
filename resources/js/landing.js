@@ -145,3 +145,63 @@ document.querySelectorAll('.bds-stats strong').forEach(element => counterObserve
 updateScrollMotion();
 
 document.querySelector('[data-proposal-feedback]')?.scrollIntoView({ block: 'center' });
+
+const applicationModal = document.querySelector('[data-application-modal]');
+const vacancySelect = applicationModal?.querySelector('[data-vacancy-select]');
+const placementSelect = applicationModal?.querySelector('[data-placement-select]');
+const vacancyBranchesElement = document.querySelector('[data-vacancy-branches]');
+let vacancyBranches = {};
+
+try {
+    vacancyBranches = JSON.parse(vacancyBranchesElement?.textContent ?? '{}');
+} catch {
+    vacancyBranches = {};
+}
+
+function updatePlacementOptions() {
+    if (!placementSelect || !vacancySelect) return;
+
+    const selected = placementSelect.dataset.oldValue ?? '';
+    const branches = vacancyBranches[vacancySelect.value] ?? [];
+    placementSelect.replaceChildren(new Option(
+        branches.length ? 'Pilih cabang penempatan...' : 'Pilih posisi terlebih dahulu...',
+        '',
+    ));
+    for (const branch of branches) {
+        placementSelect.add(new Option(branch.name, branch.id, false, String(branch.id) === selected));
+    }
+    placementSelect.dataset.oldValue = '';
+}
+
+function openApplicationModal(vacancyId = '') {
+    if (!(applicationModal instanceof HTMLDialogElement)) return;
+    if (vacancySelect && vacancyId) vacancySelect.value = vacancyId;
+    updatePlacementOptions();
+    if (!applicationModal.open) applicationModal.showModal();
+    document.body.style.overflow = 'hidden';
+}
+
+document.querySelectorAll('[data-application-open]').forEach(button => {
+    button.addEventListener('click', () => openApplicationModal(button.dataset.applicationOpen));
+});
+
+vacancySelect?.addEventListener('change', updatePlacementOptions);
+applicationModal?.querySelectorAll('[data-application-close]').forEach(button => {
+    button.addEventListener('click', () => applicationModal.close());
+});
+applicationModal?.addEventListener('click', event => {
+    if (event.target === applicationModal) applicationModal.close();
+});
+applicationModal?.addEventListener('close', () => {
+    document.body.style.overflow = '';
+});
+
+const applicationFile = applicationModal?.querySelector('[data-application-file]');
+applicationFile?.addEventListener('change', () => {
+    const label = applicationModal.querySelector('[data-application-file-name]');
+    if (label) label.textContent = applicationFile.files?.[0]?.name ?? 'Format: PDF (Maksimum 10 MB)';
+});
+
+if (applicationModal?.hasAttribute('data-application-auto-open')) {
+    openApplicationModal(vacancySelect?.value ?? '');
+}

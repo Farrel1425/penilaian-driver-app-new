@@ -6,11 +6,15 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DriverController;
 use App\Http\Controllers\Admin\EmployeeCategoryController;
 use App\Http\Controllers\Admin\IndicatorCategoryController;
+use App\Http\Controllers\Admin\JobApplicationController as AdminJobApplicationController;
+use App\Http\Controllers\Admin\JobVacancyController as AdminJobVacancyController;
 use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\OperationalMonitoringController;
 use App\Http\Controllers\Admin\PartnershipInquiryController as AdminPartnershipInquiryController;
 use App\Http\Controllers\Admin\QuestionController;
+use App\Http\Controllers\Admin\RecruitmentManagementController;
+use App\Http\Controllers\Admin\RecruitmentPeriodController;
 use App\Http\Controllers\Admin\ReportBranchController;
 use App\Http\Controllers\Admin\ReportDriverController;
 use App\Http\Controllers\Admin\ReportExportController;
@@ -23,6 +27,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\PartnershipInquiryController;
 use App\Http\Controllers\Passenger\PassengerFlowController;
+use App\Http\Controllers\RecruitmentController;
 use App\Http\Middleware\LogAdminActivity;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +35,10 @@ Route::view('/', 'welcome')->name('home');
 Route::post('/partnership-inquiries', [PartnershipInquiryController::class, 'store'])
     ->middleware('throttle:6,1')
     ->name('partnership-inquiries.store');
+Route::get('/recruitment', [RecruitmentController::class, 'index'])->name('recruitment.index');
+Route::post('/recruitment/applications', [RecruitmentController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('recruitment.applications.store');
 
 Route::prefix('rating/{vehicleToken}')->name('passenger.rating.')->group(function (): void {
     Route::get('/', [PassengerFlowController::class, 'vehicle'])->name('entry');
@@ -81,6 +90,15 @@ Route::middleware(['auth', 'active.admin', 'admin.inactivity', LogAdminActivity:
         });
 
         Route::middleware('super.admin')->group(function (): void {
+            Route::get('recruitment', RecruitmentManagementController::class)->name('recruitment.index');
+            Route::patch('recruitment-periods/{recruitmentPeriod}/active', [RecruitmentPeriodController::class, 'updateActive'])->name('recruitment-periods.active');
+            Route::resource('recruitment-periods', RecruitmentPeriodController::class)->except('show');
+            Route::patch('job-vacancies/{jobVacancy}/active', [AdminJobVacancyController::class, 'updateActive'])->name('job-vacancies.active');
+            Route::resource('job-vacancies', AdminJobVacancyController::class)->except('show');
+            Route::get('job-applications', [AdminJobApplicationController::class, 'index'])->name('job-applications.index');
+            Route::get('job-applications/{jobApplication}', [AdminJobApplicationController::class, 'show'])->name('job-applications.show');
+            Route::patch('job-applications/{jobApplication}/status', [AdminJobApplicationController::class, 'updateStatus'])->name('job-applications.status');
+            Route::get('job-applications/{jobApplication}/document', [AdminJobApplicationController::class, 'download'])->name('job-applications.document');
             Route::get('partnership-inquiries', [AdminPartnershipInquiryController::class, 'index'])->name('partnership-inquiries.index');
             Route::get('partnership-inquiries/{partnershipInquiry}', [AdminPartnershipInquiryController::class, 'show'])->name('partnership-inquiries.show');
             Route::patch('partnership-inquiries/{partnershipInquiry}/status', [AdminPartnershipInquiryController::class, 'updateStatus'])->name('partnership-inquiries.status');

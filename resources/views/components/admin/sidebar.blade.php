@@ -51,6 +51,8 @@
         </details>
 
         @if ($isSuperAdmin)
+            <a class="sidebar-link {{ request()->routeIs('admin.recruitment.*', 'admin.recruitment-periods.*', 'admin.job-vacancies.*', 'admin.job-applications.*') ? 'is-active' : '' }}" href="{{ route('admin.recruitment.index') }}"><x-lucide-briefcase-business class="nav-icon" aria-hidden="true" /><span>Recruitment</span></a>
+
             <a class="sidebar-link {{ request()->routeIs('admin.partnership-inquiries.*') ? 'is-active' : '' }}" href="{{ route('admin.partnership-inquiries.index') }}"><x-lucide-inbox class="nav-icon" aria-hidden="true" /><span>Permintaan Kerjasama</span></a>
 
             @php($settingsActive = request()->routeIs('admin.settings.*', 'admin.activity-logs.*', 'admin.users.*'))

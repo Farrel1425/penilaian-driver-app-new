@@ -6,7 +6,7 @@
             <label><span>Periode</span><input type="month" name="period" value="{{ $period->format('Y-m') }}"></label>
             <input type="hidden" name="status" value="{{ $status }}">
             <button class="secondary-button" type="submit"><x-lucide-filter aria-hidden="true" /><span>Terapkan</span></button>
-            <a class="monitoring-print-button" data-no-loading href="{{ route('admin.monitoring.report', ['period' => $period->format('Y-m')]) }}"><x-lucide-printer aria-hidden="true" /><span>Cetak Laporan<br>Semua Cabang</span></a>
+            <a class="monitoring-print-button" data-no-loading href="{{ route('admin.monitoring.report', ['period' => $period->format('Y-m')]) }}" title="Cetak laporan semua cabang" aria-label="Cetak laporan semua cabang"><x-lucide-printer aria-hidden="true" /><span>Cetak Laporan</span></a>
         </form>
     </x-slot>
 

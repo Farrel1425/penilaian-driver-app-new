@@ -49,6 +49,12 @@
                         @error('support_contact')<small class="form-error">{{ $message }}</small>@enderror
                     </div>
                     <div class="form-field form-field-full">
+                        <label for="recruitment_whatsapp">WhatsApp Recruitment</label>
+                        <input id="recruitment_whatsapp" name="recruitment_whatsapp" value="{{ old('recruitment_whatsapp', $settings['recruitment_whatsapp'] ?? '') }}" placeholder="Contoh: 0812-3456-7890">
+                        <small class="settings-field-note">Tombol Hubungi pada halaman Recruitment langsung membuka wa.me ke nomor ini.</small>
+                        @error('recruitment_whatsapp')<small class="form-error">{{ $message }}</small>@enderror
+                    </div>
+                    <div class="form-field form-field-full">
                         <label for="copyright_text">Teks Copyright</label>
                         <input id="copyright_text" name="copyright_text" value="{{ old('copyright_text', $settings['copyright_text'] ?? '© '.now()->year.'. Seluruh hak dilindungi.') }}">
                         <small class="settings-field-note">Ditampilkan pada footer landing page dan halaman login.</small>

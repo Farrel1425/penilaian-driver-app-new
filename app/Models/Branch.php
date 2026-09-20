@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['code', 'name', 'address', 'regency', 'pic_name', 'phone', 'email', 'status'])]
@@ -49,6 +50,16 @@ class Branch extends Model
     public function driverAttendances(): HasMany
     {
         return $this->hasMany(DriverAttendance::class);
+    }
+
+    public function jobVacancies(): BelongsToMany
+    {
+        return $this->belongsToMany(JobVacancy::class, 'job_vacancy_branch');
+    }
+
+    public function jobApplications(): HasMany
+    {
+        return $this->hasMany(JobApplication::class);
     }
 
     public function scopeActive(Builder $query): Builder

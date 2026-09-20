@@ -72,6 +72,15 @@
                         'Profil Sistem' => 'Pengaturan',
                         'Permintaan Kerjasama' => 'Landing Page',
                         'Detail Permintaan Kerjasama' => 'Landing Page',
+                        'Periode Recruitment' => 'Recruitment',
+                        'Tambah Periode Recruitment' => 'Recruitment',
+                        'Edit Periode Recruitment' => 'Recruitment',
+                        'Lowongan Recruitment' => 'Recruitment',
+                        'Tambah Lowongan' => 'Recruitment',
+                        'Edit Lowongan' => 'Recruitment',
+                        'Data Pelamar' => 'Recruitment',
+                        'Detail Pelamar' => 'Recruitment',
+                        'Recruitment' => 'Recruitment',
                     ];
                     $pageTitle = $title ?? 'Dashboard';
                     $pageSection = $sectionByTitle[$pageTitle] ?? 'Sistem';

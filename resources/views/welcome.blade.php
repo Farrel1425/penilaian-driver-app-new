@@ -44,6 +44,7 @@
                 <a href="#mitra">Mitra Korporasi</a>
                 <a href="#sop">SOP Kualitas</a>
                 <a href="#hubungi">Hubungi</a>
+                <a href="{{ route('recruitment.index') }}">Recruitment</a>
             </nav>
             <a class="bds-button bds-login" href="{{ route('login') }}">Login <img src="{{ $icon(24) }}" alt="" width="9" height="9"></a>
         </div>
@@ -210,7 +211,7 @@
             <div class="bds-footer-grid">
                 <div class="bds-footer-brand"><a class="bds-brand" href="#beranda"><img src="{{ $logo }}" alt="Logo PT. Bali Dana Sejahtera" width="38" height="38"><strong>PT. Bali Dana Sejahtera</strong></a><p>Perusahaan penyedia persewaan kendaraan operasional, tenaga alih daya tersertifikasi, pengadaan dan percetakan, serta layanan pembersihan dan perawatan AC di Bali sejak 2007.</p><small>SK Kemenkumham RI Terdaftar Resmi</small></div>
                 <div><h3>LAYANAN UTAMA</h3><a href="#layanan">Persewaan Armada Mobil Dinas</a><a href="#layanan">Mobil Kas Keliling Bank</a><a href="#layanan">Tenaga Driver &amp; Cleaning Service</a><a href="#layanan">Perdagangan &amp; Percetakan</a><a href="#layanan">Pembersihan &amp; Perawatan AC</a></div>
-                <div><h3>INFORMASI KORPORAT</h3><a href="#beranda">Beranda</a><a href="#profil">Profil &amp; Kepemilikan</a><a href="#mitra">Mitra Korporasi</a><a href="#sop">SOP &amp; Jaminan Kualitas</a><a href="#hubungi">Hubungi Sekretariat</a><a class="bds-footer-login" href="{{ route('login') }}">Login</a></div>
+                <div><h3>INFORMASI KORPORAT</h3><a href="#beranda">Beranda</a><a href="#profil">Profil &amp; Kepemilikan</a><a href="#mitra">Mitra Korporasi</a><a href="#sop">SOP &amp; Jaminan Kualitas</a><a href="#hubungi">Hubungi Sekretariat</a><a href="{{ route('recruitment.index') }}">Recruitment</a><a class="bds-footer-login" href="{{ route('login') }}">Login</a></div>
                 <div><h3>KEPATUHAN HUKUM</h3><p>Disnaker Prov. Bali</p><p>BPJS Ketenagakerjaan</p><p>BPJS Kesehatan</p><p>Standar K3 Operasional</p></div>
             </div>
             <div class="bds-footer-bottom">
@@ -233,6 +234,7 @@
         <a href="#layanan" data-sections="layanan"><img src="{{ asset('images/bds/mobile-nav-services.svg') }}" alt=""><span>Layanan</span></a>
         <a href="#mitra" data-sections="profil mitra sop"><img src="{{ asset('images/bds/mobile-nav-clients.svg') }}" alt=""><span>Klien</span></a>
         <a href="#hubungi" data-sections="hubungi"><img src="{{ asset('images/bds/mobile-nav-contact.svg') }}" alt=""><span>Hubungi</span></a>
+        <a href="{{ route('recruitment.index') }}"><img src="{{ asset('images/bds/mobile-nav-services.svg') }}" alt=""><span>Karir</span></a>
     </nav>
 </body>
 </html>

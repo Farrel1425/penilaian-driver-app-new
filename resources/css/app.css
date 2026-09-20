@@ -16,6 +16,345 @@
     --radius-card: 8px;
     --font-sans: "Segoe UI", Arial, Helvetica, sans-serif;
 }
+
+/* Unified recruitment workspace. */
+@media (min-width: 1024px) {
+    .admin-app .admin-page-heading--recruitment {
+        align-items: end;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0 28px;
+    }
+}
+.recruitment-heading-actions,
+.recruitment-workspace-toolbar form {
+    align-items: end;
+    display: flex;
+    gap: 10px;
+}
+.recruitment-heading-actions button {
+    min-height: 42px;
+}
+.recruitment-tabs {
+    align-items: center;
+    border-bottom: 1px solid #dce2dc;
+    display: flex;
+    gap: 28px;
+    margin-bottom: 18px;
+}
+.recruitment-tabs a {
+    align-items: center;
+    border-bottom: 3px solid transparent;
+    color: #657069;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 700;
+    gap: 8px;
+    margin-bottom: -1px;
+    padding: 12px 2px;
+}
+.recruitment-tabs a.is-active {
+    border-bottom-color: #007b35;
+    color: #006e2c;
+}
+.recruitment-tabs svg { height: 17px; width: 17px; }
+.recruitment-tabs b {
+    background: #e8f1ea;
+    border-radius: 999px;
+    color: #006e2c;
+    font-size: 10px;
+    min-width: 23px;
+    padding: 3px 7px;
+    text-align: center;
+}
+.recruitment-workspace,
+.recruitment-applicant-workspace {
+    background: #fff;
+    border: 1px solid #e0e5e0;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(39, 55, 35, 0.035);
+    overflow: hidden;
+}
+.recruitment-workspace-toolbar {
+    align-items: end;
+    background: #fff;
+    border-bottom: 1px solid #e3e7e3;
+    display: flex;
+    gap: 24px;
+    justify-content: space-between;
+    padding: 18px 20px;
+}
+.recruitment-workspace-toolbar h2 { color: #1d2420; font-size: 17px; margin: 0; }
+.recruitment-workspace-toolbar > div > p { color: #737c75; font-size: 11px; margin: 4px 0 0; }
+.recruitment-workspace-toolbar label { display: grid; gap: 5px; }
+.recruitment-workspace-toolbar label > span { color: #596159; font-size: 9px; font-weight: 700; letter-spacing: .06em; }
+.recruitment-workspace-toolbar select {
+    background: #fff;
+    border: 1px solid #c4c9ac;
+    border-radius: 8px;
+    height: 38px;
+    min-width: 160px;
+    padding: 0 12px;
+}
+.recruitment-period-list { display: grid; }
+.recruitment-period-group { border-bottom: 1px solid #e4e8e4; }
+.recruitment-period-group:last-child { border-bottom: 0; }
+.recruitment-period-group > summary {
+    align-items: center;
+    background: #f8faf8;
+    cursor: pointer;
+    display: grid;
+    gap: 15px;
+    grid-template-columns: 26px minmax(230px, 1fr) auto 76px 90px auto;
+    list-style: none;
+    min-height: 72px;
+    padding: 12px 18px;
+}
+.recruitment-period-group > summary::-webkit-details-marker { display: none; }
+.recruitment-period-group[open] > summary { background: #f2f7f3; border-bottom: 1px solid #dfe5df; }
+.recruitment-period-chevron { display: grid; place-items: center; }
+.recruitment-period-chevron svg { height: 17px; transition: transform .18s ease; width: 17px; }
+.recruitment-period-group[open] .recruitment-period-chevron svg { transform: rotate(90deg); }
+.recruitment-period-summary-main { display: grid; gap: 3px; min-width: 0; }
+.recruitment-period-summary-main strong { color: #1e2b23; font-size: 14px; }
+.recruitment-period-summary-main small { color: #737c75; font-size: 10px; }
+.recruitment-period-toggle-form { display: contents; }
+.recruitment-period-switch {
+    align-items: center;
+    color: #657069;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 9px;
+    font-weight: 800;
+    gap: 6px;
+    text-transform: uppercase;
+}
+.recruitment-period-switch input {
+    height: 1px;
+    margin: -1px;
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+}
+.recruitment-period-switch-track {
+    background: #b8c1ba;
+    border-radius: 999px;
+    display: inline-flex;
+    height: 18px;
+    padding: 2px;
+    transition: background .16s ease;
+    width: 32px;
+}
+.recruitment-period-switch-track i {
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(25, 40, 31, .25);
+    display: block;
+    height: 14px;
+    transform: translateX(0);
+    transition: transform .16s ease;
+    width: 14px;
+}
+.recruitment-period-switch input:checked + .recruitment-period-switch-track { background: #008344; }
+.recruitment-period-switch input:checked + .recruitment-period-switch-track i { transform: translateX(14px); }
+.recruitment-period-switch:has(input:checked) { color: #007b35; }
+.recruitment-period-switch:has(input:focus-visible) .recruitment-period-switch-track { box-shadow: 0 0 0 3px rgba(0, 123, 53, .18); }
+.recruitment-period-metric { display: grid; gap: 2px; text-align: center; }
+.recruitment-period-metric b { color: #223128; font-size: 14px; }
+.recruitment-period-metric small { color: #7a837d; font-size: 9px; }
+.recruitment-period-actions { align-items: center; display: flex; gap: 6px; justify-content: center; }
+.recruitment-period-actions form { display: contents; }
+.recruitment-period-actions button {
+    align-items: center;
+    background: #edf5ff;
+    border: 1px solid #c9dbf3;
+    border-radius: 7px;
+    color: #1b67bd;
+    display: inline-flex;
+    height: 30px;
+    justify-content: center;
+    padding: 0;
+    width: 30px;
+}
+.recruitment-period-actions > button:first-child { background: #edf8f2; border-color: #b9dfc7; color: #08743f; }
+.recruitment-period-actions form button { background: #fff0ef; border-color: #f0c6c2; color: #c8372d; }
+.recruitment-period-actions button:hover { background: #edf3ed; border-color: #78b887; color: #007b35; }
+.recruitment-period-actions svg { height: 15px; width: 15px; }
+.recruitment-period-content { background: #fff; padding: 0 18px 18px; }
+.recruitment-grouped-table th { background: #fff; }
+.recruitment-grouped-table td:first-child { width: 32%; }
+.recruitment-grouped-table td strong,
+.recruitment-grouped-table td small { display: block; }
+.recruitment-grouped-table td small { color: #7a837d; font-size: 10px; margin-top: 3px; }
+.recruitment-grouped-table .recruitment-action-cell { text-align: center; width: 94px; }
+.recruitment-grouped-table .recruitment-action-cell .table-row-actions { display: inline-flex; }
+.recruitment-vacancy-toggle-form { display: inline-flex; }
+.recruitment-branch-count { color: #006e2c; font-weight: 700; }
+.recruitment-period-empty {
+    align-items: center;
+    color: #68736c;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding: 25px;
+}
+.recruitment-period-empty > svg { height: 25px; width: 25px; }
+.recruitment-period-empty span { display: grid; gap: 3px; }
+.recruitment-period-empty button { background: none; border: 0; color: #007b35; cursor: pointer; font-weight: 700; margin-left: 8px; }
+
+.recruitment-admin-modal {
+    background: transparent;
+    border: 0;
+    max-height: calc(100vh - 32px);
+    max-width: none;
+    padding: 0;
+    width: min(680px, calc(100% - 32px));
+}
+.recruitment-admin-modal::backdrop { background: rgba(16, 23, 19, .72); backdrop-filter: blur(2px); }
+.recruitment-vacancy-modal { width: min(920px, calc(100% - 32px)); }
+.recruitment-admin-modal > form,
+.recruitment-applicant-modal > div {
+    background: #fff;
+    border: 1px solid #dfe5df;
+    border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+}
+.recruitment-admin-modal form > header,
+.recruitment-applicant-dialog-header {
+    align-items: center;
+    border-bottom: 1px solid #e3e8e3;
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px;
+}
+.recruitment-admin-modal form > header > span {
+    background: #e1f3e7;
+    border-radius: 9px;
+    color: #007b35;
+    display: grid;
+    flex: 0 0 38px;
+    height: 38px;
+    place-items: center;
+}
+.recruitment-admin-modal form > header > span svg { height: 19px; width: 19px; }
+.recruitment-admin-modal form > header > div,
+.recruitment-applicant-dialog-header > div { flex: 1; }
+.recruitment-admin-modal h2 { color: #1c2720; font-size: 18px; margin: 0; }
+.recruitment-admin-modal header p { color: #737c75; font-size: 10px; margin: 3px 0 0; }
+.recruitment-admin-modal header > button,
+.recruitment-applicant-dialog-header > button {
+    background: transparent;
+    border: 0;
+    color: #586159;
+    cursor: pointer;
+    display: grid;
+    height: 32px;
+    place-items: center;
+    width: 32px;
+}
+.recruitment-admin-modal header > button svg { height: 18px; width: 18px; }
+.recruitment-period-modal .form-grid,
+.recruitment-vacancy-modal-body { padding: 22px 24px; }
+.recruitment-admin-modal .form-alert { margin: 16px 24px 0; }
+.recruitment-admin-modal > form > footer {
+    align-items: center;
+    border-top: 1px solid #e3e8e3;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 16px 24px;
+}
+.recruitment-vacancy-modal-body { max-height: calc(100vh - 190px); overflow-y: auto; }
+.recruitment-branch-picker { border: 0; margin: 20px 0 0; padding: 0; }
+.recruitment-branch-picker legend { color: #253129; font-size: 12px; font-weight: 700; }
+.recruitment-branch-picker legend span { color: #ba1a1a; }
+.recruitment-branch-picker > p { color: #737c75; font-size: 10px; margin: 4px 0 12px; }
+.recruitment-branch-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; min-height: 28px; }
+.recruitment-branch-chips > span { color: #7a837d; font-size: 10px; padding: 6px 0; }
+.recruitment-branch-chips button {
+    align-items: center;
+    background: #e2f2e7;
+    border: 0;
+    border-radius: 999px;
+    color: #006e2c;
+    display: inline-flex;
+    font-size: 10px;
+    font-weight: 700;
+    gap: 5px;
+    padding: 6px 9px;
+}
+.recruitment-branch-chips button svg { height: 11px; width: 11px; }
+.recruitment-branch-search {
+    align-items: center;
+    border: 1px solid #cfd7cf;
+    border-radius: 9px;
+    display: flex;
+    gap: 8px;
+    padding: 0 11px;
+}
+.recruitment-branch-search:focus-within { border-color: #007b35; box-shadow: 0 0 0 3px rgba(0,123,53,.08); }
+.recruitment-branch-search svg { color: #69736c; height: 16px; width: 16px; }
+.recruitment-branch-search input { border: 0 !important; box-shadow: none !important; height: 39px; margin: 0 !important; outline: 0; padding: 0 !important; width: 100%; }
+.recruitment-branch-list {
+    border: 1px solid #e0e5e0;
+    border-radius: 10px;
+    display: grid;
+    margin-top: 9px;
+    max-height: 235px;
+    overflow-y: auto;
+}
+.recruitment-branch-list > label {
+    align-items: center;
+    border-bottom: 1px solid #edf0ed;
+    cursor: pointer;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 18px 1fr 18px;
+    padding: 10px 12px;
+}
+.recruitment-branch-list > label:last-child { border-bottom: 0; }
+.recruitment-branch-list > label:hover { background: #f5f9f6; }
+.recruitment-branch-list input { accent-color: #007b35; height: 16px; width: 16px; }
+.recruitment-branch-list span { display: grid; gap: 2px; }
+.recruitment-branch-list strong { color: #29342d; font-size: 11px; }
+.recruitment-branch-list small { color: #7a837d; font-size: 9px; }
+.recruitment-branch-list > label > svg { color: #007b35; height: 15px; opacity: 0; width: 15px; }
+.recruitment-branch-list > label:has(input:checked) { background: #edf7f0; }
+.recruitment-branch-list > label:has(input:checked) > svg { opacity: 1; }
+.recruitment-applicant-detail-body { padding: 22px 24px; }
+.recruitment-applicant-detail-grid { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+.recruitment-applicant-detail-grid div { display: grid; gap: 3px; }
+.recruitment-applicant-detail-grid small { color: #778079; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.recruitment-applicant-detail-grid strong { color: #27322b; font-size: 12px; overflow-wrap: anywhere; }
+.recruitment-applicant-experience { background: #f5f7f5; border-radius: 9px; margin-top: 18px; padding: 14px; }
+.recruitment-applicant-experience small { color: #68726b; display: block; font-size: 9px; font-weight: 700; margin-bottom: 5px; }
+.recruitment-applicant-experience p { color: #303a33; font-size: 11px; line-height: 1.6; margin: 0; }
+.recruitment-applicant-dialog-actions { border-top: 1px solid #e3e8e3; display: flex; flex-wrap: wrap; gap: 9px; padding: 16px 24px; }
+.recruitment-applicant-dialog-actions form { align-items: center; display: flex; flex: 1; gap: 8px; }
+.recruitment-applicant-dialog-actions select { border: 1px solid #c9d0c9; border-radius: 8px; height: 38px; min-width: 130px; padding: 0 10px; }
+
+@media (max-width: 900px) {
+    .recruitment-workspace-toolbar { align-items: stretch; flex-direction: column; }
+    .recruitment-period-group > summary { grid-template-columns: 26px minmax(0, 1fr) auto; }
+    .recruitment-period-metric { display: none; }
+    .recruitment-period-actions { grid-column: 2 / -1; }
+}
+@media (max-width: 640px) {
+    .recruitment-heading-actions,
+    .recruitment-workspace-toolbar form { align-items: stretch; display: grid; grid-template-columns: 1fr; width: 100%; }
+    .recruitment-heading-actions button { width: 100%; }
+    .recruitment-tabs { gap: 12px; }
+    .recruitment-tabs a { flex: 1; justify-content: center; }
+    .recruitment-period-group > summary { gap: 9px; padding-inline: 12px; }
+    .recruitment-period-toggle-form { grid-column: 2; justify-self: start; }
+    .recruitment-period-actions { align-items: stretch; display: grid; grid-template-columns: 1fr 34px 34px; width: 100%; }
+    .recruitment-period-content { padding-inline: 8px; }
+    .recruitment-applicant-detail-grid { grid-template-columns: 1fr; }
+    .recruitment-applicant-dialog-actions,
+    .recruitment-applicant-dialog-actions form { align-items: stretch; flex-direction: column; }
+}
 * {
     box-sizing: border-box;
 }
@@ -1213,6 +1552,83 @@ button {
     }
 }
 
+@media (min-width: 1024px) {
+    .admin-app .admin-page-heading--recruitment {
+        align-items: end;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0 28px;
+    }
+}
+
+/* Recruitment administration */
+.admin-app .recruitment-vacancy-form textarea { min-height: 84px; resize: vertical; }
+.admin-app .recruitment-branch-fieldset {
+    border: 1px solid #d9e2dc;
+    border-radius: 14px;
+    margin: 22px 0 0;
+    padding: 18px;
+}
+.admin-app .recruitment-branch-fieldset legend {
+    color: #173527;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0 8px;
+}
+.admin-app .recruitment-branch-fieldset legend span { color: #b42318; }
+.admin-app .recruitment-branch-fieldset > p { color: #66756c; font-size: 11px; margin: 0 0 14px; }
+.admin-app .recruitment-branch-options { display: grid; gap: 10px; grid-template-columns: repeat(3,minmax(0,1fr)); }
+.admin-app .recruitment-branch-options label {
+    align-items: flex-start;
+    background: #f8faf9;
+    border: 1px solid #e1e7e3;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+    padding: 12px;
+}
+.admin-app .recruitment-branch-options label:has(input:checked) { background: #edf8f2; border-color: #8ac8a8; }
+.admin-app .recruitment-branch-options input { accent-color: #08794d; flex: 0 0 auto; height: 16px; margin-top: 2px; width: 16px; }
+.admin-app .recruitment-branch-options span { display: grid; min-width: 0; }
+.admin-app .recruitment-branch-options strong { color: #24372c; font-size: 12px; overflow-wrap: anywhere; }
+.admin-app .recruitment-branch-options small { color: #738078; font-size: 10px; margin-top: 2px; }
+.admin-app .recruitment-admin-table td strong { color: #152e21; display: block; }
+.admin-app .recruitment-admin-table td small { color: #77837b; display: block; font-size: 10px; margin-top: 3px; }
+.admin-app .recruitment-table-branches { display: block; max-width: 260px; white-space: normal; }
+.admin-app .recruitment-status,
+.admin-app .application-status {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 10px;
+    font-weight: 700;
+    justify-content: center;
+    min-width: 66px;
+    padding: 5px 9px;
+}
+.admin-app .recruitment-status-draft { background: #f2f4f3; color: #59635d; }
+.admin-app .recruitment-status-open,
+.admin-app .application-status-accepted { background: #e5f6ec; color: #08743f; }
+.admin-app .recruitment-status-closed,
+.admin-app .application-status-rejected { background: #feeceb; color: #b42318; }
+.admin-app .application-status-new { background: #e9f2ff; color: #175ca6; }
+.admin-app .application-status-reviewed { background: #fff4d6; color: #956400; }
+.admin-app .application-status-contacted { background: #efe9ff; color: #6741b7; }
+.admin-app .recruitment-application-detail { grid-template-columns: minmax(0,2fr) minmax(280px,1fr); }
+.admin-app .recruitment-document-name { align-items: center; color: #3f4d45; display: flex; font-size: 11px; gap: 9px; margin: 0 0 14px; overflow-wrap: anywhere; }
+.admin-app .recruitment-document-name svg { color: #08794d; flex: 0 0 auto; height: 20px; width: 20px; }
+.admin-app .recruitment-document-download { width: 100%; }
+
+@media (max-width: 1000px) {
+    .admin-app .recruitment-branch-options { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .admin-app .recruitment-application-detail { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .admin-app .recruitment-branch-options { grid-template-columns: 1fr; }
+}
+
 /* Operational monitoring */
 .admin-app .admin-page-heading--monitoring,
 .admin-app .admin-page-heading--detail-monitoring,
@@ -1254,6 +1670,29 @@ button {
     flex: 0 0 16px;
     height: 16px;
     width: 16px;
+}
+.monitoring-period-panel .secondary-button {
+    background: transparent;
+    border-color: #c4c9ac;
+    box-shadow: none;
+    color: #444933;
+    height: 42px;
+    padding: 0 14px;
+}
+.monitoring-period-panel .secondary-button:hover {
+    background: transparent;
+    border-color: #007b35;
+    color: #006e2c;
+}
+.monitoring-period-panel .monitoring-print-button {
+    min-height: 42px;
+    padding: 0 14px;
+    white-space: nowrap;
+}
+.monitoring-period-panel .monitoring-print-button svg {
+    flex: 0 0 13px;
+    height: 13px;
+    width: 13px;
 }
 .monitoring-print-button,
 .monitoring-view-button,
@@ -15018,7 +15457,10 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .admin-page-heading--kategori-indikator,
     .admin-app .admin-page-heading--master-kendaraan,
     .admin-app .admin-page-heading--master-pertanyaan,
-    .admin-app .admin-page-heading--permintaan-kerjasama {
+    .admin-app .admin-page-heading--permintaan-kerjasama,
+    .admin-app .admin-page-heading--periode-recruitment,
+    .admin-app .admin-page-heading--lowongan-recruitment,
+    .admin-app .admin-page-heading--data-pelamar {
         align-items: end;
         display: flex;
         justify-content: space-between;
@@ -15029,6 +15471,9 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .admin-page-heading--kategori-pegawai .admin-page-heading-actions,
     .admin-app .admin-page-heading--kategori-indikator .admin-page-heading-actions,
     .admin-app .admin-page-heading--permintaan-kerjasama .admin-page-heading-actions,
+    .admin-app .admin-page-heading--periode-recruitment .admin-page-heading-actions,
+    .admin-app .admin-page-heading--lowongan-recruitment .admin-page-heading-actions,
+    .admin-app .admin-page-heading--data-pelamar .admin-page-heading-actions,
     .admin-app
         .admin-page-heading--master-kendaraan
         .admin-page-heading-actions,
@@ -15160,7 +15605,10 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .admin-page-heading--kategori-pegawai,
     .admin-app .admin-page-heading--kategori-indikator,
     .admin-app .admin-page-heading--master-kendaraan,
-    .admin-app .admin-page-heading--master-pertanyaan {
+    .admin-app .admin-page-heading--master-pertanyaan,
+    .admin-app .admin-page-heading--periode-recruitment,
+    .admin-app .admin-page-heading--lowongan-recruitment,
+    .admin-app .admin-page-heading--data-pelamar {
         display: grid;
         gap: 18px;
     }
@@ -15204,6 +15652,25 @@ body.auth-app:has(.bpd-login-page) {
     flex: 0 0 20px;
     height: 20px;
     width: 20px;
+}
+
+/* Compact recruitment header actions. */
+.admin-app .admin-page-heading--recruitment .recruitment-heading-actions button {
+    font-size: 13px;
+    gap: 7px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0 14px;
+    white-space: nowrap;
+    width: auto;
+}
+.admin-app .admin-page-heading--recruitment .recruitment-heading-actions button svg {
+    flex: 0 0 17px;
+    height: 17px;
+    width: 17px;
+}
+@media (max-width: 640px) {
+    .admin-app .admin-page-heading--recruitment .recruitment-heading-actions button { width: 100%; }
 }
 
 /* Consistent reporting and audit pages. */
@@ -15885,5 +16352,14 @@ body.auth-app:has(.bpd-login-page) {
     .admin-app .activity-log-filter > select {
         min-width: 0;
         width: 100%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .admin-app .admin-page-heading--recruitment {
+        align-items: end;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0 28px;
     }
 }

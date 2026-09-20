@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             VehicleSeeder::class,
             IndicatorCategorySeeder::class,
             ClientQuestionSeeder::class,
+            RecruitmentSeeder::class,
         ]);
     }
 }

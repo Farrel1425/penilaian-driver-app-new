@@ -93,10 +93,10 @@ class BranchController extends Controller
 
     public function destroy(Branch $branch): RedirectResponse
     {
-        if ($branch->drivers()->exists() || $branch->vehicles()->exists() || $branch->ratings()->exists()) {
+        if ($branch->drivers()->exists() || $branch->vehicles()->exists() || $branch->ratings()->exists() || $branch->jobVacancies()->exists() || $branch->jobApplications()->exists()) {
             $this->deactivateWithDependents($branch);
 
-            return back()->with('status', 'Unit kerja sudah punya data terkait, jadi unit kerja beserta pegawai dan kendaraannya dinonaktifkan.');
+            return back()->with('status', 'Unit kerja sudah punya data terkait, jadi unit kerja beserta pegawai dan kendaraannya dinonaktifkan. Data recruitment tetap tersimpan.');
         }
 
         $branch->delete();

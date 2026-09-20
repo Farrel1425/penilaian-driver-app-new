@@ -90,6 +90,32 @@ class SystemSetting extends Model
         return $number !== '' ? 'https://wa.me/'.$number : null;
     }
 
+    public static function recruitmentWhatsapp(): ?string
+    {
+        $contact = trim((string) self::value('recruitment_whatsapp'));
+
+        return $contact !== '' ? $contact : null;
+    }
+
+    public static function recruitmentWhatsappUrl(): ?string
+    {
+        $contact = self::recruitmentWhatsapp();
+
+        if ($contact === null) {
+            return null;
+        }
+
+        $number = preg_replace('/\D+/', '', $contact) ?? '';
+
+        if (Str::startsWith($number, '0')) {
+            $number = '62'.substr($number, 1);
+        } elseif (Str::startsWith($number, '8')) {
+            $number = '62'.$number;
+        }
+
+        return $number !== '' ? 'https://wa.me/'.$number : null;
+    }
+
     public static function put(string $key, ?string $value): void
     {
         self::query()->updateOrCreate(['key' => $key], ['value' => $value]);

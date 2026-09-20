@@ -5,7 +5,10 @@ namespace App\Http\Middleware;
 use App\Models\Branch;
 use App\Models\Driver;
 use App\Models\IndicatorCategory;
+use App\Models\JobApplication;
+use App\Models\JobVacancy;
 use App\Models\Question;
+use App\Models\RecruitmentPeriod;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Services\ActivityLogger;
@@ -42,6 +45,9 @@ class LogAdminActivity
             str_starts_with($route, 'admin.indicator-categories.') => 'Kategori Indikator',
             str_starts_with($route, 'admin.vehicles.') => 'Kendaraan',
             str_starts_with($route, 'admin.questions.') => 'Pertanyaan',
+            str_starts_with($route, 'admin.recruitment-periods.') => 'Periode Recruitment',
+            str_starts_with($route, 'admin.job-vacancies.') => 'Lowongan',
+            str_starts_with($route, 'admin.job-applications.') => 'Pelamar',
             str_starts_with($route, 'admin.users.') => 'Pengguna',
             str_starts_with($route, 'admin.assessments.') => 'Penilaian',
             str_starts_with($route, 'admin.reports.') => 'Laporan',
@@ -60,6 +66,7 @@ class LogAdminActivity
             str_ends_with($route, '.destroy') => 'Hapus',
             str_contains($route, 'toggle-status') => 'Ubah Status',
             str_contains($route, 'regenerate-qr') => 'Regenerate QR',
+            str_ends_with($route, '.status') => 'Ubah Status',
             str_ends_with($route, '.export') => 'Export Excel',
             str_ends_with($route, '.print') => 'Cetak Laporan',
             default => null,
@@ -79,6 +86,9 @@ class LogAdminActivity
                 $parameter instanceof Branch => $parameter->name,
                 $parameter instanceof Driver => $parameter->full_name,
                 $parameter instanceof IndicatorCategory => $parameter->name,
+                $parameter instanceof RecruitmentPeriod => $parameter->name,
+                $parameter instanceof JobVacancy => $parameter->title,
+                $parameter instanceof JobApplication => $parameter->full_name,
                 $parameter instanceof Vehicle => $parameter->police_number,
                 $parameter instanceof Question => $parameter->question,
                 $parameter instanceof User => $parameter->name,
