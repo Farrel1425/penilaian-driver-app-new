@@ -69,6 +69,27 @@ class VehicleQrCodeTest extends TestCase
         $this->assertStringNotContainsString(public_path(), $svg);
     }
 
+    public function test_vehicle_qr_uses_an_optimized_logo_asset(): void
+    {
+        $path = public_path('images/bds/bds-logo-qr.png');
+        $size = getimagesize($path);
+
+        $this->assertIsArray($size);
+        $this->assertSame(128, $size[0]);
+        $this->assertSame(128, $size[1]);
+        $this->assertLessThan(100_000, filesize($path));
+    }
+
+    public function test_vehicle_index_with_ten_qr_codes_stays_within_a_reasonable_response_size(): void
+    {
+        $this->actingAs(User::factory()->create());
+        Vehicle::factory()->count(10)->create();
+
+        $response = $this->get(route('admin.vehicles.index'))->assertOk();
+
+        $this->assertLessThan(5 * 1024 * 1024, strlen($response->getContent()));
+    }
+
     public function test_vehicle_qr_poster_asset_has_the_expected_dimensions(): void
     {
         $size = getimagesize(public_path('images/qr-vehicle-poster.png'));

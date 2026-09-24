@@ -68,7 +68,7 @@ class VehicleQrCodeService
 
     private function logoPath(): string
     {
-        return public_path('images/bds/bds-logo.png');
+        return public_path('images/bds/bds-logo-qr.png');
     }
 
     private function logoWidth(int $qrSize): int
