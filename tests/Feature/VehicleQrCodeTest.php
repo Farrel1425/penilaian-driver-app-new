@@ -69,6 +69,21 @@ class VehicleQrCodeTest extends TestCase
         $this->assertStringNotContainsString(public_path(), $svg);
     }
 
+    public function test_vehicle_qr_svg_logo_is_centered_against_the_actual_viewbox(): void
+    {
+        $vehicle = Vehicle::factory()->create();
+        $svg = app(VehicleQrCodeService::class)->svg($vehicle);
+
+        $this->assertSame(1, preg_match('/viewBox="0 0 ([0-9.]+) [0-9.]+"/', $svg, $viewBox));
+        $this->assertSame(1, preg_match('/<image x="([0-9.]+)" y="[0-9.]+" width="([0-9]+)"/', $svg, $logo));
+
+        $this->assertEqualsWithDelta(
+            ((float) $viewBox[1]) / 2,
+            (float) $logo[1] + (((float) $logo[2]) / 2),
+            0.01,
+        );
+    }
+
     public function test_vehicle_qr_uses_an_optimized_logo_asset(): void
     {
         $path = public_path('images/bds/bds-logo-qr.png');

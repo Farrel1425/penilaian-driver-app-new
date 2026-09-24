@@ -87,8 +87,14 @@ class VehicleQrCodeService
         $logoSize = $this->logoWidth($qrSize);
         $padding = max(3, (int) round($logoSize * 0.08));
         $backgroundSize = $logoSize + ($padding * 2);
-        $logoPosition = ($qrSize - $logoSize) / 2;
-        $backgroundPosition = ($qrSize - $backgroundSize) / 2;
+        $canvasSize = $qrSize;
+
+        if (preg_match('/viewBox="0 0 ([0-9.]+) ([0-9.]+)"/', $svg, $matches) === 1) {
+            $canvasSize = (float) $matches[1];
+        }
+
+        $logoPosition = ($canvasSize - $logoSize) / 2;
+        $backgroundPosition = ($canvasSize - $backgroundSize) / 2;
         $logoMarkup = sprintf(
             '<rect x="%1$s" y="%1$s" width="%2$d" height="%2$d" rx="%3$d" fill="#fff"/><image x="%4$s" y="%4$s" width="%5$d" height="%5$d" preserveAspectRatio="xMidYMid meet" href="data:image/png;base64,%6$s"/>',
             $backgroundPosition,
