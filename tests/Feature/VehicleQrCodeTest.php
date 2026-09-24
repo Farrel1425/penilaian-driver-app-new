@@ -59,14 +59,33 @@ class VehicleQrCodeTest extends TestCase
         );
     }
 
-    public function test_vehicle_qr_poster_template_has_the_expected_dimensions(): void
+    public function test_vehicle_qr_poster_asset_has_the_expected_dimensions(): void
     {
-        $size = getimagesize(public_path('images/qr-vehicle-template.png'));
+        $size = getimagesize(public_path('images/qr-vehicle-poster.png'));
 
         $this->assertIsArray($size);
         $this->assertSame('image/png', $size['mime']);
         $this->assertSame(700, $size[0]);
         $this->assertSame(1000, $size[1]);
+        $this->assertFileDoesNotExist(public_path('images/qr-vehicle-template.png'));
+    }
+
+    public function test_vehicle_qr_png_contains_the_company_logo_in_its_center(): void
+    {
+        $vehicle = Vehicle::factory()->create();
+        $png = app(VehicleQrCodeService::class)->png($vehicle, size: 320);
+        $image = imagecreatefromstring($png);
+
+        $this->assertNotFalse($image);
+
+        $center = imagecolorsforindex($image, imagecolorat($image, 160, 160));
+
+        $this->assertFalse(
+            ($center['red'] < 20 && $center['green'] < 20 && $center['blue'] < 20)
+            || ($center['red'] > 245 && $center['green'] > 245 && $center['blue'] > 245),
+        );
+
+        imagedestroy($image);
     }
 
     public function test_admin_can_download_vehicle_qr_as_exact_size_png(): void

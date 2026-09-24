@@ -12,6 +12,8 @@ use Endroid\QrCode\Writer\SvgWriter;
 
 class VehicleQrCodeService
 {
+    private const LOGO_WIDTH_RATIO = 0.16;
+
     public function svg(Vehicle $vehicle, ?string $url = null, int $size = 320): string
     {
         return Builder::create()
@@ -23,6 +25,9 @@ class VehicleQrCodeService
             ->size($size)
             ->margin(12)
             ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
+            ->logoPath($this->logoPath())
+            ->logoResizeToWidth($this->logoWidth($size))
+            ->logoPunchoutBackground(true)
             ->validateResult(false)
             ->build()
             ->getString();
@@ -48,6 +53,9 @@ class VehicleQrCodeService
             ->size($size)
             ->margin(12)
             ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
+            ->logoPath($this->logoPath())
+            ->logoResizeToWidth($this->logoWidth($size))
+            ->logoPunchoutBackground(true)
             ->validateResult(false)
             ->build()
             ->getString();
@@ -57,5 +65,15 @@ class VehicleQrCodeService
     {
         return rtrim((string) config('app.url'), '/')
             .route('passenger.rating.entry', ['vehicleToken' => $vehicle->qr_token], absolute: false);
+    }
+
+    private function logoPath(): string
+    {
+        return public_path('images/bds/bds-logo.png');
+    }
+
+    private function logoWidth(int $qrSize): int
+    {
+        return max(32, (int) round($qrSize * self::LOGO_WIDTH_RATIO));
     }
 }

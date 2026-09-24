@@ -12,13 +12,15 @@ class VehicleQrPosterService
 
     public const HEIGHT = 1000;
 
-    private const INFORMATION_TEXT_WIDTH = 160;
+    private const RENDERER_VERSION = 3;
 
-    private const INFORMATION_CENTER_X = 349.5;
+    private const QR_SIZE = 248;
 
-    private const INFORMATION_CARD_HEIGHT = 36;
+    private const QR_CORNER_RADIUS = 20;
 
-    private const QR_CENTER_X = 353;
+    private const QR_CENTER_X = 350;
+
+    private const QR_CENTER_Y = 500;
 
     private string $regularFont;
 
@@ -36,13 +38,14 @@ class VehicleQrPosterService
             throw new RuntimeException('Ekstensi GD diperlukan untuk membuat poster QR kendaraan.');
         }
 
-        $template = public_path('images/qr-vehicle-template.png');
+        $template = public_path('images/qr-vehicle-poster.png');
 
         if (! is_file($template)) {
             throw new RuntimeException('Template poster QR kendaraan tidak ditemukan.');
         }
 
         $cacheKey = hash('sha256', json_encode([
+            'renderer_version' => self::RENDERER_VERSION,
             'template' => hash_file('sha256', $template),
             'app_url' => $this->qrCode->vehicleUrl($vehicle),
             'vehicle_id' => $vehicle->getKey(),
@@ -109,59 +112,81 @@ class VehicleQrPosterService
 
     private function drawQr(GdImage $image, Vehicle $vehicle): void
     {
-        $qr = imagecreatefromstring($this->qrCode->png($vehicle, size: 248));
+        $qr = imagecreatefromstring($this->qrCode->png($vehicle, size: self::QR_SIZE));
         if (! $qr) {
             throw new RuntimeException('Gambar QR kendaraan gagal dibuat.');
         }
 
+        $this->roundCorners($qr, self::QR_CORNER_RADIUS);
+
         $qrX = (int) round(self::QR_CENTER_X - (imagesx($qr) / 2));
-        $qrY = (int) round((296 + 595 - imagesy($qr)) / 2);
+        $qrY = (int) round(self::QR_CENTER_Y - (imagesy($qr) / 2));
         imagecopy($image, $qr, $qrX, $qrY, 0, 0, imagesx($qr), imagesy($qr));
         imagedestroy($qr);
     }
 
-    private function drawVehicleInformation(GdImage $image, Vehicle $vehicle): void
+    private function roundCorners(GdImage $image, int $radius): void
     {
-        $entries = [
-            ['Plat Nomor:', $vehicle->police_number],
-            ['Merk:', trim($vehicle->brand.' '.$vehicle->model)],
-            ['Lokasi:', $vehicle->branch?->name ?? '-'],
-        ];
+        $width = imagesx($image);
+        $height = imagesy($image);
+        $transparent = imagecolorallocatealpha($image, 255, 255, 255, 127);
 
-        $fontSize = 13;
-        foreach ($entries as [$label, $value]) {
-            while ($fontSize > 9 && $this->mixedTextWidth($label, $value, $fontSize) > self::INFORMATION_TEXT_WIDTH) {
-                $fontSize--;
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+
+        foreach ([[0, 0], [$width - $radius, 0], [0, $height - $radius], [$width - $radius, $height - $radius]] as [$originX, $originY]) {
+            $centerX = $originX === 0 ? $radius - 1 : $originX;
+            $centerY = $originY === 0 ? $radius - 1 : $originY;
+
+            for ($x = $originX; $x < $originX + $radius; $x++) {
+                for ($y = $originY; $y < $originY + $radius; $y++) {
+                    if ((($x - $centerX) ** 2) + (($y - $centerY) ** 2) >= $radius ** 2) {
+                        imagesetpixel($image, $x, $y, $transparent);
+                    }
+                }
             }
         }
 
-        foreach ($entries as $index => [$label, $value]) {
-            $y = 794 + ($index * 44);
-            $this->centeredMixedText($image, $label, $value, $fontSize, $y, self::INFORMATION_CARD_HEIGHT);
-        }
+        imagealphablending($image, true);
     }
 
-    private function centeredMixedText(GdImage $image, string $label, string $value, int $size, int $top, int $height): void
+    private function drawVehicleInformation(GdImage $image, Vehicle $vehicle): void
     {
-        $label .= ' ';
-        $labelWidth = $this->textWidth($label, $size, $this->regularFont);
-        $valueWidth = $this->textWidth($value, $size, $this->boldFont);
-        $x = (int) round(self::INFORMATION_CENTER_X - (($labelWidth + $valueWidth) / 2));
+        $this->centeredText($image, strtoupper($vehicle->police_number), 17, 350, 658, 44, $this->boldFont, '#063d29', 240);
+        $this->drawInformationCard($image, 'MERK / TIPE', trim($vehicle->brand.' '.$vehicle->model), 235, 855, 212, 66);
+        $this->drawInformationCard($image, 'UNIT KERJA', $vehicle->branch?->name ?? '-', 465, 855, 212, 66);
+    }
 
-        $regularBox = imagettfbbox($size, 0, $this->regularFont, $label);
-        $boldBox = imagettfbbox($size, 0, $this->boldFont, $value);
-        $minimumY = min($regularBox[1], $regularBox[3], $regularBox[5], $regularBox[7], $boldBox[1], $boldBox[3], $boldBox[5], $boldBox[7]);
-        $maximumY = max($regularBox[1], $regularBox[3], $regularBox[5], $regularBox[7], $boldBox[1], $boldBox[3], $boldBox[5], $boldBox[7]);
+    private function drawInformationCard(GdImage $image, string $label, string $value, int $centerX, int $top, int $width, int $height): void
+    {
+        $this->centeredText($image, $label, 8, $centerX, $top + 8, 16, $this->regularFont, '#64746c', $width - 20);
+        $this->centeredText($image, $value, 11, $centerX, $top + 25, 30, $this->boldFont, '#063d29', $width - 20);
+    }
+
+    private function centeredText(
+        GdImage $image,
+        string $text,
+        int $size,
+        int $centerX,
+        int $top,
+        int $height,
+        string $font,
+        string $color,
+        int $maxWidth,
+    ): void {
+        while ($size > 7 && $this->textWidth($text, $size, $font) > $maxWidth) {
+            $size--;
+        }
+
+        $box = imagettfbbox($size, 0, $font, $text);
+        $minimumX = min($box[0], $box[2], $box[4], $box[6]);
+        $maximumX = max($box[0], $box[2], $box[4], $box[6]);
+        $minimumY = min($box[1], $box[3], $box[5], $box[7]);
+        $maximumY = max($box[1], $box[3], $box[5], $box[7]);
+        $x = (int) round($centerX - (($maximumX - $minimumX) / 2) - $minimumX);
         $baseline = (int) round($top + ($height / 2) - (($minimumY + $maximumY) / 2));
 
-        imagettftext($image, $size, 0, $x, $baseline, $this->rgb($image, '#0f4d32'), $this->regularFont, $label);
-        imagettftext($image, $size, 0, $x + $labelWidth, $baseline, $this->rgb($image, '#098f42'), $this->boldFont, $value);
-    }
-
-    private function mixedTextWidth(string $label, string $value, int $size): int
-    {
-        return $this->textWidth($label.' ', $size, $this->regularFont)
-            + $this->textWidth($value, $size, $this->boldFont);
+        imagettftext($image, $size, 0, $x, $baseline, $this->rgb($image, $color), $font, $text);
     }
 
     private function textWidth(string $text, int $size, string $font): int
