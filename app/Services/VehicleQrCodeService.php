@@ -16,7 +16,7 @@ class VehicleQrCodeService
 
     public function svg(Vehicle $vehicle, ?string $url = null, int $size = 320): string
     {
-        return Builder::create()
+        $svg = Builder::create()
             ->writer(new SvgWriter)
             ->writerOptions([SvgWriter::WRITER_OPTION_EXCLUDE_XML_DECLARATION => true])
             ->data($url ?? $this->vehicleUrl($vehicle))
@@ -25,12 +25,11 @@ class VehicleQrCodeService
             ->size($size)
             ->margin(12)
             ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
-            ->logoPath($this->logoPath())
-            ->logoResizeToWidth($this->logoWidth($size))
-            ->logoPunchoutBackground(true)
             ->validateResult(false)
             ->build()
             ->getString();
+
+        return $this->embedSvgLogo($svg, $size);
     }
 
     public function dataUri(Vehicle $vehicle, ?string $url = null, int $size = 320): string
@@ -75,5 +74,31 @@ class VehicleQrCodeService
     private function logoWidth(int $qrSize): int
     {
         return max(32, (int) round($qrSize * self::LOGO_WIDTH_RATIO));
+    }
+
+    private function embedSvgLogo(string $svg, int $qrSize): string
+    {
+        $logo = file_get_contents($this->logoPath());
+
+        if ($logo === false) {
+            return $svg;
+        }
+
+        $logoSize = $this->logoWidth($qrSize);
+        $padding = max(3, (int) round($logoSize * 0.08));
+        $backgroundSize = $logoSize + ($padding * 2);
+        $logoPosition = ($qrSize - $logoSize) / 2;
+        $backgroundPosition = ($qrSize - $backgroundSize) / 2;
+        $logoMarkup = sprintf(
+            '<rect x="%1$s" y="%1$s" width="%2$d" height="%2$d" rx="%3$d" fill="#fff"/><image x="%4$s" y="%4$s" width="%5$d" height="%5$d" preserveAspectRatio="xMidYMid meet" href="data:image/png;base64,%6$s"/>',
+            $backgroundPosition,
+            $backgroundSize,
+            $padding * 2,
+            $logoPosition,
+            $logoSize,
+            base64_encode($logo),
+        );
+
+        return str_replace('</svg>', $logoMarkup.'</svg>', $svg);
     }
 }

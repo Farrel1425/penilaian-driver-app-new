@@ -59,6 +59,16 @@ class VehicleQrCodeTest extends TestCase
         );
     }
 
+    public function test_vehicle_qr_svg_embeds_the_company_logo_as_data_without_external_asset_url(): void
+    {
+        $vehicle = Vehicle::factory()->create();
+        $svg = app(VehicleQrCodeService::class)->svg($vehicle);
+
+        $this->assertStringContainsString('<image ', $svg);
+        $this->assertStringContainsString('href="data:image/png;base64,', $svg);
+        $this->assertStringNotContainsString(public_path(), $svg);
+    }
+
     public function test_vehicle_qr_poster_asset_has_the_expected_dimensions(): void
     {
         $size = getimagesize(public_path('images/qr-vehicle-poster.png'));
