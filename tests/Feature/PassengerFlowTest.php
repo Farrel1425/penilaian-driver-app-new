@@ -85,6 +85,10 @@ class PassengerFlowTest extends TestCase
         $this->get(route('passenger.rating.drivers', $vehicle->qr_token))
             ->assertOk()
             ->assertSee($activeSameBranch->full_name)
+            ->assertSee('data-driver-search', false)
+            ->assertSee('data-driver-option', false)
+            ->assertSee('data-driver-search-empty', false)
+            ->assertSee("input.addEventListener('input', filterDrivers)", false)
             ->assertDontSee($inactiveSameBranch->full_name)
             ->assertDontSee($otherBranchDriver->full_name);
 

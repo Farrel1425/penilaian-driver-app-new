@@ -27,7 +27,7 @@
         .monitoring-document-matrix td:nth-child(2),
         .monitoring-document-matrix th:nth-child(2) { text-align: left; }
         .monitoring-category-row th { height: 16px; }
-        .monitoring-indicator-row th { height: 72px; overflow: visible; padding: 0; position: relative; }
+        .monitoring-indicator-row th { height: 72px; overflow: hidden; padding: 0; position: relative; }
         .monitoring-indicator-row th span { display: block; font-size: 5.2px; left: 50%; line-height: 1; position: absolute; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); white-space: nowrap; }
         .monitoring-final-heading,
         .monitoring-final-value { background: #eff8c9 !important; font-weight: bold; }

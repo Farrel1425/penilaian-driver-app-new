@@ -283,6 +283,7 @@ class OperationalMonitoringTest extends TestCase
             ->assertSee('PENILAIAN KENDARAAN')
             ->assertSee('monitoring-vehicle-matrix', false)
             ->assertSee('monitoring-indicator-row', false)
+            ->assertSee('style="height:', false)
             ->assertSee('DK 9999 PDF');
 
         $this->get(route('admin.monitoring.driver.export', [$branch, $driver, 'period' => '2026-09']))

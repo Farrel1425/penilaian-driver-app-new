@@ -1,3 +1,22 @@
+@php
+    $indicatorLayout = function ($names) {
+        $longest = collect($names)->max(fn ($name) => mb_strlen((string) $name)) ?? 0;
+        $fontSize = match (true) {
+            $longest > 70 => 3.8,
+            $longest > 52 => 4.2,
+            $longest > 38 => 4.6,
+            default => 5.2,
+        };
+
+        return [
+            'height' => max(72, (int) ceil(($longest * $fontSize * .62) + 22)),
+            'font_size' => $fontSize,
+        ];
+    };
+    $driverIndicatorLayout = $indicatorLayout(collect(['Kehadiran / Absen'])->merge($report['driver_indicators']->pluck('name')));
+    $vehicleIndicatorLayout = $indicatorLayout($report['vehicle_indicators']->pluck('name'));
+@endphp
+
 <article class="monitoring-document">
     <header>
         <div class="monitoring-document-meta">
@@ -31,9 +50,9 @@
                     <th rowspan="2" width="8%" class="monitoring-final-heading">Nilai</th>
                 </tr>
                 <tr class="monitoring-indicator-row">
-                    <th><span>Kehadiran / Absen</span></th>
+                    <th style="height: {{ $driverIndicatorLayout['height'] }}px"><span style="font-size: {{ $driverIndicatorLayout['font_size'] }}px">Kehadiran / Absen</span></th>
                     @foreach($report['driver_indicators'] as $indicator)
-                        <th><span>{{ $indicator['name'] }}</span></th>
+                        <th style="height: {{ $driverIndicatorLayout['height'] }}px"><span style="font-size: {{ $driverIndicatorLayout['font_size'] }}px">{{ $indicator['name'] }}</span></th>
                     @endforeach
                 </tr>
             </thead>
@@ -74,7 +93,7 @@
                 @if($report['vehicle_indicators']->isNotEmpty())
                     <tr class="monitoring-indicator-row">
                         @foreach($report['vehicle_indicators'] as $indicator)
-                            <th><span>{{ $indicator['name'] }}</span></th>
+                            <th style="height: {{ $vehicleIndicatorLayout['height'] }}px"><span style="font-size: {{ $vehicleIndicatorLayout['font_size'] }}px">{{ $indicator['name'] }}</span></th>
                         @endforeach
                     </tr>
                 @endif

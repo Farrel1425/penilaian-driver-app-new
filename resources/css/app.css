@@ -2737,7 +2737,7 @@ button {
 }
 .monitoring-indicator-row th {
     height: 112px;
-    overflow: visible;
+    overflow: hidden;
     padding: 0;
     position: relative;
 }
