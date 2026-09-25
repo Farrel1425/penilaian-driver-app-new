@@ -1,6 +1,5 @@
 <x-layouts.admin title="Detail Kendaraan">
     @php
-        $exteriorPhotoUrl = $vehicle->photo ? (Str::startsWith($vehicle->photo, ['http://', 'https://', '/']) ? $vehicle->photo : asset('storage/'.$vehicle->photo)) : null;
         $interiorPhotoUrl = $vehicle->interior_photo ? (Str::startsWith($vehicle->interior_photo, ['http://', 'https://', '/']) ? $vehicle->interior_photo : asset('storage/'.$vehicle->interior_photo)) : null;
         $qrDataUri = app(App\Services\VehicleQrCodeService::class)->dataUri($vehicle);
         $qrDownloadUrl = route('admin.vehicles.qr.download', $vehicle);
@@ -13,7 +12,7 @@
         <x-admin.panel title="Data Kendaraan">
             <div class="vehicle-detail-view">
                 <div class="vehicle-detail-photos">
-                    <figure><figcaption>Foto Eksterior</figcaption>@if ($exteriorPhotoUrl)<img src="{{ $exteriorPhotoUrl }}" alt="Foto eksterior {{ $vehicle->police_number }}">@else<div><x-lucide-car-front aria-hidden="true" /><small>Belum ada foto</small></div>@endif</figure>
+                    <figure><figcaption>Foto Eksterior</figcaption><x-entity-photo type="vehicle" :src="$vehicle->photo" alt="Foto eksterior {{ $vehicle->police_number }}" /></figure>
                     <figure><figcaption>Foto Interior</figcaption>@if ($interiorPhotoUrl)<img src="{{ $interiorPhotoUrl }}" alt="Foto interior {{ $vehicle->police_number }}">@else<div><x-lucide-image aria-hidden="true" /><small>Belum ada foto</small></div>@endif</figure>
                 </div>
                 <dl class="vehicle-detail-list">

@@ -16587,3 +16587,7 @@ body.auth-app:has(.bpd-login-page) {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+.entity-photo-default-vehicle {
+    background: #f2f6fa;
+    object-fit: contain !important;
+}

@@ -43,11 +43,7 @@
                         <tr>
                             <td>
                                 <div class="vehicle-photo-thumbnail">
-                                    @if ($vehicle->photo)
-                                        <img src="{{ Str::startsWith($vehicle->photo, ['http://', 'https://', '/']) ? $vehicle->photo : asset('storage/' . $vehicle->photo) }}" alt="{{ $vehicle->police_number }}">
-                                    @else
-                                        <x-lucide-car-front aria-hidden="true" />
-                                    @endif
+                                    <x-entity-photo type="vehicle" :src="$vehicle->photo" :alt="$vehicle->police_number" />
                                 </div>
                             </td>
                             <td class="vehicle-cell-police">{{ $vehicle->police_number }}</td>

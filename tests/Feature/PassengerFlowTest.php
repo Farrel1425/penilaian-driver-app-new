@@ -91,6 +91,25 @@ class PassengerFlowTest extends TestCase
         $this->get(route('passenger.rating.driver', [$vehicle->qr_token, $otherBranchDriver]))->assertNotFound();
     }
 
+    public function test_empty_driver_and_vehicle_photos_use_default_assets(): void
+    {
+        $branch = Branch::factory()->create();
+        $vehicle = Vehicle::factory()->for($branch)->create(['photo' => null]);
+        $driver = Driver::factory()->for($branch)->create(['photo' => null]);
+
+        $this->assertFileExists(public_path('images/defaults/driver.png'));
+        $this->assertFileExists(public_path('images/defaults/vehicle.png'));
+
+        $this->get(route('passenger.rating.entry', $vehicle->qr_token))
+            ->assertOk()
+            ->assertSee(asset('images/defaults/vehicle.png'), false);
+
+        $this->get(route('passenger.rating.drivers', $vehicle->qr_token))
+            ->assertOk()
+            ->assertSee($driver->full_name)
+            ->assertSee(asset('images/defaults/driver.png'), false);
+    }
+
     public function test_assessment_only_shows_active_questions_ordered(): void
     {
         $branch = Branch::factory()->create();

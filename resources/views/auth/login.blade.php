@@ -8,7 +8,7 @@
     @endphp
     <main class="bpd-login-page">
         <header class="bpd-login-topbar">
-            <a class="bpd-login-brand" href="{{ route('login') }}" aria-label="{{ $systemName }}">
+            <a class="bpd-login-brand" href="{{ route('home') }}" aria-label="{{ $systemName }}">
                 <img src="{{ $systemLogoUrl }}" alt="Logo {{ $systemName }}">
                 <span class="bpd-login-brand-copy"><strong>{{ $systemName }}</strong><span class="bpd-login-support"><i>Supported by</i><b>Bank BPD Bali</b></span></span>
             </a>

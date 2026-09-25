@@ -19,11 +19,7 @@
 
         <aside class="passenger-assessment-summary">
             <div class="passenger-assessment-summary-photo">
-                @if ($driver->photo)
-                    <img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/' . $driver->photo) }}" alt="{{ $driver->full_name }}">
-                @else
-                    <span>{{ strtoupper(substr($driver->full_name, 0, 1)) }}</span>
-                @endif
+                <x-entity-photo type="driver" :src="$driver->photo" :alt="$driver->full_name" />
             </div>
             <div><strong>{{ $driver->full_name }}</strong><small>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: 'Kendaraan' }} · {{ $vehicle->police_number }}</small></div>
         </aside>

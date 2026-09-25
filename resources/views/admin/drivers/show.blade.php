@@ -1,6 +1,5 @@
 <x-layouts.admin title="Detail Pegawai">
     @php
-        $photoUrl = $driver->photo ? (Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/'.$driver->photo)) : null;
         $simPhotoUrl = $driver->sim_photo ? (Str::startsWith($driver->sim_photo, ['http://', 'https://', '/']) ? $driver->sim_photo : asset('storage/'.$driver->sim_photo)) : null;
         $gender = $driver->gender === 'male' ? 'Laki-laki' : ($driver->gender === 'female' ? 'Perempuan' : null);
     @endphp
@@ -11,7 +10,7 @@
         <div class="driver-detail-view">
             <div class="driver-detail-profile">
                 <div class="driver-detail-profile-photo">
-                    @if ($photoUrl)<img src="{{ $photoUrl }}" alt="Foto {{ $driver->full_name }}">@else<x-lucide-user aria-hidden="true" />@endif
+                    <x-entity-photo type="driver" :src="$driver->photo" alt="Foto {{ $driver->full_name }}" />
                 </div>
                 <strong>{{ $driver->full_name }}</strong>
                 <span>{{ $driver->nickname ?: 'Pegawai' }}</span>

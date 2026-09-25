@@ -62,7 +62,7 @@
                     <tbody>
                         @forelse($drivers as $driver)
                             <tr>
-                                <td class="driver-cell-profile"><div class="driver-photo-thumbnail">@if($driver->photo)<img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/' . $driver->photo) }}" alt="{{ $driver->full_name }}">@else<span>{{ strtoupper(substr($driver->full_name, 0, 1)) }}</span>@endif</div><div class="driver-cell-name"><strong>{{ $driver->full_name }}</strong><small>{{ $driver->nickname ?: 'Pegawai' }}</small></div></td>
+                                <td class="driver-cell-profile"><div class="driver-photo-thumbnail"><x-entity-photo type="driver" :src="$driver->photo" :alt="$driver->full_name" /></div><div class="driver-cell-name"><strong>{{ $driver->full_name }}</strong><small>{{ $driver->nickname ?: 'Pegawai' }}</small></div></td>
                                 <td>{{ $driver->employeeCategory?->name ?: '-' }}</td>
                                 <td>{{ $driver->sim_number ?: '-' }}</td>
                                 <td>{{ $driver->branch?->name ?: '-' }}</td>

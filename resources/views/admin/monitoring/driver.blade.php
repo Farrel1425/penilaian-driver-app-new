@@ -16,7 +16,7 @@
 
     <section class="monitoring-profile-card">
         <div class="monitoring-profile-person">
-            <span class="monitoring-profile-photo">@if($driver->photo)<img src="{{ str_starts_with($driver->photo, 'http') ? $driver->photo : asset('storage/'.$driver->photo) }}" alt="Foto {{ $driver->full_name }}">@else{{ strtoupper(substr($driver->full_name, 0, 1)) }}@endif</span>
+            <span class="monitoring-profile-photo"><x-entity-photo type="driver" :src="$driver->photo" alt="Foto {{ $driver->full_name }}" /></span>
             <div><span class="monitoring-profile-name"><strong>{{ $driver->full_name }}</strong><b>{{ $driver->status === 'active' ? 'Aktif' : 'Tidak Aktif' }}</b></span><p>NIK: DRV-{{ $branch->code }}-{{ str_pad((string) $driver->id, 3, '0', STR_PAD_LEFT) }} · {{ $driver->employeeCategory?->name ?? 'Driver' }}</p><div class="monitoring-profile-tags"><span><x-lucide-car aria-hidden="true" />{{ $vehicle ? trim($vehicle->brand.' '.$vehicle->model).' ('.$vehicle->police_number.')' : 'Belum ada kendaraan yang dinilai' }}</span><span><x-lucide-map-pin aria-hidden="true" />{{ $branch->name }}</span></div></div>
         </div>
         <div class="monitoring-profile-metrics">

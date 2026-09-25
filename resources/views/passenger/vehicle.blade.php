@@ -9,11 +9,7 @@
             <div class="passenger-vehicle-photo">
                 <span class="passenger-vehicle-photo-label">Kendaraan terdeteksi</span>
                 <x-lucide-circle-check class="passenger-vehicle-verified" aria-hidden="true" />
-                @if ($vehicle->photo)
-                    <img src="{{ Str::startsWith($vehicle->photo, ['http://', 'https://', '/']) ? $vehicle->photo : asset('storage/' . $vehicle->photo) }}" alt="{{ $vehicle->police_number }}">
-                @else
-                    <x-lucide-car-front aria-hidden="true" />
-                @endif
+                <x-entity-photo type="vehicle" :src="$vehicle->photo" :alt="$vehicle->police_number" />
                 <div class="passenger-vehicle-photo-caption"><span>Model terdeteksi</span><strong>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: '-' }}</strong></div>
             </div>
 

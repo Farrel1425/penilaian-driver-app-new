@@ -10,11 +10,7 @@
             @forelse($drivers as $driver)
                 <a class="passenger-driver-option" href="{{ route('passenger.rating.driver', [$vehicle->qr_token, $driver]) }}">
                     <div class="passenger-driver-photo">
-                        @if ($driver->photo)
-                            <img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/' . $driver->photo) }}" alt="{{ $driver->full_name }}">
-                        @else
-                            <span>{{ strtoupper(substr($driver->full_name, 0, 1)) }}</span>
-                        @endif
+                        <x-entity-photo type="driver" :src="$driver->photo" :alt="$driver->full_name" />
                     </div>
                     <div class="passenger-driver-summary">
                         <h2>{{ $driver->full_name }}</h2>

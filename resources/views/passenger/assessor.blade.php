@@ -30,7 +30,7 @@
         </section>
 
         <aside class="passenger-selected-trip">
-            <div class="passenger-selected-trip-photo">@if ($driver->photo)<img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/' . $driver->photo) }}" alt="{{ $driver->full_name }}">@else<span>{{ strtoupper(substr($driver->full_name, 0, 1)) }}</span>@endif</div>
+            <div class="passenger-selected-trip-photo"><x-entity-photo type="driver" :src="$driver->photo" :alt="$driver->full_name" /></div>
             <div><span>Pengemudi Terpilih</span><strong>{{ $driver->full_name }}</strong><small>{{ trim($vehicle->brand . ' ' . $vehicle->model) ?: 'Kendaraan' }} · {{ $vehicle->police_number }}</small></div>
         </aside>
 

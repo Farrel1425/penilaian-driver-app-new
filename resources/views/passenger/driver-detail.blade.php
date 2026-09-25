@@ -8,11 +8,7 @@
     <section class="passenger-driver-detail-page">
         <div class="passenger-driver-profile">
             <div class="passenger-driver-detail-photo">
-                @if ($driver->photo)
-                    <img src="{{ Str::startsWith($driver->photo, ['http://', 'https://', '/']) ? $driver->photo : asset('storage/' . $driver->photo) }}" alt="{{ $driver->full_name }}">
-                @else
-                    <span>{{ strtoupper(substr($driver->full_name, 0, 1)) }}</span>
-                @endif
+                <x-entity-photo type="driver" :src="$driver->photo" :alt="$driver->full_name" />
             </div>
             <h2>{{ $driver->full_name }}</h2>
             <p>Mitra Terverifikasi</p>
