@@ -16,7 +16,7 @@
                 <col class="monitoring-col-name">
                 <col class="monitoring-col-status">
                 <col class="monitoring-col-attendance">
-                @foreach($report['questions'] as $question)<col class="monitoring-col-indicator">@endforeach
+                @foreach($report['driver_indicators'] as $indicator)<col class="monitoring-col-indicator">@endforeach
                 <col class="monitoring-col-final">
             </colgroup>
             <thead>
@@ -25,15 +25,15 @@
                     <th rowspan="2" width="22%">Nama</th>
                     <th rowspan="2" width="11%">Status</th>
                     <th width="7%">Sikap Kerja</th>
-                    @if($report['questions']->isNotEmpty())
-                        <th colspan="{{ $report['questions']->count() }}" width="48%">Kinerja Pelayanan</th>
+                    @if($report['driver_indicators']->isNotEmpty())
+                        <th colspan="{{ $report['driver_indicators']->count() }}" width="48%">Penilaian Driver</th>
                     @endif
                     <th rowspan="2" width="8%" class="monitoring-final-heading">Nilai</th>
                 </tr>
                 <tr class="monitoring-indicator-row">
                     <th><span>Kehadiran / Absen</span></th>
-                    @foreach($report['questions'] as $question)
-                        <th><span>{{ $question->indicator ?: str($question->question)->limit(42) }}</span></th>
+                    @foreach($report['driver_indicators'] as $indicator)
+                        <th><span>{{ $indicator['name'] }}</span></th>
                     @endforeach
                 </tr>
             </thead>
@@ -44,13 +44,13 @@
                         <td>{{ $row['driver']->full_name }}</td>
                         <td>{{ $row['driver']->employeeCategory?->name ?? 'Driver' }}</td>
                         <td>{{ $row['attendance_score'] !== null ? round($row['attendance_score'] / 10, 1) : '-' }}</td>
-                        @foreach($report['questions'] as $question)
-                            <td>{{ isset($row['report_scores'][$question->id]) ? round($row['report_scores'][$question->id], 1) : '-' }}</td>
+                        @foreach($report['driver_indicators'] as $indicator)
+                            <td>{{ isset($row['report_scores'][$indicator['id']]) ? round($row['report_scores'][$indicator['id']], 1) : '-' }}</td>
                         @endforeach
                         <td class="monitoring-final-value">{{ $row['final_score'] !== null ? round($row['final_score'], 1) : '-' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="{{ 5 + $report['questions']->count() }}">Belum ada driver aktif pada unit kerja ini.</td></tr>
+                    <tr><td colspan="{{ 5 + $report['driver_indicators']->count() }}">Belum ada driver aktif pada unit kerja ini.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -66,20 +66,20 @@
                     <th rowspan="2" width="19%">Kendaraan</th>
                     <th rowspan="2" width="10%">Penilaian</th>
                     <th rowspan="2" width="10%">Driver</th>
-                    @if($report['vehicle_questions']->isNotEmpty())
-                        <th colspan="{{ $report['vehicle_questions']->count() }}">Penilaian Kendaraan</th>
+                    @if($report['vehicle_indicators']->isNotEmpty())
+                        <th colspan="{{ $report['vehicle_indicators']->count() }}">Penilaian Kendaraan</th>
                     @endif
                     <th rowspan="2" width="9%" class="monitoring-final-heading">Nilai</th>
                 </tr>
-                @if($report['vehicle_questions']->isNotEmpty())
+                @if($report['vehicle_indicators']->isNotEmpty())
                     <tr class="monitoring-indicator-row">
-                        @foreach($report['vehicle_questions'] as $question)
-                            <th><span>{{ $question->indicator ?: str($question->question)->limit(42) }}</span></th>
+                        @foreach($report['vehicle_indicators'] as $indicator)
+                            <th><span>{{ $indicator['name'] }}</span></th>
                         @endforeach
                     </tr>
                 @endif
             </thead>
-            <tbody>@forelse($report['vehicle_rows'] as $row)<tr><td>{{ $loop->iteration }}</td><td>{{ $row['vehicle']->police_number }}</td><td>{{ trim($row['vehicle']->brand.' '.$row['vehicle']->model) ?: '-' }}</td><td>{{ $row['rating_count'] }}</td><td>{{ $row['driver_count'] }}</td>@foreach($report['vehicle_questions'] as $question)<td>{{ isset($row['report_scores'][$question->id]) ? number_format($row['report_scores'][$question->id], 1) : '-' }}</td>@endforeach<td class="monitoring-final-value">{{ $row['vehicle_score'] !== null ? number_format($row['vehicle_score'], 1) : '-' }}</td></tr>@empty<tr><td colspan="{{ 6 + $report['vehicle_questions']->count() }}">Belum ada kendaraan aktif pada unit kerja ini.</td></tr>@endforelse</tbody>
+            <tbody>@forelse($report['vehicle_rows'] as $row)<tr><td>{{ $loop->iteration }}</td><td>{{ $row['vehicle']->police_number }}</td><td>{{ trim($row['vehicle']->brand.' '.$row['vehicle']->model) ?: '-' }}</td><td>{{ $row['rating_count'] }}</td><td>{{ $row['driver_count'] }}</td>@foreach($report['vehicle_indicators'] as $indicator)<td>{{ isset($row['report_scores'][$indicator['id']]) ? number_format($row['report_scores'][$indicator['id']], 1) : '-' }}</td>@endforeach<td class="monitoring-final-value">{{ $row['vehicle_score'] !== null ? number_format($row['vehicle_score'], 1) : '-' }}</td></tr>@empty<tr><td colspan="{{ 6 + $report['vehicle_indicators']->count() }}">Belum ada kendaraan aktif pada unit kerja ini.</td></tr>@endforelse</tbody>
         </table>
     </div>
 

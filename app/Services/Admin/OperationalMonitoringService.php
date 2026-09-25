@@ -160,6 +160,7 @@ class OperationalMonitoringService
             ->active()
             ->ordered()
             ->get();
+        $driverIndicators = $this->reportIndicators($questions);
         $vehicleRows = $this->vehicleRows($branch, $period);
         $vehicleQuestions = Question::query()
             ->where('target_type', Question::TARGET_VEHICLE)
@@ -167,28 +168,29 @@ class OperationalMonitoringService
             ->active()
             ->ordered()
             ->get();
+        $vehicleIndicators = $this->reportIndicators($vehicleQuestions);
 
         return [
             'branch' => $branch,
             'questions' => $questions,
-            'rows' => $rows->map(function (array $row) use ($questions) {
-                $breakdown = $this->questionBreakdown($row['ratings'], Question::TARGET_DRIVER)->keyBy('question_id');
-                $row['report_scores'] = $questions->mapWithKeys(fn (Question $question) => [
-                    $question->id => isset($breakdown[$question->id])
-                        ? round($breakdown[$question->id]['percentage'] / 10, 1)
-                        : null,
-                ]);
+            'driver_indicators' => $driverIndicators,
+            'rows' => $rows->map(function (array $row) use ($driverIndicators) {
+                $row['report_scores'] = $this->indicatorReportScores(
+                    $row['ratings'],
+                    Question::TARGET_DRIVER,
+                    $driverIndicators,
+                );
 
                 return $row;
             }),
             'vehicle_questions' => $vehicleQuestions,
-            'vehicle_rows' => $vehicleRows->map(function (array $row) use ($vehicleQuestions) {
-                $breakdown = $this->questionBreakdown($row['ratings'], Question::TARGET_VEHICLE)->keyBy('question_id');
-                $row['report_scores'] = $vehicleQuestions->mapWithKeys(fn (Question $question) => [
-                    $question->id => isset($breakdown[$question->id])
-                        ? round($breakdown[$question->id]['percentage'] / 10, 1)
-                        : null,
-                ]);
+            'vehicle_indicators' => $vehicleIndicators,
+            'vehicle_rows' => $vehicleRows->map(function (array $row) use ($vehicleIndicators) {
+                $row['report_scores'] = $this->indicatorReportScores(
+                    $row['ratings'],
+                    Question::TARGET_VEHICLE,
+                    $vehicleIndicators,
+                );
 
                 return $row;
             }),
@@ -290,6 +292,43 @@ class OperationalMonitoringService
             })
             ->sortBy(fn (array $row) => [$row['question']->sort_order, $row['question']->id])
             ->values();
+    }
+
+    private function reportIndicators(Collection $questions): Collection
+    {
+        return $questions
+            ->groupBy('indicator_category_id')
+            ->map(function (Collection $indicatorQuestions) {
+                $firstQuestion = $indicatorQuestions->first();
+
+                return [
+                    'id' => $firstQuestion->indicator_category_id,
+                    'name' => $firstQuestion->indicator ?: 'Indikator',
+                    'questions' => $indicatorQuestions->values(),
+                ];
+            })
+            ->values();
+    }
+
+    private function indicatorReportScores(Collection $ratings, string $targetType, Collection $indicators): Collection
+    {
+        $questionIds = $indicators->flatMap(fn (array $indicator) => $indicator['questions']->pluck('id'));
+        $answers = $ratings->flatMap->answers
+            ->filter(fn (RatingAnswer $answer) => $answer->question?->target_type === $targetType
+                && $answer->question?->answer_type === Question::TYPE_RATING
+                && $questionIds->contains($answer->question_id)
+                && in_array((int) ($answer->answer_value[0] ?? 0), [1, 2, 3, 4, 5], true))
+            ->groupBy(fn (RatingAnswer $answer) => $answer->question->indicator_category_id);
+
+        return $indicators->mapWithKeys(function (array $indicator) use ($answers) {
+            $indicatorAnswers = $answers->get($indicator['id'], collect());
+
+            return [
+                $indicator['id'] => $indicatorAnswers->isEmpty()
+                    ? null
+                    : round($indicatorAnswers->avg(fn (RatingAnswer $answer) => (int) $answer->answer_value[0]) * 2, 1),
+            ];
+        });
     }
 
     private function attendances(CarbonImmutable $period, Collection $driverIds): Collection

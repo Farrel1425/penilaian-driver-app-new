@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Branch;
 use App\Models\Driver;
 use App\Models\DriverAttendance;
+use App\Models\IndicatorCategory;
 use App\Models\Question;
 use App\Models\Rating;
 use App\Models\User;
@@ -124,13 +125,13 @@ class OperationalMonitoringTest extends TestCase
         $report = $monitoring->reportRows($branch, $monitoring->period('2026-08'));
         $scores = $report['rows']->first()['report_scores'];
 
-        $this->assertSame(10.0, $scores[$first->id]);
-        $this->assertSame(8.0, $scores[$second->id]);
+        $this->assertSame(10.0, $scores[$first->indicator_category_id]);
+        $this->assertSame(8.0, $scores[$second->indicator_category_id]);
 
         $this->get(route('admin.monitoring.branch.report', [$branch, 'period' => '2026-08']))
             ->assertOk()
             ->assertSee('Sikap Kerja')
-            ->assertSee('Kinerja Pelayanan')
+            ->assertSee('Penilaian Driver')
             ->assertSee('Kehadiran / Absen')
             ->assertDontSee('Kendaraan Terakhir');
     }
@@ -236,6 +237,33 @@ class OperationalMonitoringTest extends TestCase
         $report = app(OperationalMonitoringService::class)->reportRows($branch, app(OperationalMonitoringService::class)->period('2026-09'));
         $this->assertSame(80.0, $report['vehicle_rows']->first()['vehicle_score']);
         $this->assertSame(1, $report['vehicle_rows']->first()['rating_count']);
+    }
+
+    public function test_monitoring_report_groups_multiple_questions_into_one_indicator_column(): void
+    {
+        [$branch, $driver] = $this->makeDriver();
+        $vehicle = Vehicle::factory()->for($branch)->create();
+        $driverIndicator = IndicatorCategory::factory()->create(['name' => 'Pelayanan Driver', 'target_type' => Question::TARGET_DRIVER]);
+        $vehicleIndicator = IndicatorCategory::factory()->create(['name' => 'Kebersihan Kendaraan', 'target_type' => Question::TARGET_VEHICLE]);
+        $driverQuestions = Question::factory()->count(2)->for($driverIndicator, 'indicatorCategory')->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_RATING]);
+        $vehicleQuestions = Question::factory()->count(2)->for($vehicleIndicator, 'indicatorCategory')->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_RATING]);
+        $ignoredQuestion = Question::factory()->for($vehicleIndicator, 'indicatorCategory')->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_YES_NO]);
+        $rating = Rating::factory()->for($branch)->for($driver)->for($vehicle)->create(['submitted_at' => '2026-09-12 10:00:00']);
+        $rating->answers()->create(['question_id' => $driverQuestions[0]->id, 'answer_value' => [5]]);
+        $rating->answers()->create(['question_id' => $driverQuestions[1]->id, 'answer_value' => [3]]);
+        $rating->answers()->create(['question_id' => $vehicleQuestions[0]->id, 'answer_value' => [4]]);
+        $rating->answers()->create(['question_id' => $vehicleQuestions[1]->id, 'answer_value' => [2]]);
+        $rating->answers()->create(['question_id' => $ignoredQuestion->id, 'answer_value' => [0]]);
+        $monitoring = app(OperationalMonitoringService::class);
+
+        $report = $monitoring->reportRows($branch, $monitoring->period('2026-09'));
+
+        $this->assertCount(1, $report['driver_indicators']);
+        $this->assertCount(1, $report['vehicle_indicators']);
+        $this->assertCount(2, $report['driver_indicators']->first()['questions']);
+        $this->assertCount(2, $report['vehicle_indicators']->first()['questions']);
+        $this->assertSame(8.0, $report['rows']->first()['report_scores'][$driverIndicator->id]);
+        $this->assertSame(6.0, $report['vehicle_rows']->first()['report_scores'][$vehicleIndicator->id]);
     }
 
     public function test_combined_report_and_individual_exports_are_available(): void
