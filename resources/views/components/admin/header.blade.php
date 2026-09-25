@@ -7,9 +7,9 @@
 ?>
 <?php
     $masterSearch = match ($title) {
-        'Master Cabang' => ['route' => 'admin.branches.index', 'placeholder' => 'Cari kode, unit kerja, PIC, atau kontak...', 'filters' => ['status']],
-        'Master Kendaraan' => ['route' => 'admin.vehicles.index', 'placeholder' => 'Cari nomor polisi, merk, atau Unit Kerja...', 'filters' => ['branch_id', 'status']],
-        'Master Pertanyaan' => ['route' => 'admin.questions.index', 'placeholder' => 'Cari pertanyaan atau indikator...', 'filters' => ['target_type', 'status']],
+        'Master Cabang' => ['route' => 'admin.branches.index', 'placeholder' => 'Cari kode, unit kerja, PIC, atau kontak...', 'filters' => ['status', 'completeness']],
+        'Master Kendaraan' => ['route' => 'admin.vehicles.index', 'placeholder' => 'Cari nomor polisi, merk, atau Unit Kerja...', 'filters' => ['branch_id', 'status', 'completeness']],
+        'Master Pertanyaan' => ['route' => 'admin.questions.index', 'placeholder' => 'Cari pertanyaan atau indikator...', 'filters' => ['target_type', 'answer_type', 'status']],
         'Kategori Indikator' => ['route' => 'admin.indicator-categories.index', 'placeholder' => 'Cari kategori indikator...', 'filters' => ['target_type', 'status']],
         'Permintaan Kerjasama' => ['route' => 'admin.partnership-inquiries.index', 'placeholder' => 'Cari perusahaan, PIC, kontak, atau layanan...', 'filters' => ['start_date', 'end_date', 'status']],
         'Lowongan Recruitment' => ['route' => 'admin.job-vacancies.index', 'placeholder' => 'Cari posisi, kategori, atau jenis kerja...', 'filters' => ['period', 'status']],
@@ -55,7 +55,9 @@
         <x-lucide-search aria-hidden="true" />
         @if ($isDriverIndex)
             <input type="hidden" name="branch_id" value="{{ request('branch_id') }}">
+            <input type="hidden" name="employee_category_id" value="{{ request('employee_category_id') }}">
             <input type="hidden" name="status" value="{{ request('status') }}">
+            <input type="hidden" name="completeness" value="{{ request('completeness') }}">
         @endif
         @if ($searchConfig)
             @foreach ($searchConfig['filters'] as $filter)

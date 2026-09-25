@@ -1,3 +1,9 @@
+@php
+    $activeAssessmentFilters = $filters->queryString();
+    if (auth()->user()?->isBranchAdmin() && ($activeAssessmentFilters['branch_id'] ?? null) === auth()->user()?->branch_id) {
+        unset($activeAssessmentFilters['branch_id']);
+    }
+@endphp
 <form class="filter-bar admin-dashboard-filters assessment-filter" method="GET" data-auto-filter-form>
     <input type="hidden" name="search" value="{{ $filters->search }}">
     <label><span>Mulai</span><input type="date" name="start_date" value="{{ $filters->startDate?->toDateString() }}" aria-label="Tanggal mulai"></label>
@@ -6,5 +12,7 @@
     @if (isset($drivers))<label><span>Driver</span><select name="driver_id" aria-label="Driver"><option value="">Semua Driver</option>@foreach($drivers as $driver)<option value="{{ $driver->id }}" @selected($filters->driverId === $driver->id)>{{ $driver->full_name }}</option>@endforeach</select></label>@endif
     @if (isset($vehicles))<label><span>Kendaraan</span><select name="vehicle_id" aria-label="Kendaraan"><option value="">Semua Kendaraan</option>@foreach($vehicles as $vehicle)<option value="{{ $vehicle->id }}" @selected($filters->vehicleId === $vehicle->id)>{{ $vehicle->police_number }} - {{ $vehicle->brand }}</option>@endforeach</select></label>@endif
 
-    <a class="secondary-button assessment-reset-button" href="{{ url()->current() }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
+    @if ($activeAssessmentFilters !== [])
+        <a class="secondary-button assessment-reset-button" href="{{ url()->current() }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
+    @endif
 </form>

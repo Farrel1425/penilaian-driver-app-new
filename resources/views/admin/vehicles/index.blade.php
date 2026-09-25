@@ -2,10 +2,11 @@
     <x-slot:pageActions>
         <form class="master-filter-panel" method="GET" action="{{ route('admin.vehicles.index') }}">
             <input type="hidden" name="search" value="{{ request('search') }}">
-            <label><span>UNIT KERJA</span><select name="branch_id" onchange="this.form.requestSubmit()" aria-label="Filter Unit Kerja"><option value="">Semua Unit Kerja</option>@foreach($branches as $branch)<option value="{{ $branch->id }}" @selected((int) request('branch_id') === $branch->id)>{{ $branch->name }}</option>@endforeach</select></label>
-            <label><span>STATUS KENDARAAN</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
-            @if (request()->filled('search') || request()->filled('branch_id') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.vehicles.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
-            <a class="primary-button master-create-button" href="{{ route('admin.vehicles.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Kendaraan</span></a>
+            <label><span>UNIT</span><select name="branch_id" onchange="this.form.requestSubmit()" aria-label="Filter Unit Kerja"><option value="">Semua Unit Kerja</option>@foreach($branches as $branch)<option value="{{ $branch->id }}" @selected((int) request('branch_id') === $branch->id)>{{ $branch->name }}</option>@endforeach</select></label>
+            <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
+            <label><span>KELENGKAPAN</span><select name="completeness" onchange="this.form.requestSubmit()" aria-label="Filter kelengkapan data"><option value="">Semua Data</option><option value="complete" @selected(request('completeness') === 'complete')>Lengkap</option><option value="incomplete" @selected(request('completeness') === 'incomplete')>Belum Lengkap</option></select></label>
+            @if (request()->filled('search') || request()->filled('branch_id') || request()->filled('status') || request()->filled('completeness'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.vehicles.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
+            <a class="primary-button master-create-button" href="{{ route('admin.vehicles.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
         </form>
     </x-slot:pageActions>
     <section class="vehicle-list-card master-table-card">

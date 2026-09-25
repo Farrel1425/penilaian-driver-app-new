@@ -2,7 +2,7 @@
     <x-slot:pageActions>
         <div class="assessment-list-toolbar">
             @include('admin.assessments._filter', compact('filters', 'branches', 'drivers', 'vehicles'))
-            <a class="primary-button assessment-export-button" data-no-loading href="{{ route('admin.assessments.export', $filters->queryString()) }}"><x-lucide-download aria-hidden="true" /><span>Export Excel</span></a>
+            <a class="primary-button assessment-export-button" data-no-loading href="{{ route('admin.assessments.export', $filters->queryString()) }}" title="Export Excel" aria-label="Export Excel"><x-lucide-download aria-hidden="true" /><span>Export</span></a>
         </div>
     </x-slot>
     <x-admin.panel class="assessment-list-panel">

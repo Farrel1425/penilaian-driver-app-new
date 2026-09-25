@@ -4,10 +4,11 @@
             <form class="master-filter-panel" method="GET" action="{{ route('admin.questions.index') }}">
                 <input type="hidden" name="search" value="{{ request('search') }}">
                 <label><span>KATEGORI</span><select name="target_type" onchange="this.form.requestSubmit()" aria-label="Filter kategori"><option value="">Semua Kategori</option><option value="driver" @selected(request('target_type') === 'driver')>Driver</option><option value="vehicle" @selected(request('target_type') === 'vehicle')>Kendaraan</option><option value="feedback" @selected(request('target_type') === 'feedback')>Feedback/Keluhan</option></select></label>
+                <label><span>TIPE</span><select name="answer_type" onchange="this.form.requestSubmit()" aria-label="Filter tipe jawaban"><option value="">Semua Tipe</option>@foreach (App\Models\Question::ANSWER_TYPES as $type)<option value="{{ $type }}" @selected(request('answer_type') === $type)>{{ App\Models\Question::answerTypeLabel($type) }}</option>@endforeach</select></label>
                 <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
-                @if (request()->filled('search') || request()->filled('target_type') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.questions.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
-                <a class="secondary-button master-secondary-action" href="{{ route('admin.questions.index', ['reorder' => 1]) }}"><x-lucide-grip-vertical aria-hidden="true" /><span>Ubah Urutan</span></a>
-                <a class="primary-button master-create-button" href="{{ route('admin.questions.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Pertanyaan</span></a>
+                @if (request()->filled('search') || request()->filled('target_type') || request()->filled('answer_type') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.questions.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
+                <a class="secondary-button master-secondary-action" href="{{ route('admin.questions.index', ['reorder' => 1]) }}"><x-lucide-grip-vertical aria-hidden="true" /><span>Urutkan</span></a>
+                <a class="primary-button master-create-button" href="{{ route('admin.questions.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
             </form>
         </x-slot:pageActions>
     @endif

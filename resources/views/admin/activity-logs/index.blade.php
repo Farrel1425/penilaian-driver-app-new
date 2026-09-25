@@ -10,8 +10,8 @@
                     <option value="{{ $admin->id }}" @selected((string) request('user_id') === (string) $admin->id)>{{ $admin->name }}</option>
                 @endforeach
             </select></label>
-            <a class="secondary-button" href="{{ route('admin.activity-logs.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
-            <a class="primary-button activity-log-export" data-no-loading href="{{ route('admin.activity-logs.export', request()->query()) }}"><x-lucide-download aria-hidden="true" /><span>Export Excel</span></a>
+            <a class="secondary-button assessment-reset-button" href="{{ route('admin.activity-logs.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
+            <a class="primary-button activity-log-export" data-no-loading href="{{ route('admin.activity-logs.export', request()->query()) }}" title="Export Excel" aria-label="Export Excel"><x-lucide-download aria-hidden="true" /><span>Export</span></a>
         </form>
     </x-slot>
 

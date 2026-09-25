@@ -26,6 +26,179 @@
         margin: 0 0 28px;
     }
 }
+
+/* Unified, responsive controls inside admin page headings. */
+.admin-app .admin-page-heading {
+    gap: 16px;
+    min-width: 0;
+}
+.admin-app .admin-page-heading-copy {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+.admin-app .admin-page-heading-copy h1,
+.admin-app .admin-page-heading-copy p,
+.admin-app .admin-page-heading-description {
+    overflow-wrap: anywhere;
+}
+.admin-app .admin-page-heading-actions {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+}
+.admin-app .admin-page-heading-actions > *,
+.admin-app .admin-page-heading-actions form,
+.admin-app .admin-page-heading-actions [class*="toolbar"] {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+.admin-app .admin-page-heading-actions label:has(input[type="date"]),
+.admin-app .admin-page-heading-actions label:has(input[type="month"]),
+.admin-app .admin-page-heading-actions .native-picker-field,
+.admin-app .admin-page-heading-actions input[type="date"],
+.admin-app .admin-page-heading-actions input[type="month"] {
+    cursor: pointer;
+}
+.admin-app .admin-page-heading-actions input,
+.admin-app .admin-page-heading-actions select,
+.admin-app .admin-page-heading-actions .primary-button,
+.admin-app .admin-page-heading-actions .secondary-button,
+.admin-app .admin-page-heading-actions .master-create-button,
+.admin-app .admin-page-heading-actions .master-secondary-action,
+.admin-app .admin-page-heading-actions .monitoring-print-button,
+.admin-app .admin-page-heading-actions button {
+    box-sizing: border-box;
+    height: 40px;
+    min-height: 40px;
+}
+.admin-app .admin-page-heading-actions .primary-button,
+.admin-app .admin-page-heading-actions .secondary-button,
+.admin-app .admin-page-heading-actions .master-create-button,
+.admin-app .admin-page-heading-actions .master-secondary-action,
+.admin-app .admin-page-heading-actions .monitoring-print-button,
+.admin-app .admin-page-heading-actions button {
+    border-radius: 8px;
+    font-size: 13px;
+    gap: 7px;
+    padding: 0 12px;
+    white-space: nowrap;
+}
+.admin-app .admin-page-heading-actions :is(a, button) > svg {
+    flex: 0 0 17px;
+    height: 17px;
+    width: 17px;
+}
+.admin-app .admin-page-heading-actions .master-filter-panel select,
+.admin-app .admin-page-heading-actions .admin-dashboard-filters input,
+.admin-app .admin-page-heading-actions .admin-dashboard-filters select,
+.admin-app .admin-page-heading-actions .monitoring-period-panel input,
+.admin-app .admin-page-heading-actions .monitoring-detail-actions input {
+    min-width: 144px;
+}
+.admin-app .admin-page-heading-actions .assessment-reset-button,
+.admin-app .admin-page-heading-actions .assessment-export-button,
+.admin-app .admin-page-heading-actions .activity-log-export,
+.admin-app .admin-page-heading-actions .monitoring-print-button,
+.admin-app .admin-page-heading-actions .page-inline-actions .secondary-button,
+.admin-app .admin-page-heading-actions .performance-report-actions .secondary-button {
+    flex: 0 0 40px;
+    min-width: 40px;
+    padding: 0;
+    width: 40px;
+}
+.admin-app .admin-page-heading-actions .assessment-reset-button span,
+.admin-app .admin-page-heading-actions .assessment-export-button span,
+.admin-app .admin-page-heading-actions .activity-log-export span,
+.admin-app .admin-page-heading-actions .monitoring-print-button span,
+.admin-app .admin-page-heading-actions .page-inline-actions .secondary-button span,
+.admin-app .admin-page-heading-actions .performance-report-actions .secondary-button span {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+@media (max-width: 1279px) {
+    .admin-app .admin-page-heading {
+        align-items: stretch !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .admin-app .admin-page-heading-actions {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+    .admin-app .admin-page-heading-actions > *,
+    .admin-app .admin-page-heading-actions [class*="toolbar"] {
+        justify-content: flex-start !important;
+    }
+    .admin-app .admin-page-heading-actions .master-filter-panel,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters,
+    .admin-app .admin-page-heading-actions .monitoring-period-panel,
+    .admin-app .admin-page-heading-actions .monitoring-detail-actions {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 640px) {
+    .admin-app .admin-page-heading {
+        gap: 14px;
+    }
+    .admin-app .admin-page-heading-copy h1 {
+        font-size: clamp(22px, 7vw, 30px);
+        line-height: 1.15;
+    }
+    .admin-app .admin-page-heading-actions .master-filter-panel,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+    }
+    .admin-app .admin-page-heading-actions .master-filter-panel label,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters label {
+        min-width: 0;
+    }
+    .admin-app .admin-page-heading-actions .master-filter-panel input,
+    .admin-app .admin-page-heading-actions .master-filter-panel select,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters input,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters select {
+        min-width: 0;
+        width: 100%;
+    }
+    .admin-app .admin-page-heading-actions .master-create-button,
+    .admin-app .admin-page-heading-actions .master-secondary-action {
+        grid-column: auto;
+        margin-left: 0;
+        width: auto;
+    }
+    .admin-app .admin-page-heading-actions .monitoring-period-panel,
+    .admin-app .admin-page-heading-actions .monitoring-detail-actions {
+        align-items: end;
+        display: flex;
+        width: 100%;
+    }
+    .admin-app .admin-page-heading-actions .monitoring-period-panel label,
+    .admin-app .admin-page-heading-actions .monitoring-detail-actions form,
+    .admin-app .admin-page-heading-actions .monitoring-detail-actions form label {
+        flex: 1 1 160px;
+        min-width: 0;
+    }
+    .admin-app .admin-page-heading-actions .monitoring-period-panel input,
+    .admin-app .admin-page-heading-actions .monitoring-detail-actions input {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-app .admin-page-heading-actions .master-filter-panel,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
 .recruitment-heading-actions,
 .recruitment-workspace-toolbar form {
     align-items: end;
@@ -16361,5 +16534,56 @@ body.auth-app:has(.bpd-login-page) {
         display: flex;
         justify-content: space-between;
         margin: 0 0 28px;
+    }
+}
+
+/* Lock the shared page-heading dimensions after page-specific legacy rules. */
+.admin-app .admin-page-heading-actions :is(input, select, button, .primary-button, .secondary-button, .master-create-button, .master-secondary-action, .monitoring-print-button) {
+    box-sizing: border-box;
+    height: 40px !important;
+    min-height: 40px !important;
+}
+.admin-app .admin-page-heading-actions :is(.primary-button, .secondary-button, .master-create-button, .master-secondary-action, .monitoring-print-button, button) {
+    border-radius: 8px;
+    font-size: 13px;
+    gap: 7px;
+    white-space: nowrap;
+}
+.admin-app .admin-page-heading-actions :is(.assessment-reset-button, .assessment-export-button, .activity-log-export, .monitoring-print-button),
+.admin-app .admin-page-heading-actions .page-inline-actions .secondary-button,
+.admin-app .admin-page-heading-actions .performance-report-actions .secondary-button {
+    flex: 0 0 40px;
+    min-width: 40px !important;
+    padding: 0 !important;
+    width: 40px !important;
+}
+
+@media (max-width: 1279px) {
+    .admin-app .admin-page-heading-actions {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .admin-app .admin-page-heading-actions .master-filter-panel,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+    }
+    .admin-app .admin-page-heading-actions .master-filter-panel :is(input, select),
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters :is(input, select),
+    .admin-app .admin-page-heading-actions .monitoring-period-panel input,
+    .admin-app .admin-page-heading-actions .monitoring-detail-actions input {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-app .admin-page-heading-actions .master-filter-panel,
+    .admin-app .admin-page-heading-actions .admin-dashboard-filters {
+        grid-template-columns: minmax(0, 1fr);
     }
 }

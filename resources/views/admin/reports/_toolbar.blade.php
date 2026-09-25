@@ -14,11 +14,11 @@
         @include('admin.assessments._filter', [...$filterData, 'searchPlaceholder' => $type === 'branch' ? 'Cari unit kerja' : 'Cari driver, kendaraan, atau unit kerja'])
 
         <div class="page-inline-actions performance-report-actions">
-            <a class="secondary-button" data-no-loading href="{{ route('admin.reports.export', ['type' => $type, ...$filters->queryString()]) }}">
+            <a class="secondary-button" data-no-loading href="{{ route('admin.reports.export', ['type' => $type, ...$filters->queryString()]) }}" title="Export Excel" aria-label="Export Excel">
                 <x-lucide-download aria-hidden="true" />
                 <span>Export Excel</span>
             </a>
-            <a class="secondary-button" target="_blank" href="{{ route('admin.reports.print', ['type' => $type, ...$filters->queryString()]) }}">
+            <a class="secondary-button" target="_blank" href="{{ route('admin.reports.print', ['type' => $type, ...$filters->queryString()]) }}" title="Simpan PDF" aria-label="Simpan PDF">
                 <x-lucide-printer aria-hidden="true" />
                 <span>Simpan PDF</span>
             </a>

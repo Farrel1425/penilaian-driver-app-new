@@ -89,6 +89,20 @@ class AdminReportTest extends TestCase
             ->assertDontSee($old->submitted_at->format('d M Y'));
     }
 
+    public function test_assessment_history_only_shows_reset_when_a_filter_is_active(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->get(route('admin.assessments.index'))
+            ->assertOk()
+            ->assertDontSee('assessment-reset-button', false);
+
+        $this->get(route('admin.assessments.index', ['start_date' => '2026-08-01']))
+            ->assertOk()
+            ->assertSee('assessment-reset-button', false)
+            ->assertSee('Reset');
+    }
+
     public function test_driver_and_vehicle_report_accuracy(): void
     {
         $this->actingAs(User::factory()->create());

@@ -4,7 +4,7 @@
             <input type="hidden" name="search" value="{{ request('search') }}">
             <label><span>PERIODE</span><select name="period" onchange="this.form.requestSubmit()"><option value="">Semua Periode</option>@foreach ($periods as $period)<option value="{{ $period->id }}" @selected((string) request('period') === (string) $period->id)>{{ $period->name }}</option>@endforeach</select></label>
             <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()"><option value="">Semua Status</option>@foreach (App\Models\JobVacancy::STATUSES as $value => $label)<option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>@endforeach</select></label>
-            @if (request()->filled('search') || request()->filled('period') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.job-vacancies.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
+            @if (request()->filled('search') || request()->filled('period') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.job-vacancies.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
             <a class="primary-button master-create-button" href="{{ route('admin.job-vacancies.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Lowongan</span></a>
         </form>
     </x-slot:pageActions>

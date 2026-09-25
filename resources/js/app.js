@@ -1407,12 +1407,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     schedule();
 });
-// Open native date pickers from the whole input area, not only the calendar icon.
+// Open native date and month pickers from the whole labelled control area.
 document.addEventListener('click', (event) => {
-    const input = event.target instanceof Element ? event.target.closest('input[type="date"]') : null;
+    if (!(event.target instanceof Element)) {
+        return;
+    }
+
+    const directInput = event.target.closest('input[type="date"], input[type="month"]');
+    const labelledInput = event.target.closest('label')?.querySelector('input[type="date"], input[type="month"]');
+    const input = directInput ?? labelledInput;
 
     if (!(input instanceof HTMLInputElement) || input.disabled || input.readOnly) {
         return;
+    }
+
+    if (!directInput) {
+        event.preventDefault();
     }
 
     input.focus({ preventScroll: true });

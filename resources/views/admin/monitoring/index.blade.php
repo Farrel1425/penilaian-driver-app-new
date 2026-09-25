@@ -3,10 +3,13 @@
     <x-slot:pageDescription>Pantau penilaian, absensi, dan kelengkapan setiap unit kerja.</x-slot>
     <x-slot:pageActions>
         <form class="monitoring-period-panel" method="GET">
-            <label><span>Periode</span><input type="month" name="period" value="{{ $period->format('Y-m') }}"></label>
+            <label class="native-picker-field"><span>Periode</span><input type="month" name="period" value="{{ $period->format('Y-m') }}" onchange="this.form.requestSubmit()"></label>
             <input type="hidden" name="status" value="{{ $status }}">
-            <button class="secondary-button" type="submit"><x-lucide-filter aria-hidden="true" /><span>Terapkan</span></button>
-            <a class="monitoring-print-button" data-no-loading href="{{ route('admin.monitoring.report', ['period' => $period->format('Y-m')]) }}" title="Cetak laporan semua cabang" aria-label="Cetak laporan semua cabang"><x-lucide-printer aria-hidden="true" /><span>Cetak Laporan</span></a>
+            <input type="hidden" name="search" value="{{ request('search') }}">
+            @if (request()->filled('period') || request()->filled('status') || request()->filled('search'))
+                <a class="secondary-button assessment-reset-button" href="{{ route('admin.monitoring.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
+            @endif
+            <a class="monitoring-print-button" data-no-loading href="{{ route('admin.monitoring.report', ['period' => $period->format('Y-m')]) }}" title="Cetak laporan" aria-label="Cetak laporan"><x-lucide-printer aria-hidden="true" /><span>Cetak</span></a>
         </form>
     </x-slot>
 
@@ -14,9 +17,9 @@
         <header class="monitoring-panel-header">
             <div><h3>Daftar Unit Kerja &amp; Status Cabang Bali</h3><p>Klik aksi pada cabang untuk meninjau personel driver operasional.</p></div>
             <nav class="monitoring-status-tabs" aria-label="Filter status kelengkapan">
-                <a @class(['is-active' => !in_array($status, ['complete', 'incomplete'], true)]) href="{{ route('admin.monitoring.index', ['period' => $period->format('Y-m')]) }}">Semua <b>{{ $rows->total() }}</b></a>
-                <a @class(['is-active' => $status === 'complete']) href="{{ route('admin.monitoring.index', ['period' => $period->format('Y-m'), 'status' => 'complete']) }}">Lengkap</a>
-                <a @class(['is-active' => $status === 'incomplete']) href="{{ route('admin.monitoring.index', ['period' => $period->format('Y-m'), 'status' => 'incomplete']) }}">Belum Lengkap</a>
+                <a @class(['is-active' => !in_array($status, ['complete', 'incomplete'], true)]) href="{{ route('admin.monitoring.index', array_filter(['period' => $period->format('Y-m'), 'search' => request('search')])) }}">Semua <b>{{ $rows->total() }}</b></a>
+                <a @class(['is-active' => $status === 'complete']) href="{{ route('admin.monitoring.index', array_filter(['period' => $period->format('Y-m'), 'status' => 'complete', 'search' => request('search')])) }}">Lengkap</a>
+                <a @class(['is-active' => $status === 'incomplete']) href="{{ route('admin.monitoring.index', array_filter(['period' => $period->format('Y-m'), 'status' => 'incomplete', 'search' => request('search')])) }}">Belum Lengkap</a>
             </nav>
         </header>
         <div class="table-wrap">

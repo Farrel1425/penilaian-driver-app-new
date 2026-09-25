@@ -66,4 +66,23 @@ class Branch extends Model
     {
         return $query->where('status', self::STATUS_ACTIVE);
     }
+
+    public function scopeDataCompleteness(Builder $query, ?string $completeness): Builder
+    {
+        $fields = ['code', 'name', 'address', 'regency', 'pic_name', 'phone', 'email', 'status'];
+
+        return match ($completeness) {
+            'complete' => $query->where(function (Builder $query) use ($fields): void {
+                foreach ($fields as $field) {
+                    $query->whereNotNull($field)->whereRaw("TRIM({$field}) <> ''");
+                }
+            }),
+            'incomplete' => $query->where(function (Builder $query) use ($fields): void {
+                foreach ($fields as $field) {
+                    $query->orWhereNull($field)->orWhereRaw("TRIM({$field}) = ''");
+                }
+            }),
+            default => $query,
+        };
+    }
 }

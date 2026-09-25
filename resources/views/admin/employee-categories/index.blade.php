@@ -3,8 +3,8 @@
         <form class="master-filter-panel" method="GET" action="{{ route('admin.employee-categories.index') }}">
             <input type="hidden" name="search" value="{{ request('search') }}">
             <label><span>STATUS KATEGORI</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status kategori"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
-            @if (request()->filled('search') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.employee-categories.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
-            <a class="primary-button master-create-button" href="{{ route('admin.employee-categories.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Kategori</span></a>
+            @if (request()->filled('search') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.employee-categories.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
+            <a class="primary-button master-create-button" href="{{ route('admin.employee-categories.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
         </form>
     </x-slot:pageActions>
 

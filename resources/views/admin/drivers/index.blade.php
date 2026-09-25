@@ -3,7 +3,7 @@
         <form class="master-filter-panel" method="GET" action="{{ route('admin.employees.index') }}">
             <input type="hidden" name="search" value="{{ request('search') }}">
             <label>
-                <span>UNIT KERJA</span>
+                <span>UNIT</span>
                 <select name="branch_id" onchange="this.form.requestSubmit()" aria-label="Filter unit kerja">
                     <option value="">Semua Unit Kerja</option>
                     @foreach($branches as $branch)
@@ -12,7 +12,7 @@
                 </select>
             </label>
             <label>
-                <span>KATEGORI PEGAWAI</span>
+                <span>KATEGORI</span>
                 <select name="employee_category_id" onchange="this.form.requestSubmit()" aria-label="Filter kategori pegawai">
                     <option value="">Semua Kategori</option>
                     @foreach($categories as $category)
@@ -21,17 +21,25 @@
                 </select>
             </label>
             <label>
-                <span>STATUS PEGAWAI</span>
+                <span>STATUS</span>
                 <select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status pegawai">
                     <option value="">Semua Status</option>
                     <option value="active" @selected(request('status') === 'active')>Aktif</option>
                     <option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option>
                 </select>
             </label>
-            @if (request()->filled('search') || request()->filled('branch_id') || request()->filled('employee_category_id') || request()->filled('status'))
-                <a class="secondary-button assessment-reset-button" href="{{ route('admin.employees.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
+            <label>
+                <span>KELENGKAPAN</span>
+                <select name="completeness" onchange="this.form.requestSubmit()" aria-label="Filter kelengkapan data">
+                    <option value="">Semua Data</option>
+                    <option value="complete" @selected(request('completeness') === 'complete')>Lengkap</option>
+                    <option value="incomplete" @selected(request('completeness') === 'incomplete')>Belum Lengkap</option>
+                </select>
+            </label>
+            @if (request()->filled('search') || request()->filled('branch_id') || request()->filled('employee_category_id') || request()->filled('status') || request()->filled('completeness'))
+                <a class="secondary-button assessment-reset-button" href="{{ route('admin.employees.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
             @endif
-            <a class="primary-button master-create-button" href="{{ route('admin.employees.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Pegawai</span></a>
+            <a class="primary-button master-create-button" href="{{ route('admin.employees.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
         </form>
     </x-slot:pageActions>
 

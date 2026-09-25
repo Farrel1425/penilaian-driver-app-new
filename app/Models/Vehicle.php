@@ -101,6 +101,73 @@ class Vehicle extends Model
         return $query->where('status', self::STATUS_ACTIVE);
     }
 
+    public function scopeDataCompleteness(Builder $query, ?string $completeness): Builder
+    {
+        $stringFields = [
+            'police_number',
+            'brand',
+            'model',
+            'color',
+            'chassis_number',
+            'engine_number',
+            'fuel_type',
+            'transmission',
+            'acquisition_source',
+            'ownership_type',
+            'photo',
+            'interior_photo',
+            'status',
+            'qr_token',
+        ];
+        $valueFields = [
+            'branch_id',
+            'year',
+            'passenger_capacity',
+            'acquisition_date',
+            'stnk_expired_at',
+            'kir_expired_at',
+        ];
+
+        if ($completeness === 'complete') {
+            return $query
+                ->where(function (Builder $query) use ($stringFields): void {
+                    foreach ($stringFields as $field) {
+                        $query->whereNotNull($field)->whereRaw("TRIM({$field}) <> ''");
+                    }
+                })
+                ->whereNotNull($valueFields)
+                ->where(function (Builder $query): void {
+                    $query->where('ownership_type', '!=', self::OWNERSHIP_RENTAL)
+                        ->orWhere(function (Builder $query): void {
+                            $query->whereNotNull('contract_number')
+                                ->whereRaw("TRIM(contract_number) <> ''")
+                                ->whereNotNull('contract_expired_at');
+                        });
+                });
+        }
+
+        if ($completeness === 'incomplete') {
+            return $query->where(function (Builder $query) use ($stringFields, $valueFields): void {
+                foreach ($stringFields as $field) {
+                    $query->orWhereNull($field)->orWhereRaw("TRIM({$field}) = ''");
+                }
+                foreach ($valueFields as $field) {
+                    $query->orWhereNull($field);
+                }
+                $query->orWhere(function (Builder $query): void {
+                    $query->where('ownership_type', self::OWNERSHIP_RENTAL)
+                        ->where(function (Builder $query): void {
+                            $query->whereNull('contract_number')
+                                ->orWhereRaw("TRIM(contract_number) = ''")
+                                ->orWhereNull('contract_expired_at');
+                        });
+                });
+            });
+        }
+
+        return $query;
+    }
+
     protected function casts(): array
     {
         return [

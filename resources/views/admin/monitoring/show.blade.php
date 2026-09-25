@@ -2,8 +2,8 @@
     <x-slot:pageActions>
         <div class="monitoring-detail-actions">
             <a class="secondary-button" href="{{ route('admin.monitoring.index', ['period' => $period->format('Y-m')]) }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a>
-            <form method="GET"><label><span>Periode</span><input type="month" name="period" value="{{ $period->format('Y-m') }}"></label><button class="secondary-button" type="submit"><x-lucide-filter aria-hidden="true" /> Terapkan</button></form>
-            <a class="monitoring-print-button" data-no-loading href="{{ route('admin.monitoring.branch.report', [$branch, 'period' => $period->format('Y-m')]) }}"><x-lucide-printer aria-hidden="true" /><span>Cetak Laporan<br>Cabang</span></a>
+            <form method="GET"><label class="native-picker-field"><span>Periode</span><input type="month" name="period" value="{{ $period->format('Y-m') }}" onchange="this.form.requestSubmit()"></label><input type="hidden" name="status" value="{{ $status }}">@if (request()->filled('period') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.monitoring.show', $branch) }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif</form>
+            <a class="monitoring-print-button" data-no-loading href="{{ route('admin.monitoring.branch.report', [$branch, 'period' => $period->format('Y-m')]) }}" title="Cetak laporan cabang" aria-label="Cetak laporan cabang"><x-lucide-printer aria-hidden="true" /><span>Cetak</span></a>
         </div>
     </x-slot>
 

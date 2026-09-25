@@ -94,6 +94,54 @@ class Driver extends Model
             ->where('requires_sim', true));
     }
 
+    public function scopeDataCompleteness(Builder $query, ?string $completeness): Builder
+    {
+        $stringFields = ['full_name', 'birth_place', 'gender', 'address', 'phone', 'status'];
+        $valueFields = ['branch_id', 'employee_category_id', 'birth_date', 'join_date'];
+        $simStringFields = ['sim_number', 'sim_type', 'sim_photo'];
+
+        if ($completeness === 'complete') {
+            return $query
+                ->where(function (Builder $query) use ($stringFields): void {
+                    foreach ($stringFields as $field) {
+                        $query->whereNotNull($field)->whereRaw("TRIM({$field}) <> ''");
+                    }
+                })
+                ->whereNotNull($valueFields)
+                ->where(function (Builder $query) use ($simStringFields): void {
+                    $query->whereDoesntHave('employeeCategory', fn (Builder $category) => $category->where('requires_sim', true))
+                        ->orWhere(function (Builder $query) use ($simStringFields): void {
+                            foreach ($simStringFields as $field) {
+                                $query->whereNotNull($field)->whereRaw("TRIM({$field}) <> ''");
+                            }
+                            $query->whereNotNull('sim_expired_at');
+                        });
+                });
+        }
+
+        if ($completeness === 'incomplete') {
+            return $query->where(function (Builder $query) use ($stringFields, $valueFields, $simStringFields): void {
+                foreach ($stringFields as $field) {
+                    $query->orWhereNull($field)->orWhereRaw("TRIM({$field}) = ''");
+                }
+                foreach ($valueFields as $field) {
+                    $query->orWhereNull($field);
+                }
+                $query->orWhere(function (Builder $query) use ($simStringFields): void {
+                    $query->whereHas('employeeCategory', fn (Builder $category) => $category->where('requires_sim', true))
+                        ->where(function (Builder $query) use ($simStringFields): void {
+                            foreach ($simStringFields as $field) {
+                                $query->orWhereNull($field)->orWhereRaw("TRIM({$field}) = ''");
+                            }
+                            $query->orWhereNull('sim_expired_at');
+                        });
+                });
+            });
+        }
+
+        return $query;
+    }
+
     protected function casts(): array
     {
         return [

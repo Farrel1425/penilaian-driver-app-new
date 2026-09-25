@@ -30,6 +30,7 @@ class VehicleController extends Controller
             })
             ->when($request->integer('branch_id'), fn ($query, int $branchId) => $query->where('branch_id', $branchId))
             ->when($request->string('status')->toString(), fn ($query, string $status) => $query->where('status', $status))
+            ->dataCompleteness($request->string('completeness')->toString())
             ->latest()
             ->paginate(10)
             ->withQueryString();

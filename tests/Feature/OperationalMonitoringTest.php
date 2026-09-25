@@ -176,6 +176,44 @@ class OperationalMonitoringTest extends TestCase
             ->assertHeader('content-type', 'application/pdf');
     }
 
+    public function test_monitoring_filters_incomplete_data_and_only_shows_reset_for_active_filters(): void
+    {
+        $admin = User::factory()->create();
+        [$completeBranch, $completeDriver] = $this->makeDriver();
+        [$incompleteBranch] = $this->makeDriver();
+        $completeBranch->update(['name' => 'Unit Monitoring Lengkap']);
+        $incompleteBranch->update(['name' => 'Unit Monitoring Belum Lengkap']);
+
+        DriverAttendance::query()->create([
+            'branch_id' => $completeBranch->id,
+            'driver_id' => $completeDriver->id,
+            'entered_by' => $admin->id,
+            'period' => '2026-09-01',
+            'present_days' => 22,
+            'sick_days' => 0,
+            'permitted_days' => 0,
+            'absent_days' => 0,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.monitoring.index'))
+            ->assertOk()
+            ->assertDontSee('assessment-reset-button', false)
+            ->assertDontSee('Terapkan');
+
+        $this->get(route('admin.monitoring.index', [
+            'period' => '2026-09',
+            'status' => 'incomplete',
+            'search' => 'Monitoring',
+        ]))
+            ->assertOk()
+            ->assertSee('assessment-reset-button', false)
+            ->assertSee($incompleteBranch->name)
+            ->assertDontSee($completeBranch->name)
+            ->assertSee('name="search" value="Monitoring"', false)
+            ->assertSee('onchange="this.form.requestSubmit()"', false);
+    }
+
     private function makeDriver(): array
     {
         $branch = Branch::factory()->create();

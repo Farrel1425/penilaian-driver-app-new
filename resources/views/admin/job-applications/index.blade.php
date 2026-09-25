@@ -4,7 +4,7 @@
             <input type="hidden" name="search" value="{{ request('search') }}">
             <label><span>POSISI</span><select name="vacancy" onchange="this.form.requestSubmit()"><option value="">Semua Posisi</option>@foreach ($vacancies as $vacancy)<option value="{{ $vacancy->id }}" @selected((string) request('vacancy') === (string) $vacancy->id)>{{ $vacancy->title }}</option>@endforeach</select></label>
             <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()"><option value="">Semua Status</option>@foreach (App\Models\JobApplication::STATUSES as $value => $label)<option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>@endforeach</select></label>
-            @if (request()->filled('search') || request()->filled('vacancy') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.job-applications.index') }}"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
+            @if (request()->filled('search') || request()->filled('vacancy') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.job-applications.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
         </form>
     </x-slot:pageActions>
     <section class="branch-list-card master-table-card">

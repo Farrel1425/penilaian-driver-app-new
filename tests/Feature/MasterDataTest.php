@@ -266,4 +266,62 @@ class MasterDataTest extends TestCase
             ->assertSee('data-vehicle-qr-modal', false)
             ->assertSee(route('admin.vehicles.qr.download', $vehicle), false);
     }
+
+    public function test_master_lists_can_filter_complete_and_incomplete_records(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $completeBranch = Branch::factory()->create(['name' => 'Unit Lengkap']);
+        $incompleteBranch = Branch::factory()->create(['name' => 'Unit Belum Lengkap', 'pic_name' => null]);
+
+        $this->get(route('admin.branches.index', ['completeness' => 'complete']))
+            ->assertOk()
+            ->assertSee($completeBranch->name)
+            ->assertDontSee($incompleteBranch->name);
+        $this->get(route('admin.branches.index', ['completeness' => 'incomplete']))
+            ->assertOk()
+            ->assertSee($incompleteBranch->name)
+            ->assertDontSee($completeBranch->name);
+
+        $completeDriver = Driver::factory()->for($completeBranch)->create([
+            'full_name' => 'Pegawai Lengkap',
+            'sim_photo' => 'driver-sims/sim-lengkap.jpg',
+        ]);
+        $incompleteDriver = Driver::factory()->for($completeBranch)->create([
+            'full_name' => 'Pegawai Belum Lengkap',
+            'birth_place' => null,
+        ]);
+
+        $this->get(route('admin.employees.index', ['completeness' => 'complete']))
+            ->assertOk()
+            ->assertSee($completeDriver->full_name)
+            ->assertDontSee($incompleteDriver->full_name);
+        $this->get(route('admin.employees.index', ['completeness' => 'incomplete']))
+            ->assertOk()
+            ->assertSee($incompleteDriver->full_name)
+            ->assertDontSee($completeDriver->full_name);
+
+        $completeVehicle = Vehicle::factory()->for($completeBranch)->create([
+            'police_number' => 'DK 1000 OK',
+            'acquisition_source' => 'purchase',
+            'ownership_type' => Vehicle::OWNERSHIP_COMPANY,
+            'stnk_expired_at' => '2028-01-01',
+            'kir_expired_at' => '2028-01-01',
+            'photo' => 'vehicles/exterior/lengkap.jpg',
+            'interior_photo' => 'vehicles/interior/lengkap.jpg',
+        ]);
+        $incompleteVehicle = Vehicle::factory()->for($completeBranch)->create([
+            'police_number' => 'DK 2000 NO',
+            'chassis_number' => null,
+        ]);
+
+        $this->get(route('admin.vehicles.index', ['completeness' => 'complete']))
+            ->assertOk()
+            ->assertSee($completeVehicle->police_number)
+            ->assertDontSee($incompleteVehicle->police_number);
+        $this->get(route('admin.vehicles.index', ['completeness' => 'incomplete']))
+            ->assertOk()
+            ->assertSee($incompleteVehicle->police_number)
+            ->assertDontSee($completeVehicle->police_number);
+    }
 }

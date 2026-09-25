@@ -298,6 +298,26 @@ class QuestionManagementTest extends TestCase
         ])->assertSessionHasErrors('indicator_category_id');
     }
 
+    public function test_question_list_can_filter_by_answer_type(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $rating = Question::factory()->create([
+            'question' => 'Pertanyaan rating khusus',
+            'answer_type' => Question::TYPE_RATING,
+        ]);
+        $paragraph = Question::factory()->create([
+            'question' => 'Pertanyaan paragraf khusus',
+            'answer_type' => Question::TYPE_PARAGRAPH,
+        ]);
+
+        $this->get(route('admin.questions.index', ['answer_type' => Question::TYPE_RATING]))
+            ->assertOk()
+            ->assertSee($rating->question)
+            ->assertDontSee($paragraph->question)
+            ->assertSee('name="answer_type"', false)
+            ->assertSee('assessment-reset-button', false);
+    }
+
     private function categoryId(string $targetType, string $name = 'Indikator Uji'): int
     {
         return IndicatorCategory::query()->firstOrCreate(

@@ -33,6 +33,7 @@ class BranchController extends Controller
                 });
             })
             ->when($request->string('status')->toString(), fn ($query, string $status) => $query->where('status', $status))
+            ->dataCompleteness($request->string('completeness')->toString())
             ->latest()
             ->paginate(10)
             ->withQueryString();

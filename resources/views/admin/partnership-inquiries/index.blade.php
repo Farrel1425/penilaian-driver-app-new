@@ -20,7 +20,7 @@
                 </select>
             </label>
             @if (request()->filled('search') || request()->filled('start_date') || request()->filled('end_date') || request()->filled('status'))
-                <a class="secondary-button assessment-reset-button dashboard-filter-reset" href="{{ route('admin.partnership-inquiries.index') }}">
+                <a class="secondary-button assessment-reset-button dashboard-filter-reset" href="{{ route('admin.partnership-inquiries.index') }}" title="Reset filter" aria-label="Reset filter">
                     <x-lucide-rotate-ccw aria-hidden="true" />
                     <span>Reset</span>
                 </a>

@@ -48,6 +48,28 @@ class Question extends Model
 
     public const TYPE_PARAGRAPH = 'paragraph';
 
+    public const ANSWER_TYPES = [
+        self::TYPE_RATING,
+        self::TYPE_YES_NO,
+        self::TYPE_MULTIPLE_CHOICE,
+        self::TYPE_CHECKBOX,
+        self::TYPE_SHORT_TEXT,
+        self::TYPE_PARAGRAPH,
+    ];
+
+    public static function answerTypeLabel(string $answerType): string
+    {
+        return match ($answerType) {
+            self::TYPE_RATING => 'Rating 1-5',
+            self::TYPE_YES_NO => 'Ya / Tidak',
+            self::TYPE_MULTIPLE_CHOICE => 'Pilihan Ganda',
+            self::TYPE_CHECKBOX => 'Checkbox',
+            self::TYPE_SHORT_TEXT => 'Jawaban Singkat',
+            self::TYPE_PARAGRAPH => 'Paragraf',
+            default => $answerType,
+        };
+    }
+
     public const STATUS_ACTIVE = 'active';
 
     public const STATUS_INACTIVE = 'inactive';
