@@ -5,7 +5,7 @@
             <label><span>TARGET</span><select name="target_type" onchange="this.form.requestSubmit()" aria-label="Filter target"><option value="">Semua Target</option>@foreach ([App\Models\Question::TARGET_DRIVER, App\Models\Question::TARGET_VEHICLE, App\Models\Question::TARGET_FEEDBACK] as $target)<option value="{{ $target }}" @selected(request('target_type') === $target)>{{ App\Models\Question::targetLabel($target) }}</option>@endforeach</select></label>
             <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status kategori"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
             @if (request()->filled('search') || request()->filled('target_type') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.indicator-categories.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
-            <a class="primary-button master-create-button" href="{{ route('admin.indicator-categories.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
+            <a class="primary-button master-create-button" href="{{ route('admin.indicator-categories.create') }}" title="Tambah kategori indikator" aria-label="Tambah kategori indikator"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
         </form>
     </x-slot:pageActions>
 

@@ -8,6 +8,7 @@ use App\Models\DriverAttendance;
 use App\Models\Question;
 use App\Models\Rating;
 use App\Models\RatingAnswer;
+use App\Models\Vehicle;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -45,18 +46,21 @@ class OperationalMonitoringService
             ->when($branchId, fn (Builder $query) => $query->whereKey($branchId))
             ->with([
                 'drivers' => fn ($query) => $this->eligibleDrivers($query)->orderBy('full_name'),
+                'vehicles' => fn ($query) => $query->active()->orderBy('police_number'),
             ])
             ->withCount(['vehicles' => fn ($query) => $query->active()])
             ->orderBy('name')
             ->get();
 
         $driverIds = $branches->flatMap->drivers->pluck('id');
+        $vehicleIds = $branches->flatMap->vehicles->pluck('id');
         $attendances = $this->attendances($period, $driverIds)->keyBy('driver_id');
         $ratings = $this->ratings($period, $driverIds)->groupBy('driver_id');
+        $vehicleRatings = $this->vehicleRatings($period, $vehicleIds)->groupBy('vehicle_id');
 
         $workingDays = $this->workingDays($period);
 
-        return $branches->map(function (Branch $branch) use ($attendances, $ratings, $workingDays) {
+        return $branches->map(function (Branch $branch) use ($attendances, $ratings, $vehicleRatings, $workingDays) {
             $driverRows = $branch->drivers->map(fn (Driver $driver) => $this->driverRow(
                 $driver,
                 $ratings->get($driver->id, collect()),
@@ -65,6 +69,12 @@ class OperationalMonitoringService
             ));
             $completed = $driverRows->where('is_complete', true)->count();
             $attendanceScores = $driverRows->pluck('attendance_score')->filter(fn ($score) => $score !== null);
+            $vehicleRows = $branch->vehicles->map(fn (Vehicle $vehicle) => $this->vehicleRow(
+                $vehicle,
+                $vehicleRatings->get($vehicle->id, collect()),
+            ));
+            $vehicleScores = $vehicleRows->pluck('vehicle_score')->filter(fn ($score) => $score !== null);
+            $vehiclesRated = $vehicleRows->where('has_ratings', true)->count();
 
             return [
                 'branch' => $branch,
@@ -73,6 +83,10 @@ class OperationalMonitoringService
                 'completed' => $completed,
                 'attendance_average' => $attendanceScores->isEmpty() ? null : round($attendanceScores->avg(), 2),
                 'is_complete' => $driverRows->isNotEmpty() && $completed === $driverRows->count(),
+                'vehicles_rated' => $vehiclesRated,
+                'vehicle_rating_count' => $vehicleRows->sum('rating_count'),
+                'vehicle_average' => $vehicleScores->isEmpty() ? null : round($vehicleScores->avg(), 2),
+                'is_vehicle_complete' => $vehicleRows->isNotEmpty() && $vehiclesRated === $vehicleRows->count(),
             ];
         });
     }
@@ -112,11 +126,43 @@ class OperationalMonitoringService
         return $row;
     }
 
+    public function vehicleRows(Branch $branch, CarbonImmutable $period, ?int $driverId = null): Collection
+    {
+        $vehicles = $branch->vehicles()->active()->orderBy('police_number')->get();
+        $ratings = $this->vehicleRatings($period, $vehicles->pluck('id'), $driverId)->groupBy('vehicle_id');
+
+        return $vehicles
+            ->map(fn (Vehicle $vehicle) => $this->vehicleRow($vehicle, $ratings->get($vehicle->id, collect())))
+            ->when($driverId, fn (Collection $rows) => $rows->where('has_ratings', true))
+            ->values();
+    }
+
+    public function vehicleDetail(Branch $branch, Vehicle $vehicle, CarbonImmutable $period): array
+    {
+        $ratings = $this->vehicleRatings($period, collect([$vehicle->id]))->sortByDesc('submitted_at')->values();
+        $row = $this->vehicleRow($vehicle, $ratings);
+        $row['question_breakdown'] = $this->questionBreakdown($ratings, Question::TARGET_VEHICLE);
+        $row['comments'] = $ratings->flatMap->answers
+            ->filter(fn (RatingAnswer $answer) => filled($answer->answer_text))
+            ->sortByDesc('created_at')
+            ->values();
+        $row['branch'] = $branch;
+
+        return $row;
+    }
+
     public function reportRows(Branch $branch, CarbonImmutable $period): array
     {
         $rows = $this->driverRows($branch, $period);
         $questions = Question::query()
             ->where('target_type', Question::TARGET_DRIVER)
+            ->where('answer_type', Question::TYPE_RATING)
+            ->active()
+            ->ordered()
+            ->get();
+        $vehicleRows = $this->vehicleRows($branch, $period);
+        $vehicleQuestions = Question::query()
+            ->where('target_type', Question::TARGET_VEHICLE)
             ->where('answer_type', Question::TYPE_RATING)
             ->active()
             ->ordered()
@@ -135,6 +181,38 @@ class OperationalMonitoringService
 
                 return $row;
             }),
+            'vehicle_questions' => $vehicleQuestions,
+            'vehicle_rows' => $vehicleRows->map(function (array $row) use ($vehicleQuestions) {
+                $breakdown = $this->questionBreakdown($row['ratings'], Question::TARGET_VEHICLE)->keyBy('question_id');
+                $row['report_scores'] = $vehicleQuestions->mapWithKeys(fn (Question $question) => [
+                    $question->id => isset($breakdown[$question->id])
+                        ? round($breakdown[$question->id]['percentage'] / 10, 1)
+                        : null,
+                ]);
+
+                return $row;
+            }),
+        ];
+    }
+
+    public function driverReport(Branch $branch, Driver $driver, CarbonImmutable $period): array
+    {
+        return [
+            'type' => 'driver',
+            'branch' => $branch,
+            'period' => $period,
+            'detail' => $this->driverDetail($branch, $driver, $period),
+            'related_vehicles' => $this->vehicleRows($branch, $period, $driver->id),
+        ];
+    }
+
+    public function vehicleReport(Branch $branch, Vehicle $vehicle, CarbonImmutable $period): array
+    {
+        return [
+            'type' => 'vehicle',
+            'branch' => $branch,
+            'period' => $period,
+            'detail' => $this->vehicleDetail($branch, $vehicle, $period),
         ];
     }
 
@@ -157,6 +235,23 @@ class OperationalMonitoringService
                 ? round(($driverScore * 0.9) + ($attendanceScore * 0.1), 2)
                 : null,
             'is_complete' => $attendance !== null && $attendance->totalDays() === $workingDays,
+        ];
+    }
+
+    private function vehicleRow(Vehicle $vehicle, Collection $ratings): array
+    {
+        $ratings = $ratings->sortByDesc('submitted_at')->values();
+        $drivers = $ratings->pluck('driver')->filter()->unique('id')->values();
+
+        return [
+            'vehicle' => $vehicle,
+            'ratings' => $ratings,
+            'rating_count' => $ratings->count(),
+            'driver_count' => $drivers->count(),
+            'drivers' => $drivers,
+            'latest_rating' => $ratings->first(),
+            'vehicle_score' => $this->weightedScore($ratings, Question::TARGET_VEHICLE),
+            'has_ratings' => $ratings->isNotEmpty(),
         ];
     }
 
@@ -222,6 +317,23 @@ class OperationalMonitoringService
                 $period->endOfMonth()->endOfDay()->utc(),
             ])
             ->with(['vehicle', 'answers.question.indicatorCategory'])
+            ->get();
+    }
+
+    private function vehicleRatings(CarbonImmutable $period, Collection $vehicleIds, ?int $driverId = null): Collection
+    {
+        if ($vehicleIds->isEmpty()) {
+            return collect();
+        }
+
+        return Rating::query()
+            ->whereIn('vehicle_id', $vehicleIds)
+            ->when($driverId, fn (Builder $query) => $query->where('driver_id', $driverId))
+            ->whereBetween('submitted_at', [
+                $period->utc(),
+                $period->endOfMonth()->endOfDay()->utc(),
+            ])
+            ->with(['driver.employeeCategory', 'vehicle', 'answers.question.indicatorCategory'])
             ->get();
     }
 

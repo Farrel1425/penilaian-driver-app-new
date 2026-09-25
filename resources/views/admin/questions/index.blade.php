@@ -8,7 +8,7 @@
                 <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
                 @if (request()->filled('search') || request()->filled('target_type') || request()->filled('answer_type') || request()->filled('status'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.questions.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
                 <a class="secondary-button master-secondary-action" href="{{ route('admin.questions.index', ['reorder' => 1]) }}"><x-lucide-grip-vertical aria-hidden="true" /><span>Urutkan</span></a>
-                <a class="primary-button master-create-button" href="{{ route('admin.questions.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
+                <a class="primary-button master-create-button" href="{{ route('admin.questions.create') }}" title="Tambah pertanyaan" aria-label="Tambah pertanyaan"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
             </form>
         </x-slot:pageActions>
     @endif

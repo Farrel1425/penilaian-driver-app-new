@@ -16,6 +16,7 @@
         .monitoring-document h2 { font-size: 11px; margin: 8px 0 3px; text-transform: uppercase; }
         .monitoring-document > header p { color: #5b5f5e; font-size: 6px; margin: 0; }
         .monitoring-document-table-wrap { width: 100%; }
+        .monitoring-document-section-title { font-size: 8px; margin: 16px 0 5px; }
         table { border-collapse: collapse; table-layout: fixed; width: 100%; }
         .monitoring-document-matrix { border: .7px solid #191c1b; }
         .monitoring-document-matrix thead { display: table-header-group; }

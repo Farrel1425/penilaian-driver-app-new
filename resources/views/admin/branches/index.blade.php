@@ -5,7 +5,7 @@
             <label><span>STATUS</span><select name="status" onchange="this.form.requestSubmit()" aria-label="Filter status"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select></label>
             <label><span>KELENGKAPAN</span><select name="completeness" onchange="this.form.requestSubmit()" aria-label="Filter kelengkapan data"><option value="">Semua Data</option><option value="complete" @selected(request('completeness') === 'complete')>Lengkap</option><option value="incomplete" @selected(request('completeness') === 'incomplete')>Belum Lengkap</option></select></label>
             @if (request()->filled('search') || request()->filled('status') || request()->filled('completeness'))<a class="secondary-button assessment-reset-button" href="{{ route('admin.branches.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>@endif
-            <a class="primary-button master-create-button" href="{{ route('admin.branches.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Unit</span></a>
+            <a class="primary-button master-create-button" href="{{ route('admin.branches.create') }}" title="Tambah unit kerja" aria-label="Tambah unit kerja"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
         </form>
     </x-slot:pageActions>
 

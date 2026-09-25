@@ -7,7 +7,7 @@
                 <label class="sr-only" for="user-status">Status</label>
                 <select id="user-status" name="status" onchange="this.form.submit()"><option value="">Semua Status</option><option value="active" @selected(request('status') === 'active')>Aktif</option><option value="inactive" @selected(request('status') === 'inactive')>Nonaktif</option></select>
             </form>
-            <a href="{{ route('admin.users.create') }}" class="primary-button vehicle-create-button"><x-lucide-plus aria-hidden="true" /> Tambah Admin</a>
+            <a href="{{ route('admin.users.create') }}" class="primary-button vehicle-create-button" title="Tambah pengguna" aria-label="Tambah pengguna"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
         </div>
         <div class="user-table-scroll">
             <table class="user-list-table">

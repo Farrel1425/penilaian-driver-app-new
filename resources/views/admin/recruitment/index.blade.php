@@ -2,8 +2,8 @@
     <x-slot:pageDescription>Kelola gelombang, lowongan, cabang penempatan, dan proses pelamar dalam satu halaman.</x-slot:pageDescription>
     <x-slot:pageActions>
         <div class="recruitment-heading-actions">
-            <button class="secondary-button" type="button" data-period-create><x-lucide-calendar-plus aria-hidden="true" /><span>Tambah Gelombang</span></button>
-            <button class="primary-button master-create-button" type="button" data-vacancy-create @disabled($periods->isEmpty())><x-lucide-plus aria-hidden="true" /><span>Tambah Lowongan</span></button>
+            <button class="secondary-button" type="button" data-period-create title="Tambah gelombang" aria-label="Tambah gelombang"><x-lucide-calendar-plus aria-hidden="true" /><span>Tambah</span></button>
+            <button class="primary-button master-create-button" type="button" data-vacancy-create title="Tambah lowongan" aria-label="Tambah lowongan" @disabled($periods->isEmpty())><x-lucide-plus aria-hidden="true" /><span>Tambah</span></button>
         </div>
     </x-slot:pageActions>
 

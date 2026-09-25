@@ -4,10 +4,11 @@
             <span>KODE FORMULIR: MON-{{ $report['branch']->code }}-{{ $period->format('Ym') }}</span>
             <span>DOKUMEN MONITORING OPERASIONAL</span>
         </div>
-        <h2>MONITORING TENAGA ALIH DAYA DRIVER {{ strtoupper($report['branch']->name) }} {{ strtoupper($period->translatedFormat('F Y')) }}</h2>
+        <h2>MONITORING DRIVER &amp; KENDARAAN {{ strtoupper($report['branch']->name) }} {{ strtoupper($period->translatedFormat('F Y')) }}</h2>
         <p>Wilayah Operasional: {{ $report['branch']->name }}</p>
     </header>
 
+    <h3 class="monitoring-document-section-title">PENILAIAN DRIVER</h3>
     <div class="monitoring-document-table-wrap">
         <table class="monitoring-document-matrix">
             <colgroup>
@@ -52,6 +53,33 @@
                     <tr><td colspan="{{ 5 + $report['questions']->count() }}">Belum ada driver aktif pada unit kerja ini.</td></tr>
                 @endforelse
             </tbody>
+        </table>
+    </div>
+
+    <h3 class="monitoring-document-section-title">PENILAIAN KENDARAAN</h3>
+    <div class="monitoring-document-table-wrap">
+        <table class="monitoring-document-matrix monitoring-vehicle-matrix">
+            <thead>
+                <tr class="monitoring-category-row">
+                    <th rowspan="2" width="4%">No</th>
+                    <th rowspan="2" width="16%">Nomor Polisi</th>
+                    <th rowspan="2" width="19%">Kendaraan</th>
+                    <th rowspan="2" width="10%">Penilaian</th>
+                    <th rowspan="2" width="10%">Driver</th>
+                    @if($report['vehicle_questions']->isNotEmpty())
+                        <th colspan="{{ $report['vehicle_questions']->count() }}">Penilaian Kendaraan</th>
+                    @endif
+                    <th rowspan="2" width="9%" class="monitoring-final-heading">Nilai</th>
+                </tr>
+                @if($report['vehicle_questions']->isNotEmpty())
+                    <tr class="monitoring-indicator-row">
+                        @foreach($report['vehicle_questions'] as $question)
+                            <th><span>{{ $question->indicator ?: str($question->question)->limit(42) }}</span></th>
+                        @endforeach
+                    </tr>
+                @endif
+            </thead>
+            <tbody>@forelse($report['vehicle_rows'] as $row)<tr><td>{{ $loop->iteration }}</td><td>{{ $row['vehicle']->police_number }}</td><td>{{ trim($row['vehicle']->brand.' '.$row['vehicle']->model) ?: '-' }}</td><td>{{ $row['rating_count'] }}</td><td>{{ $row['driver_count'] }}</td>@foreach($report['vehicle_questions'] as $question)<td>{{ isset($row['report_scores'][$question->id]) ? number_format($row['report_scores'][$question->id], 1) : '-' }}</td>@endforeach<td class="monitoring-final-value">{{ $row['vehicle_score'] !== null ? number_format($row['vehicle_score'], 1) : '-' }}</td></tr>@empty<tr><td colspan="{{ 6 + $report['vehicle_questions']->count() }}">Belum ada kendaraan aktif pada unit kerja ini.</td></tr>@endforelse</tbody>
         </table>
     </div>
 

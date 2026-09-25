@@ -214,6 +214,80 @@ class OperationalMonitoringTest extends TestCase
             ->assertSee('onchange="this.form.requestSubmit()"', false);
     }
 
+    public function test_vehicle_monitoring_uses_only_vehicle_questions_and_selected_period(): void
+    {
+        $admin = User::factory()->create();
+        [$branch, $driver] = $this->makeDriver();
+        $vehicle = Vehicle::factory()->for($branch)->create(['police_number' => 'DK 1234 MON']);
+        $vehicleQuestion = Question::factory()->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_RATING, 'weight' => 100]);
+        $driverQuestion = Question::factory()->create(['target_type' => Question::TARGET_DRIVER, 'answer_type' => Question::TYPE_RATING, 'weight' => 100]);
+        $rating = Rating::factory()->for($branch)->for($driver)->for($vehicle)->create(['submitted_at' => '2026-09-12 10:00:00']);
+        $rating->answers()->create(['question_id' => $vehicleQuestion->id, 'answer_value' => [4]]);
+        $rating->answers()->create(['question_id' => $driverQuestion->id, 'answer_value' => [1]]);
+        Rating::factory()->for($branch)->for($driver)->for($vehicle)->create(['submitted_at' => '2026-08-12 10:00:00']);
+
+        $this->actingAs($admin)
+            ->get(route('admin.monitoring.show', [$branch, 'target' => 'vehicle', 'period' => '2026-09']))
+            ->assertOk()
+            ->assertSee('DK 1234 MON')
+            ->assertSee('80.0')
+            ->assertSee('Total Penilaian');
+
+        $report = app(OperationalMonitoringService::class)->reportRows($branch, app(OperationalMonitoringService::class)->period('2026-09'));
+        $this->assertSame(80.0, $report['vehicle_rows']->first()['vehicle_score']);
+        $this->assertSame(1, $report['vehicle_rows']->first()['rating_count']);
+    }
+
+    public function test_combined_report_and_individual_exports_are_available(): void
+    {
+        $admin = User::factory()->create();
+        [$branch, $driver] = $this->makeDriver();
+        $vehicle = Vehicle::factory()->for($branch)->create(['police_number' => 'DK 9999 PDF']);
+        $question = Question::factory()->create(['target_type' => Question::TARGET_VEHICLE, 'answer_type' => Question::TYPE_RATING]);
+        $rating = Rating::factory()->for($branch)->for($driver)->for($vehicle)->create(['submitted_at' => '2026-09-10 10:00:00']);
+        $rating->answers()->create(['question_id' => $question->id, 'answer_value' => [5]]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.monitoring.branch.report', [$branch, 'period' => '2026-09']))
+            ->assertOk()
+            ->assertSee('MONITORING DRIVER &amp; KENDARAAN', false)
+            ->assertSee('PENILAIAN DRIVER')
+            ->assertSee('PENILAIAN KENDARAAN')
+            ->assertSee('monitoring-vehicle-matrix', false)
+            ->assertSee('monitoring-indicator-row', false)
+            ->assertSee('DK 9999 PDF');
+
+        $this->get(route('admin.monitoring.driver.export', [$branch, $driver, 'period' => '2026-09']))
+            ->assertOk()->assertHeader('content-type', 'application/pdf');
+        $this->get(route('admin.monitoring.vehicle.export', [$branch, $vehicle, 'period' => '2026-09']))
+            ->assertOk()->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_driver_vehicle_association_comes_from_ratings_in_selected_period(): void
+    {
+        [$branch, $driver] = $this->makeDriver();
+        $currentVehicle = Vehicle::factory()->for($branch)->create();
+        $oldVehicle = Vehicle::factory()->for($branch)->create();
+        Rating::factory()->for($branch)->for($driver)->for($currentVehicle)->create(['submitted_at' => '2026-09-10 10:00:00']);
+        Rating::factory()->for($branch)->for($driver)->for($oldVehicle)->create(['submitted_at' => '2026-08-10 10:00:00']);
+        $monitoring = app(OperationalMonitoringService::class);
+
+        $report = $monitoring->driverReport($branch, $driver, $monitoring->period('2026-09'));
+
+        $this->assertSame([$currentVehicle->id], $report['related_vehicles']->pluck('vehicle.id')->all());
+    }
+
+    public function test_branch_admin_cannot_access_other_branch_vehicle_monitoring(): void
+    {
+        [$ownBranch] = $this->makeDriver();
+        [$otherBranch] = $this->makeDriver();
+        $vehicle = Vehicle::factory()->for($otherBranch)->create();
+        $admin = User::factory()->create(['role' => User::ROLE_BRANCH_ADMIN, 'branch_id' => $ownBranch->id]);
+
+        $this->actingAs($admin)->get(route('admin.monitoring.vehicle', [$otherBranch, $vehicle]))->assertForbidden();
+        $this->get(route('admin.monitoring.vehicle.export', [$otherBranch, $vehicle]))->assertForbidden();
+    }
+
     private function makeDriver(): array
     {
         $branch = Branch::factory()->create();

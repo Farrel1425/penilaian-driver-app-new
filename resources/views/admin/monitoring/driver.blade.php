@@ -1,5 +1,5 @@
 <x-layouts.admin title="Preview Penilaian">
-    <x-slot:pageActions><a class="secondary-button" href="{{ route('admin.monitoring.show', [$branch, 'period' => $period->format('Y-m')]) }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a></x-slot>
+    <x-slot:pageActions><div class="monitoring-report-actions"><a class="secondary-button" href="{{ route('admin.monitoring.show', [$branch, 'period' => $period->format('Y-m'), 'target' => 'driver']) }}"><x-lucide-arrow-left aria-hidden="true" /><span>Kembali</span></a><a class="primary-button" data-no-loading href="{{ route('admin.monitoring.driver.export', [$branch, $driver, 'period' => $period->format('Y-m')]) }}"><x-lucide-download aria-hidden="true" /><span>Download</span></a></div></x-slot>
 
     @php
         $grade = match (true) {

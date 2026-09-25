@@ -39,7 +39,7 @@
             @if (request()->filled('search') || request()->filled('branch_id') || request()->filled('employee_category_id') || request()->filled('status') || request()->filled('completeness'))
                 <a class="secondary-button assessment-reset-button" href="{{ route('admin.employees.index') }}" title="Reset filter" aria-label="Reset filter"><x-lucide-rotate-ccw aria-hidden="true" /><span>Reset</span></a>
             @endif
-            <a class="primary-button master-create-button" href="{{ route('admin.employees.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
+            <a class="primary-button master-create-button" href="{{ route('admin.employees.create') }}" title="Tambah pegawai" aria-label="Tambah pegawai"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a>
         </form>
     </x-slot:pageActions>
 

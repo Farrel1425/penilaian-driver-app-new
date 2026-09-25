@@ -80,6 +80,9 @@ Route::middleware(['auth', 'active.admin', 'admin.inactivity', LogAdminActivity:
             Route::get('penilaian/monitoring/{branch}/report', [OperationalMonitoringController::class, 'report'])->name('monitoring.branch.report');
             Route::get('penilaian/monitoring/{branch}/export', [OperationalMonitoringController::class, 'export'])->name('monitoring.branch.export');
             Route::get('penilaian/monitoring/{branch}/drivers/{driver}', [OperationalMonitoringController::class, 'driver'])->name('monitoring.driver');
+            Route::get('penilaian/monitoring/{branch}/drivers/{driver}/export', [OperationalMonitoringController::class, 'exportDriver'])->name('monitoring.driver.export');
+            Route::get('penilaian/monitoring/{branch}/vehicles/{vehicle}', [OperationalMonitoringController::class, 'vehicle'])->name('monitoring.vehicle');
+            Route::get('penilaian/monitoring/{branch}/vehicles/{vehicle}/export', [OperationalMonitoringController::class, 'exportVehicle'])->name('monitoring.vehicle.export');
             Route::post('penilaian/monitoring/{branch}/drivers/{driver}/attendance', [OperationalMonitoringController::class, 'storeAttendance'])->name('monitoring.attendance.store');
             Route::get('reports/drivers', ReportDriverController::class)->name('reports.drivers');
             Route::get('reports/vehicles', ReportVehicleController::class)->name('reports.vehicles');

@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Driver;
 use App\Models\DriverAttendance;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Services\Admin\OperationalMonitoringService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -22,18 +23,22 @@ class OperationalMonitoringController extends Controller
     {
         $period = $monitoring->period($request->string('period')->value());
         $rows = $monitoring->branchRows($period, $this->scopedBranchId($request));
+        $target = $this->target($request);
         $search = $request->string('search')->trim()->lower()->value();
         $status = $request->string('status')->value();
 
         $rows = $rows
             ->when($search, fn (Collection $items) => $items->filter(fn (array $row) => str($row['branch']->code.' '.$row['branch']->name.' '.$row['branch']->regency)->lower()->contains($search)))
-            ->when(in_array($status, ['complete', 'incomplete'], true), fn (Collection $items) => $items->filter(fn (array $row) => $row['is_complete'] === ($status === 'complete')))
+            ->when(in_array($status, ['complete', 'incomplete'], true), fn (Collection $items) => $items->filter(
+                fn (array $row) => $row[$target === 'vehicle' ? 'is_vehicle_complete' : 'is_complete'] === ($status === 'complete')
+            ))
             ->values();
 
         return view('admin.monitoring.index', [
             'period' => $period,
             'rows' => $this->paginate($rows, $request, 9),
             'status' => $status,
+            'target' => $target,
         ]);
     }
 
@@ -41,11 +46,16 @@ class OperationalMonitoringController extends Controller
     {
         $this->authorizeBranch($request, $branch);
         $period = $monitoring->period($request->string('period')->value());
-        $rows = $monitoring->driverRows($branch, $period);
+        $target = $this->target($request);
+        $rows = $target === 'vehicle'
+            ? $monitoring->vehicleRows($branch, $period)
+            : $monitoring->driverRows($branch, $period);
         $status = $request->string('status')->value();
 
         $rows = $rows
-            ->when(in_array($status, ['complete', 'incomplete'], true), fn (Collection $items) => $items->filter(fn (array $row) => $row['is_complete'] === ($status === 'complete')))
+            ->when(in_array($status, ['complete', 'incomplete'], true), fn (Collection $items) => $items->filter(
+                fn (array $row) => $row[$target === 'vehicle' ? 'has_ratings' : 'is_complete'] === ($status === 'complete')
+            ))
             ->values();
 
         return view('admin.monitoring.show', [
@@ -54,6 +64,7 @@ class OperationalMonitoringController extends Controller
             'rows' => $this->paginate($rows, $request, 10),
             'status' => $status,
             'workingDays' => $monitoring->workingDays($period),
+            'target' => $target,
         ]);
     }
 
@@ -66,6 +77,41 @@ class OperationalMonitoringController extends Controller
             'period' => $period,
             ...$monitoring->driverDetail($branch, $driver, $period),
         ]);
+    }
+
+    public function vehicle(Request $request, Branch $branch, Vehicle $vehicle, OperationalMonitoringService $monitoring): View
+    {
+        $this->authorizeVehicle($request, $branch, $vehicle);
+        $period = $monitoring->period($request->string('period')->value());
+
+        return view('admin.monitoring.vehicle', [
+            'period' => $period,
+            ...$monitoring->vehicleDetail($branch, $vehicle, $period),
+        ]);
+    }
+
+    public function exportDriver(Request $request, Branch $branch, Driver $driver, OperationalMonitoringService $monitoring)
+    {
+        $this->authorizeDriver($request, $branch, $driver);
+        $period = $monitoring->period($request->string('period')->value());
+        $report = $monitoring->driverReport($branch, $driver, $period);
+        $filename = str('monitoring-driver-'.$driver->full_name.'-'.$period->format('Y-m'))->slug().'.pdf';
+
+        return Pdf::loadView('admin.monitoring.individual-pdf', compact('report'))
+            ->setPaper('a4', 'portrait')
+            ->download($filename);
+    }
+
+    public function exportVehicle(Request $request, Branch $branch, Vehicle $vehicle, OperationalMonitoringService $monitoring)
+    {
+        $this->authorizeVehicle($request, $branch, $vehicle);
+        $period = $monitoring->period($request->string('period')->value());
+        $report = $monitoring->vehicleReport($branch, $vehicle, $period);
+        $filename = str('monitoring-kendaraan-'.$vehicle->police_number.'-'.$period->format('Y-m'))->slug().'.pdf';
+
+        return Pdf::loadView('admin.monitoring.individual-pdf', compact('report'))
+            ->setPaper('a4', 'portrait')
+            ->download($filename);
     }
 
     public function storeAttendance(Request $request, Branch $branch, Driver $driver, OperationalMonitoringService $monitoring): RedirectResponse
@@ -156,6 +202,21 @@ class OperationalMonitoringController extends Controller
     {
         $this->authorizeBranch($request, $branch);
         abort_unless($driver->branch_id === $branch->id && $driver->newQuery()->whereKey($driver->getKey())->eligibleForAssessment()->exists(), 404);
+    }
+
+    private function authorizeVehicle(Request $request, Branch $branch, Vehicle $vehicle): void
+    {
+        $this->authorizeBranch($request, $branch);
+        abort_unless(
+            $vehicle->branch_id === $branch->id
+                && $vehicle->newQuery()->whereKey($vehicle->getKey())->active()->exists(),
+            404,
+        );
+    }
+
+    private function target(Request $request): string
+    {
+        return $request->string('target')->value() === 'vehicle' ? 'vehicle' : 'driver';
     }
 
     private function paginate(Collection $items, Request $request, int $perPage): LengthAwarePaginator

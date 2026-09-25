@@ -1,5 +1,5 @@
 <x-layouts.admin title="Periode Recruitment">
-    <x-slot:pageActions><a class="primary-button master-create-button" href="{{ route('admin.recruitment-periods.create') }}"><x-lucide-plus aria-hidden="true" /><span>Tambah Periode</span></a></x-slot:pageActions>
+    <x-slot:pageActions><a class="primary-button master-create-button" href="{{ route('admin.recruitment-periods.create') }}" title="Tambah periode" aria-label="Tambah periode"><x-lucide-plus aria-hidden="true" /><span>Tambah</span></a></x-slot:pageActions>
     <section class="branch-list-card master-table-card">
         <div class="table-wrap">
             <table class="data-table recruitment-admin-table">
